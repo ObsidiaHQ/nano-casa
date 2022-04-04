@@ -1,0 +1,176 @@
+<div class="container my-5">
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <h3 class="mb-5">Monitoring open source development in the nano ecosystem.</h3>
+      <p class="fw-light font-italic">
+        Keep in mind that due to the financial use cases of the <a href="https://nano.org" target="_blank">nano</a> protocol, businesses and
+        startups are more likely to be secretive about their projects.
+        These charts are only an indicator of open source activity, not the nano ecosystem in general. <br>
+        P.S.: Many repos don't have any topics assigned and are therefore left out of the statistics. If you're a maintainer of a nano-related repo, make sure to tag it to help keep the data as accurate as possible!
+      </p>
+      <p>
+        Repos being tracked have the following topics:
+        <span class="badge rounded-pill bg-primary mx-1">nanocurrency</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano + cryptocurrency</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano + crypto</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano-currency</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano-cryptocurrency</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-6 col-md-3">
+      <div class="card my-2 card-sm">
+        <ng-container *ngIf="!uniqueRepos.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="uniqueRepos.length">
+          <div class="card-body">
+            <h5 class="pt-1"><span class="mx-2"><fa-icon [icon]="faRepo"></fa-icon></span>repos</h5>
+            <h5 class="mb-0">{{uniqueRepos.length}}</h5>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card my-2 card-sm">
+        <ng-container *ngIf="!uniqueRepos.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="uniqueRepos.length">
+          <div class="card-body">
+            <h5 class="pt-1"><span class="mx-2"><fa-icon [icon]="faHistory"></fa-icon></span>latest repo</h5>
+            <h5 class="mb-0"><a [href]="uniqueRepos[uniqueRepos.length-1].html_url">{{uniqueRepos[uniqueRepos.length-1].name}}</a></h5>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card my-2 card-sm">
+        <ng-container *ngIf="!contributors.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="contributors.length">
+          <div class="card-body">
+            <h5 class="pt-1"><span class="mx-2"><fa-icon [icon]="faUser" class="mr-2"></fa-icon></span>contributors</h5>
+            <h5 class="mb-0">{{contributors.length}}</h5>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-8">
+      <div class="card my-2">
+        <ng-container *ngIf="!reposData.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="reposData.length">
+          <div class="card-body">
+            <div class="card-title">
+              <h5>repos created by year</h5>
+            </div>
+            <div style="flex:auto; min-width: 0;">
+              <div class="chart" style="width: 100%; height: 410px">
+                <ngx-charts-bar-vertical [xAxis]="true" [yAxis]="true" [results]="reposData" scheme="solar" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
+                </ngx-charts-bar-vertical>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="card my-2">
+        <ng-container *ngIf="!popularRepos.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="popularRepos.length">
+          <div class="card-body">
+            <div class="card-title">
+              <h5>most popular repos</h5>
+            </div>
+            <ul class="list-group" id="popular-repos">
+              <li *ngFor="let repo of popularRepos" class="list-group-item">
+                <a [href]="repo.html_url" target="_blank">
+                  {{repo.name}}
+                </a>
+                <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
+              </li>
+            </ul>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card my-2">
+      <ng-container *ngIf="!contributors.length">
+        <div class="spinner-grow text-secondary align-self-center" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="contributors.length">
+        <div class="card-body">
+          <div class="card-title">
+            <h5>contributions by user</h5>
+          </div>
+          <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">contributor</th>
+                <th scope="col">total contributions</th>
+                <th scope="col"># of repos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let contrib of contributors | slice:0:50; let i = index;">
+                <td scope="row" class="pt-3">{{i+1}}</td>
+                <td>
+                  <img [src]="contrib.profile.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
+                  <a [href]="contrib.profile.html_url">{{contrib.profile.login}}</a>
+                </td>
+                <td class="pt-3">{{contrib.total_contribs | number}}</td>
+                <td class="pt-3">{{contrib.repos_involved}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+      </ng-container>
+    </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-2 card-sm pt-3">
+        <div class="card-body">
+          <a href="https://twitter.com/GeorgeMamar" target="_blank" class="mx-3">twitter updates</a>
+          <a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="mx-3">source</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
