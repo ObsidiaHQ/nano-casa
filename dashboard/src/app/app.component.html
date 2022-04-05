@@ -21,17 +21,17 @@
   </div>
 
   <div class="row mb-3">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-2">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!uniqueRepos.length">
+        <ng-container *ngIf="!data.repos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="uniqueRepos.length">
+        <ng-container *ngIf="data.repos.length">
           <div class="card-body">
-            <h5 class="pt-1"><span class="mx-2"><fa-icon [icon]="faRepo"></fa-icon></span>repos</h5>
-            <h5 class="mb-0">{{uniqueRepos.length}}</h5>
+            <h5 class="pt-1">repos</h5>
+            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faRepo"></fa-icon></span>{{data.repos.length}}</h5>
           </div>
         </ng-container>
       </div>
@@ -39,15 +39,18 @@
 
     <div class="col-6 col-md-3">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!uniqueRepos.length">
+        <ng-container *ngIf="!data.repos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="uniqueRepos.length">
+        <ng-container *ngIf="data.repos.length">
           <div class="card-body">
-            <h5 class="pt-1"><span class="mx-2"><fa-icon [icon]="faHistory"></fa-icon></span>latest repo</h5>
-            <h5 class="mb-0"><a [href]="uniqueRepos[uniqueRepos.length-1].html_url">{{uniqueRepos[uniqueRepos.length-1].name}}</a></h5>
+            <h5 class="pt-1">latest repo</h5>
+            <h5 class="mb-0">
+              <span class="me-3"><fa-icon [icon]="faHistory"></fa-icon></span>
+              <a [href]="'https://github.com/' + data.repos[data.repos.length-1].full_name">{{data.repos[data.repos.length-1].name}}</a>
+            </h5>
           </div>
         </ng-container>
       </div>
@@ -55,15 +58,39 @@
 
     <div class="col-6 col-md-3">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!contributors.length">
+        <ng-container *ngIf="!data.contributors.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="contributors.length">
+        <ng-container *ngIf="data.contributors.length">
           <div class="card-body">
-            <h5 class="pt-1"><span class="mx-2"><fa-icon [icon]="faUser" class="mr-2"></fa-icon></span>contributors</h5>
-            <h5 class="mb-0">{{contributors.length}}</h5>
+            <h5 class="pt-1">contributors</h5>
+            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faUser" class="mr-2"></fa-icon></span>{{data.contributors.length}}</h5>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <div class="card my-2 card-sm">
+        <ng-container *ngIf="!data.contributors.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="data.contributors.length">
+          <div class="card-body">
+            <h5 class="pt-1">V24 progress</h5>
+            <div class="progress">
+              <div class="progress-bar bg-warning" role="progressbar" 
+                [ngStyle]="{width: data.misc.protocol_milestone.closed_issues*100/(data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues)+'%' }"
+                [attr.aria-valuenow]="data.misc.protocol_milestone.closed_issues" 
+                [attr.aria-valuemin]="0" 
+                [attr.aria-valuemax]="data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues">
+                <span style="height: 16px;">{{data.misc.protocol_milestone.closed_issues}}/{{data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues}}</span>
+              </div>
+            </div>
           </div>
         </ng-container>
       </div>
@@ -106,9 +133,9 @@
             <div class="card-title">
               <h5>most popular repos</h5>
             </div>
-            <ul class="list-group" id="popular-repos">
+            <ul class="list-group">
               <li *ngFor="let repo of popularRepos" class="list-group-item">
-                <a [href]="repo.html_url" target="_blank">
+                <a [href]="'https://github.com/' + repo.full_name" target="_blank">
                   {{repo.name}}
                 </a>
                 <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
@@ -123,12 +150,37 @@
   <div class="row mb-3">
     <div class="col-12">
       <div class="card my-2">
-      <ng-container *ngIf="!contributors.length">
+        <ng-container *ngIf="!data.commits[0].series.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="data.commits[0].series.length">
+          <div class="card-body">
+            <div class="card-title">
+              <h5>weekly activity</h5>
+            </div>
+            <div style="flex:auto; min-width: 0;">
+              <div class="chart" style="width: 100%; height: 410px">
+                <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="data.commits" scheme="natural" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
+                </ngx-charts-area-chart>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card my-2">
+      <ng-container *ngIf="!data.contributors.length">
         <div class="spinner-grow text-secondary align-self-center" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
       </ng-container>
-      <ng-container *ngIf="contributors.length">
+      <ng-container *ngIf="data.contributors.length">
         <div class="card-body">
           <div class="card-title">
             <h5>contributions by user</h5>
@@ -144,13 +196,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let contrib of contributors | slice:0:50; let i = index;">
+              <tr *ngFor="let contrib of data.contributors | slice:0:50; let i = index;">
                 <td scope="row" class="pt-3">{{i+1}}</td>
                 <td>
-                  <img [src]="contrib.profile.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
-                  <a [href]="contrib.profile.html_url">{{contrib.profile.login}}</a>
+                  <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
+                  <a [href]="'https://github.com/' + contrib.login">{{contrib.login}}</a>
                 </td>
-                <td class="pt-3">{{contrib.total_contribs | number}}</td>
+                <td class="pt-3">{{contrib.contributions | number}}</td>
                 <td class="pt-3">{{contrib.repos_involved}}</td>
               </tr>
             </tbody>

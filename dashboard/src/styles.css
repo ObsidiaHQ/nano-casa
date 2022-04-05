@@ -100,3 +100,6 @@ a:hover {
 .ngx-charts .gridline-path {
     stroke: var(--border-light) !important;
 }
+.progress {
+    background-color: var(--bg-darker);
+}
