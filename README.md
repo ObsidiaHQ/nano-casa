@@ -4,6 +4,8 @@ Monitoring open source development in the nano ecosystem.
 ## Roadmap
 - [x] repos chart
 - [x] contributors list
-- [ ] commits activity chart
+- [x] commits activity chart
+- [ ] pagination
+- [ ] active last week/month
 
-<img src="https://i.imgur.com/2e7plWI.png">
+<img src="https://i.imgur.com/n5sUzXl.png">

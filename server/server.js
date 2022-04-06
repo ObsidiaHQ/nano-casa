@@ -1,11 +1,14 @@
-const express = require('express');
-const cors = require('cors');
-const compression = require('compression');
-const path = require('path');
+const express =      require('express');
+const cors =         require('cors');
+const compression =  require('compression');
+const cron =         require('node-cron');
+const path =         require('path');
 const { Octokit } =  require('octokit');
-const octo = new Octokit();
-const mongoose = require('mongoose');
-mongoose.connect('');
+const mongoose =     require('mongoose');
+const rateLimit =    require('express-rate-limit');
+require('dotenv').config();
+const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
+mongoose.connect(process.env.DB_URL);
 
 const Repo = mongoose.model('Repo', new mongoose.Schema({
     name:             String,
@@ -32,11 +35,19 @@ const Misc = mongoose.model('Misc', new mongoose.Schema({
     }
 }));
 
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 const app = express();
 app.use(cors());
 app.use(compression());
+app.use(limiter);
 
-const build_path = '../dashboard/dist/nano-casa';
+const build_path = './nano-casa';
 app.use(express.static(path.join(__dirname, build_path)));
 
 app.all('/', function (req, res) {
@@ -78,6 +89,13 @@ app.listen(8080, function() {
     console.log("server running at http://localhost:8080");
 });
 
+cron.schedule('30 * * * *', async () => {
+    await refreshRepos();
+    refreshMisc();
+    refreshContributors();
+    refreshCommits();
+});
+
 async function refreshMisc() {
     const milestones = (await octo.request('GET /repos/nanocurrency/nano-node/milestones')).data;
     const open = milestones.filter(m => m.state == 'open').sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)));
@@ -90,6 +108,7 @@ async function refreshMisc() {
             closed_issues: latest[0]?.closed_issues || open[0]?.closed_issues || 0
         }
     });
+    await Misc.collection.drop();
     await Misc.create(normalized);
 }
 
@@ -118,7 +137,7 @@ async function refreshRepos() {
         while (!foundAll) {
             queries[i].repos = (await octo.request('GET /search/repositories', { q: queries[i].topic, per_page: 100, page: page })).data.items;
 
-            foundAll = activity.length < 100;
+            foundAll = queries[i].repos.length < 100;
             if (!foundAll) page++;
         }
     }    
@@ -128,6 +147,7 @@ async function refreshRepos() {
     }, new Set);
 
     const normalized = uniqueRepos.map(({ id, name, full_name, html_url,created_at, stargazers_count }) => new Repo({ id, name, full_name, html_url,created_at, stargazers_count }));
+    await Repo.collection.drop();
     await Repo.create(normalized);
 }
 
@@ -148,6 +168,7 @@ async function refreshCommits() {
     }
 
     const normalized = all.map((commit) => new Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
+    await Commit.collection.drop();
     await Commit.create(normalized);
 }
 
@@ -161,7 +182,7 @@ async function refreshContributors() {
             const repoContributors = (await octo.request(`GET /repos/${repos[i].full_name}/contributors`, { per_page: 100, page: page })).data;
             all = [...all, ...repoContributors];
 
-            foundAll = activity.length < 100;
+            foundAll = repoContributors.length < 100;
             if (!foundAll) page++;
         }
     }
@@ -179,5 +200,6 @@ async function refreshContributors() {
             repos_involved: all.filter(c => c.login === login).length
         }
     ));
+    await Contributor.collection.drop();
     await Contributor.create(normalized);
 }

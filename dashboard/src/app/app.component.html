@@ -2,7 +2,8 @@
 
   <div class="row mb-3">
     <div class="col-12">
-      <h3 class="mb-5">Monitoring open source development in the nano ecosystem.</h3>
+      <h3>Monitoring open source development in the nano ecosystem.</h3>
+      <small class="mb-5 d-block">updated hourly</small>
       <p class="fw-light font-italic">
         Keep in mind that due to the financial use cases of the <a href="https://nano.org" target="_blank">nano</a> protocol, businesses and
         startups are more likely to be secretive about their projects.
@@ -12,10 +13,10 @@
       <p>
         Repos being tracked have the following topics:
         <span class="badge rounded-pill bg-primary mx-1">nanocurrency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano + cryptocurrency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano + crypto</span>
         <span class="badge rounded-pill bg-primary mx-1">nano-currency</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano + cryptocurrency</span>
         <span class="badge rounded-pill bg-primary mx-1">nano-cryptocurrency</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano + crypto</span>
       </p>
     </div>
   </div>
@@ -81,7 +82,7 @@
         </ng-container>
         <ng-container *ngIf="data.contributors.length">
           <div class="card-body">
-            <h5 class="pt-1">V24 progress</h5>
+            <h5 class="pt-1">{{data.misc.protocol_milestone.title}} progress</h5>
             <div class="progress">
               <div class="progress-bar bg-warning" role="progressbar" 
                 [ngStyle]="{width: data.misc.protocol_milestone.closed_issues*100/(data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues)+'%' }"

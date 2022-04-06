@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
     }
 
     getData(): void {
-        this.http.get('http://localhost:8080/data').subscribe((data: any) => {
+        this.http.get('https://nano.casa/data').subscribe((data: any) => {
             this.data.contributors = data.contributors;
             this.data.misc = data.misc;
             this.setRepos(data.repos);
