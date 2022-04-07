@@ -57,7 +57,7 @@ app.all('/', function (req, res) {
 app.all('/data', async function (req, res) {
     const data = {
         repos: await Repo.find({}, { _id: 0 }).sort({ created_at: 'asc' }),
-        contributors: await Contributor.find({}, { _id: 0 }).sort({ contributions: 'desc' }),
+        contributors: await Contributor.find({}, { _id: 0 }).sort({ contributions: 'desc', repos_involved: 'desc' }),
         commits: await Commit.aggregate([{
             $group: {
                 _id: {
