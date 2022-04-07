@@ -17,6 +17,9 @@ export class AppComponent implements OnInit {
 
     reposData = [];
     popularRepos = [];
+    popularReposPage = [];
+    contributorsPage = [];
+    contributorsPageIndex = 0;
 
     data = {
         repos: [],
@@ -48,7 +51,7 @@ export class AppComponent implements OnInit {
 
     setRepos(repos: any[]) {
         this.data.repos = repos;
-        this.popularRepos = repos.sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 10);
+        this.popularRepos = repos.sort((a, b) => b.stargazers_count - a.stargazers_count);
 
         // list years since 2014
         const YEARS = Array.from(Array(new Date().getFullYear() - 2013), (_, i) => (i + 2014).toString());

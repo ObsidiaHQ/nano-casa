@@ -112,7 +112,7 @@
               <h5>repos created by year</h5>
             </div>
             <div style="flex:auto; min-width: 0;">
-              <div class="chart" style="width: 100%; height: 410px">
+              <div class="chart" style="width: 100%; height: 417px">
                 <ngx-charts-bar-vertical [xAxis]="true" [yAxis]="true" [results]="reposData" scheme="solar" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
                 </ngx-charts-bar-vertical>
               </div>
@@ -135,13 +135,14 @@
               <h5>most popular repos</h5>
             </div>
             <ul class="list-group">
-              <li *ngFor="let repo of popularRepos" class="list-group-item">
+              <li *ngFor="let repo of popularReposPage" class="list-group-item">
                 <a [href]="'https://github.com/' + repo.full_name" target="_blank">
                   {{repo.name}}
                 </a>
                 <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
               </li>
             </ul>
+            <app-pagination [pageSize]="9" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
           </div>
         </ng-container>
       </div>
@@ -162,7 +163,7 @@
               <h5>weekly activity</h5>
             </div>
             <div style="flex:auto; min-width: 0;">
-              <div class="chart" style="width: 100%; height: 410px">
+              <div class="chart" style="width: 100%; height: 417px">
                 <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="data.commits" scheme="natural" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
                 </ngx-charts-area-chart>
               </div>
@@ -197,8 +198,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let contrib of data.contributors | slice:0:50; let i = index;">
-                <td scope="row" class="pt-3">{{i+1}}</td>
+              <tr *ngFor="let contrib of contributorsPage; let i = index;">
+                <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                 <td>
                   <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
                   <a [href]="'https://github.com/' + contrib.login">{{contrib.login}}</a>
@@ -208,6 +209,7 @@
               </tr>
             </tbody>
           </table>
+          <app-pagination [pageSize]="40" [items]="data.contributors" (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
         </div>
         </div>
       </ng-container>
