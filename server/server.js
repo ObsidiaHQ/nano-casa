@@ -89,7 +89,7 @@ app.listen(8080, function() {
     console.log("server running at http://localhost:8080");
 });
 
-cron.schedule('30 * * * *', async () => {
+cron.schedule('15 * * * *', async () => {
     await refreshRepos();
     refreshMisc();
     refreshContributors();
@@ -133,12 +133,13 @@ async function refreshRepos() {
     ];
 
     for (let i = 0; i < queries.length; i++) {
-        let foundAll = false, page = 1;
-        while (!foundAll) {
-            queries[i].repos = (await octo.request('GET /search/repositories', { q: queries[i].topic, per_page: 100, page: page })).data.items;
+        let incomplete_results = true, page = 1;
+        while (incomplete_results) {
+            const res = (await octo.request('GET /search/repositories', { q: queries[i].topic, per_page: 100, page: page })).data;
+            queries[i].repos = [...queries[i].repos, ...res.items];
 
-            foundAll = queries[i].repos.length < 100;
-            if (!foundAll) page++;
+            incomplete_results = res.incomplete_results;
+            if (incomplete_results) page++;
         }
     }    
 
