@@ -103,3 +103,38 @@ a:hover {
 .progress {
     background-color: var(--bg-darker);
 }
+.popover_title {
+    text-decoration: none;
+    text-align: center;
+    color: var(--bg-light3);
+}
+.popover_wrapper {
+    position: relative;
+    display: inline-block;
+}
+.popover_content {
+    opacity: 0;
+    border-radius: 8px;
+    visibility: hidden;
+    position: absolute;
+    left: -20px;
+    transform: translate(0, 20px);
+    background-color: var(--bg-darker);
+    padding: 1rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    width: fit-content;
+    white-space: nowrap;
+}
+.popover_content a {
+    width: max-content;
+    max-width: 150px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.popover_wrapper:hover .popover_content {
+    z-index: 10;
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, 0px);
+    transition: all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97);
+}

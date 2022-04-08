@@ -24,15 +24,15 @@
   <div class="row mb-3">
     <div class="col-6 col-md-2">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!data.repos.length">
+        <ng-container *ngIf="!repos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="data.repos.length">
+        <ng-container *ngIf="repos.length">
           <div class="card-body">
             <h5 class="pt-1">repos</h5>
-            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faRepo"></fa-icon></span>{{data.repos.length}}</h5>
+            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faRepo"></fa-icon></span>{{repos.length}}</h5>
           </div>
         </ng-container>
       </div>
@@ -40,17 +40,17 @@
 
     <div class="col-6 col-md-3">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!data.repos.length">
+        <ng-container *ngIf="!repos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="data.repos.length">
+        <ng-container *ngIf="repos.length">
           <div class="card-body">
             <h5 class="pt-1">latest repo</h5>
             <h5 class="mb-0">
               <span class="me-3"><fa-icon [icon]="faHistory"></fa-icon></span>
-              <a [href]="'https://github.com/' + data.repos[data.repos.length-1].full_name">{{data.repos[data.repos.length-1].name}}</a>
+              <a [href]="'https://github.com/' + repos[repos.length-1].full_name">{{repos[repos.length-1].name}}</a>
             </h5>
           </div>
         </ng-container>
@@ -59,15 +59,15 @@
 
     <div class="col-6 col-md-3">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!data.contributors.length">
+        <ng-container *ngIf="!contributors.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="data.contributors.length">
+        <ng-container *ngIf="contributors.length">
           <div class="card-body">
             <h5 class="pt-1">contributors</h5>
-            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faUser" class="mr-2"></fa-icon></span>{{data.contributors.length}}</h5>
+            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faUser" class="mr-2"></fa-icon></span>{{contributors.length}}</h5>
           </div>
         </ng-container>
       </div>
@@ -75,21 +75,21 @@
 
     <div class="col-6 col-md-4">
       <div class="card my-2 card-sm">
-        <ng-container *ngIf="!data.contributors.length">
+        <ng-container *ngIf="!contributors.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="data.contributors.length">
+        <ng-container *ngIf="contributors.length">
           <div class="card-body">
-            <h5 class="pt-1">{{data.misc.protocol_milestone.title}} progress</h5>
+            <h5 class="pt-1">{{misc.protocol_milestone.title}} progress</h5>
             <div class="progress">
               <div class="progress-bar bg-warning" role="progressbar" 
-                [ngStyle]="{width: data.misc.protocol_milestone.closed_issues*100/(data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues)+'%' }"
-                [attr.aria-valuenow]="data.misc.protocol_milestone.closed_issues" 
+                [ngStyle]="{width: misc.protocol_milestone.closed_issues*100/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues)+'%' }"
+                [attr.aria-valuenow]="misc.protocol_milestone.closed_issues" 
                 [attr.aria-valuemin]="0" 
-                [attr.aria-valuemax]="data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues">
-                <span style="height: 16px;">{{data.misc.protocol_milestone.closed_issues}}/{{data.misc.protocol_milestone.open_issues + data.misc.protocol_milestone.closed_issues}}</span>
+                [attr.aria-valuemax]="misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues">
+                <span style="height: 16px;">{{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}}</span>
               </div>
             </div>
           </div>
@@ -152,19 +152,19 @@
   <div class="row mb-3">
     <div class="col-12">
       <div class="card my-2">
-        <ng-container *ngIf="!data.commits[0].series.length">
+        <ng-container *ngIf="!commits[0].series.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="data.commits[0].series.length">
+        <ng-container *ngIf="commits[0].series.length">
           <div class="card-body">
             <div class="card-title">
               <h5>weekly activity</h5>
             </div>
             <div style="flex:auto; min-width: 0;">
               <div class="chart" style="width: 100%; height: 417px">
-                <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="data.commits" scheme="natural" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
+                <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="commits" scheme="natural" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
                 </ngx-charts-area-chart>
               </div>
             </div>
@@ -177,18 +177,18 @@
   <div class="row mb-3">
     <div class="col-12">
       <div class="card my-2">
-      <ng-container *ngIf="!data.contributors.length">
+      <ng-container *ngIf="!contributors.length">
         <div class="spinner-grow text-secondary align-self-center" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
       </ng-container>
-      <ng-container *ngIf="data.contributors.length">
+      <ng-container *ngIf="contributors.length">
         <div class="card-body">
           <div class="card-title">
             <h5>contributions by user</h5>
           </div>
           <div class="table-responsive">
-          <table class="table table-hover">
+          <table class="table table-hover" style="overflow: hidden;">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -206,18 +206,19 @@
                 </td>
                 <td class="pt-3">{{contrib.contributions | number}}</td>
                 <td class="pt-3" >
-                  {{contrib.repos_count}}
-                  <details data-popover="up">
-                    <summary style="cursor: pointer;" class="px-3 mx-1"><fa-icon [icon]="faRepo"></fa-icon></summary>
-                    <div>
-                      <p>{{contrib.repos}}</p>
+                  <div class="popover_wrapper" style="cursor: pointer;">
+                    {{contrib.repos_count}}
+                    <span class="p-2 mx-1 popover_title"><fa-icon [icon]="faRepo"></fa-icon></span>
+                    <div class="popover_content">
+                      <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo">{{repo.split('/')[1]}}</a>
+                      <span class="d-block mt-2" *ngIf="contrib.repos.length > 3">+{{contrib.repos.length-3}} more</span>
                     </div>
-                  </details>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
-          <app-pagination [pageSize]="40" [items]="data.contributors" (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
+          <app-pagination [pageSize]="40" [items]="contributors" (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
         </div>
         </div>
       </ng-container>
