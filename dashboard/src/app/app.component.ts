@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { faCodeBranch, faHistory, faStar, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faHistory, faInfoCircle, faStar, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { ScaleType } from '@swimlane/ngx-charts';
 
 @Component({
@@ -14,6 +14,7 @@ export class AppComponent implements OnInit {
     faUser = faUsers;
     faStar = faStar;
     faHistory = faHistory;
+    faInfo = faInfoCircle;
 
     reposData = [];
     popularRepos = [];
@@ -42,7 +43,13 @@ export class AppComponent implements OnInit {
 
     getData(): void {
         this.http.get('https://nano.casa/data').subscribe((data: any) => {
-            this.data.contributors = data.contributors;
+            this.data.contributors = data.contributors.map(({ login, repos_count, avatar_url, repos, contributions }) => ({ 
+                login, 
+                repos_count, 
+                avatar_url, 
+                contributions,
+                repos: repos.slice(0, 3).join(", ") + (repos.length > 3 ? ` +${repos.length - 3} more` : '') 
+            }));
             this.data.misc = data.misc;
             this.setRepos(data.repos);
             this.setCommits(data.commits);
@@ -67,6 +74,6 @@ export class AppComponent implements OnInit {
     }
 
     setCommits(commits: any[]) {
-        this.data.commits[0].series = commits.map((com) => ({ name: `${com._id.year}|${com._id.week}`, value: com.count }));
+        this.data.commits[0].series = commits.map((com) => ({ name: com.date, value: com.count }));
     }
 }

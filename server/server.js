@@ -25,7 +25,7 @@ const Contributor = mongoose.model('Contributor', new mongoose.Schema({
     login:            String,
     avatar_url:       String,
     contributions:    Number,
-    repos_involved:   Number
+    repos:            [String]
 }));
 const Misc = mongoose.model('Misc', new mongoose.Schema({
     protocol_milestone: {
@@ -57,7 +57,10 @@ app.all('/', function (req, res) {
 app.all('/data', async function (req, res) {
     const data = {
         repos: await Repo.find({}, { _id: 0 }).sort({ created_at: 'asc' }),
-        contributors: await Contributor.find({}, { _id: 0 }).sort({ contributions: 'desc', repos_involved: 'desc' }),
+        contributors: await Contributor.aggregate([
+            { $project: { contributions: 1, repos_count: { $size: "$repos" }, repos: 1, login: 1, avatar_url: 1, _id: 0 } },
+            { $sort: { contributions: -1, repos_count: -1 } }
+        ]),
         commits: await Commit.aggregate([{
             $group: {
                 _id: {
@@ -74,11 +77,10 @@ app.all('/data', async function (req, res) {
                 },
                 count : { $sum : 1 }
             }
+        }, { 
+            $project: { date: { $concat: [{ $toString: '$_id.year' }, '|', { $toString: '$_id.week' }] }, count: 1, _id: 0 } 
         }, {
-            $sort: {
-              '_id.year': 1,
-              '_id.week': 1
-            }
+            $sort: { date: 1 }
         }]),
         misc: await Misc.findOne({ _id: { '$ne': null }}, { _id: 0 })
     };
@@ -89,11 +91,10 @@ app.listen(8080, function() {
     console.log("server running at http://localhost:8080");
 });
 
-cron.schedule('15 */2 * * *', async () => {
-    await refreshRepos();
+cron.schedule('05 */2 * * *', async () => {
     refreshMisc();
-    refreshContributors();
-    refreshCommits();
+    const repos = await refreshRepos();
+    refreshCommitsAndContributors(repos);
 });
 
 async function refreshMisc() {
@@ -150,57 +151,46 @@ async function refreshRepos() {
     const normalized = uniqueRepos.map(({ id, name, full_name, html_url,created_at, stargazers_count }) => new Repo({ id, name, full_name, html_url,created_at, stargazers_count }));
     await Repo.collection.drop();
     await Repo.create(normalized);
+    return normalized;
 }
 
-async function refreshCommits() {
-    let all = [];
-    const repos = await Repo.find();
+async function refreshCommitsAndContributors(repos = []) {
+    let allCommits = [];
 
     for (let i = 0; i < repos.length; i++) {
         let foundAll = false, page = 1;
         while (!foundAll) {
-            let activity = (await octo.request(`GET /repos/${repos[i].full_name}/commits`, { per_page: 100, page: page })).data;
+            let activity = (await octo.request(`GET /repos/${repos[i].full_name}/commits`, { per_page: 100, page: page, since: '2014-05-01T14:49:25Z' })).data;
             activity = activity.map(act => ({...act, repo_full_name: repos[i].full_name}));
-            all = [...all, ...activity];
+            allCommits = [...allCommits, ...activity];
 
             foundAll = activity.length < 100;
             if (!foundAll) page++;
         }
     }
 
-    const normalized = all.map((commit) => new Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
-    await Commit.collection.drop();
-    await Commit.create(normalized);
-}
+    const contributors = {};
 
-async function refreshContributors() {
-    let all = [];
-    const repos = await Repo.find();
-
-    for (let i = 0; i < repos.length; i++) {
-        let foundAll = false, page = 1;
-        while (!foundAll) {
-            const repoContributors = (await octo.request(`GET /repos/${repos[i].full_name}/contributors`, { per_page: 100, page: page })).data;
-            all = [...all, ...repoContributors];
-
-            foundAll = repoContributors.length < 100;
-            if (!foundAll) page++;
+    allCommits.forEach((commit) =>{
+        if (commit.author && !contributors[commit.author.login]) {
+            contributors[commit.author.login] = { 
+                avatar_url: commit.author.avatar_url, 
+                login: commit.author.login, 
+                contributions: 0, 
+                repos: []
+            }
         }
-    }
-
-    const unique = all.filter(function ({ login }) {
-        return !this.has(login) && this.add(login);
-    }, new Set);
-
-    const normalized = unique.map(({ login, avatar_url, html_url }) => new Contributor(
-        { 
-            login, 
-            avatar_url, 
-            html_url, 
-            contributions: all.filter(c => c.login === login).reduce((total, usr) => total + usr.contributions, 0),
-            repos_involved: all.filter(c => c.login === login).length
+        if (commit.author && contributors[commit.author.login]) {
+            contributors[commit.author.login].contributions += 1, 
+            contributors[commit.author.login].repos = [...contributors[commit.author.login].repos, commit.repo_full_name]
         }
-    ));
+    });
+
+    const normalizedContribs = Object.values(contributors).map(({ avatar_url, login, contributions, repos }) => new Contributor({ avatar_url, login, contributions, repos: [...new Set(repos)] }));
     await Contributor.collection.drop();
-    await Contributor.create(normalized);
+    await Contributor.create(normalizedContribs);
+
+    const normalizedCommits = allCommits.map((commit) => new Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
+    await Commit.collection.drop();
+    await Commit.create(normalizedCommits);
 }

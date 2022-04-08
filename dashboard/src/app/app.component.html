@@ -205,7 +205,15 @@
                   <a [href]="'https://github.com/' + contrib.login">{{contrib.login}}</a>
                 </td>
                 <td class="pt-3">{{contrib.contributions | number}}</td>
-                <td class="pt-3">{{contrib.repos_involved}}</td>
+                <td class="pt-3" >
+                  {{contrib.repos_count}}
+                  <details data-popover="up">
+                    <summary style="cursor: pointer;" class="px-3 mx-1"><fa-icon [icon]="faRepo"></fa-icon></summary>
+                    <div>
+                      <p>{{contrib.repos}}</p>
+                    </div>
+                  </details>
+                </td>
               </tr>
             </tbody>
           </table>
