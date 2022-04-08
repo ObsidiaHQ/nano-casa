@@ -22,7 +22,8 @@ const Misc = mongoose.model('Misc', new mongoose.Schema({
         title:         String,
         open_issues:   Number,
         closed_issues: Number
-    }
+    },
+    last_updated: Date
 }));
 
 module.exports = { Repo, Commit, Contributor, Misc };

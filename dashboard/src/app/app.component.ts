@@ -25,7 +25,8 @@ interface Misc {
         title:         string,
         open_issues:   number,
         closed_issues: number
-    }
+    },
+    last_updated: any
 }
 
 @Component({
@@ -55,7 +56,8 @@ export class AppComponent implements OnInit {
             title: '',
             open_issues: 0,
             closed_issues: 0
-        }
+        },
+        last_updated: ''
     }
 
     constructor(private http: HttpClient) { }

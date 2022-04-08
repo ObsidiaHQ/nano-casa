@@ -11,12 +11,13 @@ async function refreshMisc() {
     const open = milestones.filter(m => m.state == 'open').sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)));
     const latest = open.filter(m => m.title.toLowerCase().startsWith('v'));
 
-    const normalized = new Misc({
+    const normalized = new models.Misc({
         protocol_milestone: {
             title: latest[0]?.title || open[0]?.title || 'inactive',
             open_issues: latest[0]?.open_issues || open[0]?.open_issues || 0,
             closed_issues: latest[0]?.closed_issues || open[0]?.closed_issues || 0
-        }
+        }, 
+        last_updated: new Date()
     });
     await models.Misc.collection.drop();
     await models.Misc.create(normalized);
@@ -57,7 +58,7 @@ async function refreshRepos() {
         return !this.has(full_name) && this.add(full_name);
     }, new Set);
 
-    const normalized = uniqueRepos.map(({ id, name, full_name, html_url,created_at, stargazers_count }) => new Repo({ id, name, full_name, html_url,created_at, stargazers_count }));
+    const normalized = uniqueRepos.map(({ id, name, full_name, html_url,created_at, stargazers_count }) => new models.Repo({ id, name, full_name, html_url,created_at, stargazers_count }));
     await models.Repo.collection.drop();
     await models.Repo.create(normalized);
     return normalized;
@@ -95,11 +96,11 @@ async function refreshCommitsAndContributors(repos = []) {
         }
     });
 
-    const normalizedContribs = Object.values(contributors).map(({ avatar_url, login, contributions, repos }) => new Contributor({ avatar_url, login, contributions, repos: [...new Set(repos)] }));
+    const normalizedContribs = Object.values(contributors).map(({ avatar_url, login, contributions, repos }) => new models.Contributor({ avatar_url, login, contributions, repos: [...new Set(repos)] }));
     await models.Contributor.collection.drop();
     await models.Contributor.create(normalizedContribs);
 
-    const normalizedCommits = allCommits.map((commit) => new Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
+    const normalizedCommits = allCommits.map((commit) => new models.Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
     await models.Commit.collection.drop();
     await models.Commit.create(normalizedCommits);
 }
