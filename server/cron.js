@@ -6,6 +6,12 @@ require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 mongoose.connect(process.env.DB_URL);
 
+const IGNORED_REPOS = ['ITMFLtd/ITCONode', 'onitsoft/nexchange-open-client-react', 'imerkle/binbase_wallet_old', 'BizblocksChains/nexchange-open-client-react', 'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet', 'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo', 'dsvakola/Coin_sorter_counter_system', 'panapina/pina'];
+const KNOWN_REPOS = {
+    names: ['appditto/natrium_wallet_flutter', 'appditto/pippin_nano_wallet', 'appditto/nanodart', 'appditto/natrium-wallet-server', 'appditto/natricon', 'appditto/nanopaperwallet', 'appditto/flutter_nano_ffi'],
+    repos: []
+};
+
 async function refreshMisc() {
     const startTime = new Date();
     const milestones = (await octo.request('GET /repos/nanocurrency/nano-node/milestones')).data;
@@ -46,6 +52,12 @@ async function refreshRepos() {
         }, {
             topic: 'topic:crypto+topic:nano',
             repos: []
+        }, {
+            topic: 'nanocurrency+in:description',
+            repos: []
+        }, {
+            topic: 'nano+currency+in:description',
+            repos: []
         }
     ];
 
@@ -58,13 +70,20 @@ async function refreshRepos() {
             foundAll = res.length < 100;
             if (!foundAll) page++;
         }
-    }    
+    }
 
-    const uniqueRepos = queries.map(q => q.repos).flat().filter(function ({ full_name }) {
-        return !this.has(full_name) && this.add(full_name);
+    for (let i = 0; i < KNOWN_REPOS.names.length; i++) {
+        const res = (await octo.request(`GET /repos/${KNOWN_REPOS.names[i]}`)).data;
+        KNOWN_REPOS.repos = [...KNOWN_REPOS.repos, res];
+    }
+
+    const allRepos = [...(queries.map(q => q.repos).flat()), ...KNOWN_REPOS.repos];
+
+    const uniqueRepos = allRepos.filter(function ({ full_name }) {
+        return !this.has(full_name) && this.add(full_name) && !IGNORED_REPOS.includes(full_name);
     }, new Set);
 
-    const normalized = uniqueRepos.map(({ id, name, full_name, html_url,created_at, stargazers_count }) => new models.Repo({ id, name, full_name, html_url,created_at, stargazers_count }));
+    const normalized = uniqueRepos.map(({ id, name, full_name, html_url, created_at, stargazers_count }) => new models.Repo({ id, name, full_name, html_url, created_at, stargazers_count }));
     await models.Repo.collection.drop();
     await models.Repo.collection.insertMany(normalized);
 
@@ -137,6 +156,6 @@ async function refreshCommitsAndContributors(repos = []) {
 const task = cron.schedule('05 */2 * * *', async () => {
     const repos = await refreshRepos();
     refreshCommitsAndContributors(repos);
-    refreshMisc();
+    await refreshMisc();
     task.stop();
 });

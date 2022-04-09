@@ -20,6 +20,7 @@
     "@angular/router": "~13.1.0",
     "@fortawesome/angular-fontawesome": "^0.10.2",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-brands-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@swimlane/ngx-charts": "^20.1.0",
     "jw-paginate": "^1.0.4",

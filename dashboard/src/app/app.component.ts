@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { faCodeBranch, faHistory, faInfoCircle, faStar, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ScaleType } from '@swimlane/ngx-charts';
 
 interface Repo {
@@ -42,6 +43,8 @@ export class AppComponent implements OnInit {
     faStar = faStar;
     faHistory = faHistory;
     faInfo = faInfoCircle;
+    faTwitter = faTwitter;
+    faGithub = faGithub;
 
     reposData = [];
     popularRepos: Repo[] = [];
