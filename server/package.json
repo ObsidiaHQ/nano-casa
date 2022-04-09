@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "cron": "node cron.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

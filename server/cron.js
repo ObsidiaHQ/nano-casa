@@ -7,6 +7,7 @@ const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 mongoose.connect(process.env.DB_URL);
 
 async function refreshMisc() {
+    const startTime = new Date();
     const milestones = (await octo.request('GET /repos/nanocurrency/nano-node/milestones')).data;
     const open = milestones.filter(m => m.state == 'open').sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)));
     const latest = open.filter(m => m.title.toLowerCase().startsWith('v'));
@@ -20,10 +21,15 @@ async function refreshMisc() {
         last_updated: new Date()
     });
     await models.Misc.collection.drop();
-    await models.Misc.create(normalized);
+    await models.Misc.collection.insertOne(normalized);
+
+    const endTime = new Date();
+    const timeDiff = Math.round((endTime - startTime) / 1000);
+    console.log("refreshed misc in", timeDiff, "seconds");
 }
 
 async function refreshRepos() {
+    const startTime = new Date();
     const queries = [
         {
             topic: 'topic:nanocurrency',
@@ -60,12 +66,17 @@ async function refreshRepos() {
 
     const normalized = uniqueRepos.map(({ id, name, full_name, html_url,created_at, stargazers_count }) => new models.Repo({ id, name, full_name, html_url,created_at, stargazers_count }));
     await models.Repo.collection.drop();
-    await models.Repo.create(normalized);
+    await models.Repo.collection.insertMany(normalized);
+
+    const endTime = new Date();
+    const timeDiff = Math.round((endTime - startTime) / 1000);
+    console.log("refreshed repos in", timeDiff, "seconds");
+
     return normalized;
 }
 
 async function refreshCommitsAndContributors(repos = []) {
-    let allCommits = [];
+    let allCommits = []; const startTime = new Date();
 
     for (let i = 0; i < repos.length; i++) {
         let foundAll = false, page = 1;
@@ -80,6 +91,8 @@ async function refreshCommitsAndContributors(repos = []) {
     }
 
     const contributors = {};
+    const now = new Date();
+    const lastMonth = new Date(now.setDate(now.getDate()-30));
 
     allCommits.forEach((commit) =>{
         if (commit.author && !contributors[commit.author.login]) {
@@ -87,26 +100,43 @@ async function refreshCommitsAndContributors(repos = []) {
                 avatar_url: commit.author.avatar_url, 
                 login: commit.author.login, 
                 contributions: 0, 
+                last_month: 0,
                 repos: []
             }
         }
         if (commit.author && contributors[commit.author.login]) {
             contributors[commit.author.login].contributions += 1, 
             contributors[commit.author.login].repos = [...contributors[commit.author.login].repos, commit.repo_full_name]
+
+            if (new Date(commit.commit.author?.date) > lastMonth)
+                contributors[commit.author.login].last_month += 1;
         }
     });
 
-    const normalizedContribs = Object.values(contributors).map(({ avatar_url, login, contributions, repos }) => new models.Contributor({ avatar_url, login, contributions, repos: [...new Set(repos)] }));
+    const endTime1 = new Date();
+    const timeDiff1 = Math.round((endTime1 - startTime) / 1000);
+    console.log("fetched commits in", timeDiff1, "seconds");
+
+    const normalizedContribs = Object.values(contributors).map(({ avatar_url, login, contributions, repos, last_month }) => new models.Contributor({ avatar_url, login, contributions, last_month, repos: [...new Set(repos)] }));
     await models.Contributor.collection.drop();
-    await models.Contributor.create(normalizedContribs);
+    await models.Contributor.collection.insertMany(normalizedContribs);
+
+    const endTime2 = new Date();
+    const timeDiff2 = Math.round((endTime2 - endTime1) / 1000);
+    console.log("refreshed users in", timeDiff2, "seconds");
 
     const normalizedCommits = allCommits.map((commit) => new models.Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
     await models.Commit.collection.drop();
-    await models.Commit.create(normalizedCommits);
+    await models.Commit.collection.insertMany(normalizedCommits);
+
+    const endTime3 = new Date();
+    const timeDiff3 = Math.round((endTime3 - endTime2) / 1000);
+    console.log("refreshed commits in", timeDiff3, "seconds");
 }
 
-cron.schedule('05 */2 * * *', async () => {
-    refreshMisc();
+const task = cron.schedule('05 */2 * * *', async () => {
     const repos = await refreshRepos();
     refreshCommitsAndContributors(repos);
+    refreshMisc();
+    task.stop();
 });

@@ -31,7 +31,7 @@ app.all('/data', async function (req, res) {
     const data = {
         repos: await models.Repo.find({}, { _id: 0 }).sort({ created_at: 'asc' }),
         contributors: await models.Contributor.aggregate([
-            { $project: { contributions: 1, repos_count: { $size: "$repos" }, repos: 1, login: 1, avatar_url: 1, _id: 0 } },
+            { $project: { contributions: 1, last_month: 1, repos_count: { $size: "$repos" }, repos: 1, login: 1, avatar_url: 1, _id: 0 } },
             { $sort: { contributions: -1, repos_count: -1 } }
         ]),
         commits: await models.Commit.aggregate([{

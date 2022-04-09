@@ -15,6 +15,7 @@ const Contributor = mongoose.model('Contributor', new mongoose.Schema({
     login:            String,
     avatar_url:       String,
     contributions:    Number,
+    last_month:        Number,
     repos:            [String]
 }));
 const Misc = mongoose.model('Misc', new mongoose.Schema({
