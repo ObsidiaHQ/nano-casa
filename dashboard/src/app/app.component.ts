@@ -17,6 +17,7 @@ interface Contributor {
     login:            string,
     avatar_url:       string,
     contributions:    number,
+    last_month:       number,
     repos:            string[],
     repos_count:      number
 }

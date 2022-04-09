@@ -3,7 +3,7 @@
   <div class="row mb-3">
     <div class="col-12">
       <h3>Monitoring open source development in the nano ecosystem.</h3>
-      <small class="mb-5 d-block">last updated {{misc.last_updated | date}}</small>
+      <small class="mb-5 d-block">last updated {{misc.last_updated | date:'short'}}</small>
       <p class="fw-light font-italic">
         Keep in mind that due to the financial use cases of the <a href="https://nano.org" target="_blank">nano</a> protocol, businesses and
         startups are more likely to be secretive about their projects.
@@ -185,7 +185,7 @@
       <ng-container *ngIf="contributors.length">
         <div class="card-body">
           <div class="card-title">
-            <h5>contributions by user</h5>
+            <h5>contributions by user <fa-icon class="mx-1" style="cursor: help;" [icon]="faInfo" title="Commits to main/master branches"></fa-icon></h5>
           </div>
           <div class="table-responsive">
           <table class="table table-hover" style="overflow: hidden;">
@@ -193,7 +193,8 @@
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">contributor</th>
-                <th scope="col">total contributions</th>
+                <th scope="col">total commits</th>
+                <th scope="col">last month</th>
                 <th scope="col"># of repos</th>
               </tr>
             </thead>
@@ -205,6 +206,7 @@
                   <a [href]="'https://github.com/' + contrib.login">{{contrib.login}}</a>
                 </td>
                 <td class="pt-3">{{contrib.contributions | number}}</td>
+                <td class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
                 <td class="pt-3" >
                   <div class="popover_wrapper" style="cursor: pointer;">
                     {{contrib.repos_count}}
