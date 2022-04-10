@@ -205,7 +205,10 @@
                 <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                 <td>
                   <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
-                  <a [href]="'https://github.com/' + contrib.login">{{contrib.login}}</a>
+                  <a [href]="'https://github.com/' + contrib.login" class="me-4">{{contrib.login}}</a>
+                  <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
+                  <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
+                  <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>
                 </td>
                 <td class="pt-3">{{contrib.contributions | number}}</td>
                 <td class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>

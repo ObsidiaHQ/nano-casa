@@ -154,8 +154,8 @@ async function refreshCommitsAndContributors(repos = []) {
 }
 
 const task = cron.schedule('05 */2 * * *', async () => {
-    const repos = await refreshRepos();
-    refreshCommitsAndContributors(repos);
     await refreshMisc();
+    const repos = await refreshRepos();
+    await refreshCommitsAndContributors(repos);
     task.stop();
 });

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { faCodeBranch, faHistory, faInfoCircle, faStar, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ScaleType } from '@swimlane/ngx-charts';
 
@@ -45,9 +45,13 @@ export class AppComponent implements OnInit {
     faInfo = faInfoCircle;
     faTwitter = faTwitter;
     faGithub = faGithub;
+    faMedal = faMedal;
+    faStarOL = faStarOfLife;
+    faMeteor = faMeteor;
 
     reposData = [];
     popularRepos: Repo[] = [];
+    popularReposNames: string[] = [];
     popularReposPage: Repo[] = [];
     contributorsPage: Contributor[] = [];
     contributorsPageIndex = 0;
@@ -82,6 +86,7 @@ export class AppComponent implements OnInit {
     setRepos(repos: any[]) {
         this.repos = repos;
         this.popularRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
+        this.popularReposNames = this.popularRepos.map(r => r.full_name);
 
         // list years since 2014
         const YEARS = Array.from(Array(new Date().getFullYear() - 2013), (_, i) => (i + 2014).toString());
@@ -98,5 +103,13 @@ export class AppComponent implements OnInit {
 
     setCommits(commits: Commit[]) {
         this.commits[0].series = commits.map((com) => ({ name: com.date, value: com.count }));
+    }
+
+    hasPopularRepo(repos: string[]) {
+        return repos.some(r => this.popularReposNames.indexOf(r) >= 0 && this.popularReposNames.indexOf(r) < 10 && r != 'nanocurrency/nano-node');
+    }
+
+    contributedToNode(repos: string[]) {
+        return repos.includes('nanocurrency/nano-node');
     }
 }
