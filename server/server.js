@@ -50,10 +50,10 @@ app.all('/data', async function (req, res) {
                 },
                 count : { $sum : 1 }
             }
+        }, {
+            $sort: { '_id.year': 1, '_id.week': 1 }
         }, { 
             $project: { date: { $concat: [{ $toString: '$_id.year' }, '|', { $toString: '$_id.week' }] }, count: 1, _id: 0 } 
-        }, {
-            $sort: { date: 1 }
         }]),
         misc: await models.Misc.findOne({ _id: { '$ne': null }}, { _id: 0 })
     };

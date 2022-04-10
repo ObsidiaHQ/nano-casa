@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ScaleType } from '@swimlane/ngx-charts';
 
@@ -48,6 +48,7 @@ export class AppComponent implements OnInit {
     faMedal = faMedal;
     faStarOL = faStarOfLife;
     faMeteor = faMeteor;
+    faDown = faArrowDown;
 
     reposData = [];
     popularRepos: Repo[] = [];
@@ -67,6 +68,7 @@ export class AppComponent implements OnInit {
         },
         last_updated: ''
     }
+    filterBy: string = 'total';
 
     constructor(private http: HttpClient) { }
 
@@ -111,5 +113,11 @@ export class AppComponent implements OnInit {
 
     contributedToNode(repos: string[]) {
         return repos.includes('nanocurrency/nano-node');
+    }
+
+    sortContributors(by: 'month' | 'total') {
+        if (this.filterBy === by) return;
+        this.filterBy = by;
+        this.contributors = [...this.contributors].sort((a,b) => by === 'total' ? (b.contributions - a.contributions) : (b.last_month - a.last_month));
     }
 }

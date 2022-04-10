@@ -195,8 +195,8 @@
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">contributor</th>
-                <th scope="col">total commits</th>
-                <th scope="col">last month</th>
+                <th scope="col">total commits <span role="button" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'total' ? 'lightsalmon' : ''}" (click)="sortContributors('total')"><fa-icon [icon]="faDown"></fa-icon></span></th>
+                <th scope="col">last month <span role="button" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'month' ? 'lightsalmon' : ''}" (click)="sortContributors('month')"><fa-icon [icon]="faDown"></fa-icon></span></th>
                 <th scope="col"># of repos</th>
               </tr>
             </thead>
