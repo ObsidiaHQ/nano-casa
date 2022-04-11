@@ -91,7 +91,10 @@
                 [attr.aria-valuenow]="misc.protocol_milestone.closed_issues" 
                 [attr.aria-valuemin]="0" 
                 [attr.aria-valuemax]="misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues">
-                <span style="height: 16px;">{{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}}</span>
+                <span style="height: 16px;">
+                  {{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}} 
+                  ({{misc.protocol_milestone.closed_issues/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues) | percent}})
+                </span>
               </div>
             </div>
           </div>
