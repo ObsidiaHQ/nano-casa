@@ -26,5 +26,14 @@ const Misc = mongoose.model('Misc', new mongoose.Schema({
     },
     last_updated: Date
 }));
+const Profile = mongoose.model('Profile', new mongoose.Schema({
+    name:              String,
+    github:            String,
+    twitter:           String,
+    sponsor_link:      String,
+    nano_account:      String,
+    description:       String,
+    tags:              [String]
+}));
 
-module.exports = { Repo, Commit, Contributor, Misc };
+module.exports = { Repo, Commit, Contributor, Misc, Profile };

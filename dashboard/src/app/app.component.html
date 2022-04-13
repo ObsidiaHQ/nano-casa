@@ -204,17 +204,18 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let contrib of contributorsPage; let i = index;">
-                <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
-                <td>
-                  <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
-                  <a [href]="'https://github.com/' + contrib.login" class="me-4">{{contrib.login}}</a>
-                  <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
-                  <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
-                  <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>
-                </td>
-                <td class="pt-3">{{contrib.contributions | number}}</td>
-                <td class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
+              <ng-container *ngFor="let contrib of contributorsPage; let i = index;">
+                <tr>
+                  <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
+                  <td>
+                    <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
+                    <a [href]="'https://github.com/' + contrib.login" class="me-4">{{contrib.login}}</a>
+                    <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
+                    <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
+                    <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>
+                  </td>
+                  <td class="pt-3">{{contrib.contributions | number}}</td>
+                  <td class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
                 <td class="pt-3" >
                   <div class="popover_wrapper" style="cursor: pointer;">
                     {{contrib.repos_count}}
@@ -222,10 +223,32 @@
                     <div class="popover_content">
                       <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo">{{repo.split('/')[1]}}</a>
                       <span class="d-block mt-2" *ngIf="contrib.repos.length > 3">+{{contrib.repos.length-3}} more</span>
+                      </div>
                     </div>
+                  </td>
+                  <td class="text-center">
+                    <a class="d-block mt-2 px-2" *ngIf="contrib.profile" data-bs-toggle="collapse" [href]="'#collapse' + contrib.login" role="button" aria-expanded="false" [attr.aria-controls]="'collapse' + contrib.login">
+                      <fa-icon [icon]="faMore"></fa-icon>
+                    </a>
+                  </td>
+                </tr>
+
+                <tr *ngIf="contrib.profile" class="collapse" [id]="'collapse' + contrib.login">
+                  <td colspan="5">
+                    <div class="p-4">
+                      <h5>
+                        <span class="me-3">{{contrib.profile.name}}</span>
+                        <a title="View on NanoDevList" [href]="'https://NanoDevList.com/'" target="_blank" class="mx-2"><fa-icon [icon]="faExt"></fa-icon></a>
+                        <a *ngIf="contrib.profile.github" title="GitHub profile" [href]="'https://github.com/' + contrib.profile.github" target="_blank" class="mx-2"><fa-icon [icon]="faGithub"></fa-icon></a>
+                        <a *ngIf="contrib.profile.twitter" title="Twitter profile" [href]="'https://twitter.com/' + contrib.profile.twitter" target="_blank" class="mx-2"><fa-icon [icon]="faTwitter"></fa-icon></a>
+                      </h5>
+                      <p class="my-3" [innerHTML]="contrib.profile.description"></p>
+                      <a class="mx-2" *ngIf="contrib.profile.sponsor_link" target="_blank" [href]="contrib.profile.sponsor_link" style="text-decoration: none; color: deeppink;"><fa-icon [icon]="faHeart"></fa-icon> sponsor</a>
+                      <a class="mx-2" *ngIf="contrib.profile.nano_account" target="_blank" [href]="'https://nano.to/' + contrib.profile.nano_account" style="text-decoration: none; color: cornflowerblue"><span style="font-size: 1.25rem; font-weight:lighter;">Ӿ</span> tip nano</a>
                   </div>
                 </td>
               </tr>
+              </ng-container>
             </tbody>
           </table>
           <app-pagination [pageSize]="40" [items]="contributors" (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor, faArrowDown, faAngleDown, faHeart, faExternalLink, faCodeCommit, faCodePullRequest } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ScaleType } from '@swimlane/ngx-charts';
 
@@ -20,7 +20,8 @@ interface Contributor {
     contributions:    number,
     last_month:       number,
     repos:            string[],
-    repos_count:      number
+    repos_count:      number,
+    profile:          any
 }
 interface Misc {
     protocol_milestone: {
@@ -49,6 +50,11 @@ export class AppComponent implements OnInit {
     faStarOL = faStarOfLife;
     faMeteor = faMeteor;
     faDown = faArrowDown;
+    faMore = faAngleDown;
+    faHeart = faHeart;
+    faExt = faExternalLink;
+    faCommit = faCodeCommit;
+    faPR = faCodePullRequest;
 
     reposData = [];
     popularRepos: Repo[] = [];
@@ -79,6 +85,12 @@ export class AppComponent implements OnInit {
     getData(): void {
         this.http.get('https://nano.casa/data').subscribe((data: any) => {
             this.contributors = data.contributors;
+            this.contributors = this.contributors.map(usr => {
+                const profile = data.devList.find(dl => dl.github.toLowerCase() === usr.login.toLowerCase());
+                if (profile)
+                    profile.description = profile.description.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
+                return ({...usr, profile });
+            });
             this.misc = data.misc;
             this.setRepos(data.repos);
             this.setCommits(data.commits);

@@ -2,13 +2,14 @@ const cron =         require('node-cron');
 const { Octokit } =  require('octokit');
 const mongoose =     require('mongoose');
 const models =       require('./models');
+const fetch =        require('node-fetch');
 require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 mongoose.connect(process.env.DB_URL);
 
 const IGNORED_REPOS = ['ITMFLtd/ITCONode', 'onitsoft/nexchange-open-client-react', 'imerkle/binbase_wallet_old', 'BizblocksChains/nexchange-open-client-react', 'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet', 'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo', 'dsvakola/Coin_sorter_counter_system', 'panapina/pina'];
 const KNOWN_REPOS = {
-    names: ['appditto/natrium_wallet_flutter', 'appditto/pippin_nano_wallet', 'appditto/nanodart', 'appditto/natrium-wallet-server', 'appditto/natricon', 'appditto/nanopaperwallet', 'appditto/flutter_nano_ffi'],
+    names: ['appditto/natrium_wallet_flutter', 'appditto/pippin_nano_wallet', 'appditto/nanodart', 'appditto/natrium-wallet-server', 'appditto/natricon', 'appditto/nanopaperwallet', 'appditto/flutter_nano_ffi', 'wezrule/UE4NanoPlugin', 'wezrule/UnityNanoPlugin'],
     repos: []
 };
 
@@ -113,8 +114,10 @@ async function refreshCommitsAndContributors(repos = []) {
     const now = new Date();
     const lastMonth = new Date(now.setDate(now.getDate()-30));
 
+    allCommits = allCommits.filter(commit => !!commit.author);
+
     allCommits.forEach((commit) =>{
-        if (commit.author && !contributors[commit.author.login]) {
+        if (!contributors[commit.author.login]) {
             contributors[commit.author.login] = { 
                 avatar_url: commit.author.avatar_url, 
                 login: commit.author.login, 
@@ -123,7 +126,7 @@ async function refreshCommitsAndContributors(repos = []) {
                 repos: []
             }
         }
-        if (commit.author && contributors[commit.author.login]) {
+        if (contributors[commit.author.login]) {
             contributors[commit.author.login].contributions += 1, 
             contributors[commit.author.login].repos = [...contributors[commit.author.login].repos, commit.repo_full_name]
 
@@ -144,7 +147,7 @@ async function refreshCommitsAndContributors(repos = []) {
     const timeDiff2 = Math.round((endTime2 - endTime1) / 1000);
     console.log("refreshed users in", timeDiff2, "seconds");
 
-    const normalizedCommits = allCommits.map((commit) => new models.Commit({ repo_full_name: commit.repo_full_name, author: commit.author?.login, date: commit.commit.author?.date }));
+    const normalizedCommits = allCommits.map((commit) => new models.Commit({ repo_full_name: commit.repo_full_name, author: commit.author.login, date: commit.commit.author?.date }));
     await models.Commit.collection.drop();
     await models.Commit.collection.insertMany(normalizedCommits);
 
@@ -153,9 +156,25 @@ async function refreshCommitsAndContributors(repos = []) {
     console.log("refreshed commits in", timeDiff3, "seconds");
 }
 
-const task = cron.schedule('05 */2 * * *', async () => {
+async function refreshDevList() {
+    const url = '/repos/Joohansson/nanodevlist/contents/donatees';
+    const devs = [];
+    let devsRes = (await octo.request(`GET ${url}`)).data;
+    for (let i = 0; i < devsRes.length; i++) {
+        const { name, github, twitter, sponsor_link, nano_account, description, tags } = await (await fetch(`${devsRes[i].download_url}`)).json();
+        devs.push(new models.Profile({ name, github, twitter, sponsor_link, nano_account, description, tags }));
+    }
+    await models.Profile.collection.drop();
+    await models.Profile.collection.insertMany(devs);
+    return devs;
+}
+
+const task = cron.schedule('08 */2 * * *', async () => {
     await refreshMisc();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
-    task.stop();
+});
+
+const devListTask = cron.schedule('0,30 * * * *', async () => {
+    await refreshDevList();
 });

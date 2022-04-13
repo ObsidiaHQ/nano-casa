@@ -9,6 +9,7 @@ Monitoring open source development in the nano ecosystem.
 - [x] curate a list of known repos
 - [x] highlight top contributors
 - [x] users list sorting
+- [x] NanoDevList profiles
 - [ ] active repos last week/month
 
 

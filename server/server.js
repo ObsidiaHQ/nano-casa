@@ -55,7 +55,8 @@ app.all('/data', async function (req, res) {
         }, { 
             $project: { date: { $concat: [{ $toString: '$_id.year' }, '|', { $toString: '$_id.week' }] }, count: 1, _id: 0 } 
         }]),
-        misc: await models.Misc.findOne({ _id: { '$ne': null }}, { _id: 0 })
+        misc: await models.Misc.findOne({ _id: { '$ne': null }}, { _id: 0 }),
+        devList: await models.Profile.find({}, { _id: 0 })
     };
     res.json(data);
 });
