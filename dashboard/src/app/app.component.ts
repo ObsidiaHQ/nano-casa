@@ -8,7 +8,10 @@ interface Repo {
     name:             string,
     full_name:        string,
     created_at:       string,
-    stargazers_count: number
+    stargazers_count: number,
+    prs_30d:          number,
+    commits_30d:      number,
+    avatar_url:       string  
 }
 interface Commit {
     count:            number, 
@@ -63,6 +66,7 @@ export class AppComponent implements OnInit {
     contributorsPage: Contributor[] = [];
     contributorsPageIndex = 0;
 
+    busyRepos: Repo[] = [];
     repos: Repo[] = [];
     contributors: Contributor[] = [];
     commits = [{name: 'commits', series: []}];
@@ -83,7 +87,7 @@ export class AppComponent implements OnInit {
     }
 
     getData(): void {
-        this.http.get('https://nano.casa/data').subscribe((data: any) => {
+        this.http.get('http://localhost:8080/data').subscribe((data: any) => {
             this.contributors = data.contributors;
             this.contributors = this.contributors.map(usr => {
                 const profile = data.devList.find(dl => dl.github.toLowerCase() === usr.login.toLowerCase());
@@ -97,9 +101,10 @@ export class AppComponent implements OnInit {
         });
     }
 
-    setRepos(repos: any[]) {
+    setRepos(repos: Repo[]) {
         this.repos = repos;
         this.popularRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
+        this.busyRepos = [...repos].filter(a => (0 + a.prs_30d) > 0).sort((a, b) => b.prs_30d - a.prs_30d);
         this.popularReposNames = this.popularRepos.map(r => r.full_name);
 
         // list years since 2014

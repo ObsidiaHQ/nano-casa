@@ -36,7 +36,9 @@ async function refreshMisc() {
 }
 
 async function refreshRepos() {
-    const startTime = new Date();
+    const startTime = new Date(), now = new Date();
+    const lastMonth = new Date(now.setDate(now.getDate()-30));
+
     const queries = [
         {
             topic: 'topic:nanocurrency',
@@ -84,7 +86,20 @@ async function refreshRepos() {
         return !this.has(full_name) && this.add(full_name) && !IGNORED_REPOS.includes(full_name);
     }, new Set);
 
-    const normalized = uniqueRepos.map(({ id, name, full_name, html_url, created_at, stargazers_count }) => new models.Repo({ id, name, full_name, html_url, created_at, stargazers_count }));
+    for (let i = 0; i < uniqueRepos.length; i++) {
+        let foundAll = false, page = 1;
+        uniqueRepos[i].prs_30d = 0;
+        while (!foundAll) {
+            let pulls = (await octo.request(`GET /repos/${uniqueRepos[i].full_name}/pulls`, { per_page: 100, page: page })).data;
+            pulls = pulls.filter(pr => new Date(pr.created_at) > lastMonth);
+            uniqueRepos[i].prs_30d += pulls.length;
+
+            foundAll = pulls.length < 100;
+            if (!foundAll) page++;
+        }
+    }
+
+    const normalized = uniqueRepos.map(({ id, name, full_name, html_url, created_at, stargazers_count, owner, prs_30d }) => new models.Repo({ id, name, full_name, html_url, created_at, stargazers_count, avatar_url: owner.avatar_url, prs_30d }));
     await models.Repo.collection.drop();
     await models.Repo.collection.insertMany(normalized);
 
@@ -178,3 +193,5 @@ const task = cron.schedule('08 */2 * * *', async () => {
 const devListTask = cron.schedule('0,30 * * * *', async () => {
     await refreshDevList();
 });
+
+module.exports = { refreshRepos }

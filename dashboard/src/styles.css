@@ -78,6 +78,7 @@ tr, thead, th {
 }
 a, thead th {
     color: var(--bg-light3);
+    text-decoration: none;
 }
 a:hover {
     color: var(--bg-light4);
@@ -137,4 +138,10 @@ a:hover {
     visibility: visible;
     transform: translate(0, 0px);
     transition: all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97);
+}
+.busy-repo {
+    background-color: var(--bg-darker);
+    border-radius: 8px;
+    min-width: 140px;
+    min-height: 136px;
 }

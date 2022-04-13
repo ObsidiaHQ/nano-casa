@@ -5,10 +5,10 @@ import paginate from 'jw-paginate';
 @Component({
     selector: 'app-pagination',
     template: `<ul *ngIf="pager.pages && pager.pages.length" class="pagination">
-        <li [ngClass]="{disabled:pager.currentPage === 1}" class="page-item previous-item">
+        <li [ngClass]="{disabled:pager.currentPage === 1}" class="page-item previous-item pt-md-2">
             <a (click)="setPage(pager.currentPage - 1)" class="page-link" role="button">< previous</a>
         </li>
-        <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}" class="page-item next-item">
+        <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}" class="page-item next-item pt-md-2">
             <a (click)="setPage(pager.currentPage + 1)" class="page-link" role="button">next ></a>
         </li>
     </ul>`,

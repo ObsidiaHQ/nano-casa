@@ -4,7 +4,10 @@ const Repo = mongoose.model('Repo', new mongoose.Schema({
     name:             String,
     full_name:        String,
     created_at:       String,
-    stargazers_count: Number
+    stargazers_count: Number,
+    avatar_url:       String,
+    prs_30d:          Number,
+    commits_30d:      Number
 }));
 const Commit = mongoose.model('Commit', new mongoose.Schema({
     repo_full_name:   String,
@@ -15,7 +18,7 @@ const Contributor = mongoose.model('Contributor', new mongoose.Schema({
     login:            String,
     avatar_url:       String,
     contributions:    Number,
-    last_month:        Number,
+    last_month:       Number,
     repos:            [String]
 }));
 const Misc = mongoose.model('Misc', new mongoose.Schema({

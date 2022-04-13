@@ -10,7 +10,7 @@ Monitoring open source development in the nano ecosystem.
 - [x] highlight top contributors
 - [x] users list sorting
 - [x] NanoDevList profiles
-- [ ] active repos last week/month
+- [x] active repos last week/month
 
 
 <img src="https://i.imgur.com/CvPsln0.png">

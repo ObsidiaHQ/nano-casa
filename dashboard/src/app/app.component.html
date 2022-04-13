@@ -1,6 +1,6 @@
 <div class="container my-5">
 
-  <div class="row mb-3">
+  <div class="row">
     <div class="col-12">
       <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://twitter.com/GeorgeMamar"><fa-icon [icon]="faTwitter"></fa-icon></a>
       <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://github.com/obsidiaHQ/nano-casa"><fa-icon [icon]="faGithub"></fa-icon></a>
@@ -23,9 +23,9 @@
     </div>
   </div>
 
-  <div class="row mb-3">
+  <div class="row">
     <div class="col-6 col-md-2">
-      <div class="card my-2 card-sm">
+      <div class="card mb-4 mt-1 card-sm">
         <ng-container *ngIf="!repos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="col-6 col-md-3">
-      <div class="card my-2 card-sm">
+      <div class="card mb-4 mt-1 card-sm">
         <ng-container *ngIf="!repos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -60,7 +60,7 @@
     </div>
 
     <div class="col-6 col-md-3">
-      <div class="card my-2 card-sm">
+      <div class="card mb-4 mt-1 card-sm">
         <ng-container *ngIf="!contributors.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -76,7 +76,7 @@
     </div>
 
     <div class="col-6 col-md-4">
-      <div class="card my-2 card-sm">
+      <div class="card mb-4 mt-1 card-sm">
         <ng-container *ngIf="!contributors.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -103,32 +103,54 @@
     </div>
   </div>
 
-  <div class="row mb-3">
+  <div class="row">
     <div class="col-12 col-md-8">
-      <div class="card my-2">
-        <ng-container *ngIf="!reposData.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="reposData.length">
+      <div class="col-12 mb-4">
+        <div class="card mb-4 mt-1">
+          <ng-container *ngIf="!reposData.length">
+            <div class="spinner-grow text-secondary align-self-center" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="reposData.length">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>repos created by year</h5>
+              </div>
+              <div style="flex:auto; min-width: 0;">
+                <div class="chart" style="width: 100%; height: 417px">
+                  <ngx-charts-bar-vertical [xAxis]="true" [yAxis]="true" [results]="reposData" scheme="solar" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
+                  </ngx-charts-bar-vertical>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="col-12 mb-3 md-md-0">
+        <div class="card mb-4 mt-1" style="min-height: 220px;">
           <div class="card-body">
             <div class="card-title">
-              <h5>repos created by year</h5>
+              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 30 days"></fa-icon></h5>
             </div>
-            <div style="flex:auto; min-width: 0;">
-              <div class="chart" style="width: 100%; height: 417px">
-                <ngx-charts-bar-vertical [xAxis]="true" [yAxis]="true" [results]="reposData" scheme="solar" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
-                </ngx-charts-bar-vertical>
+            <div class="d-flex pb-3" style="overflow-x: auto;">
+              <div *ngFor="let busy of busyRepos | slice:0:10" class="p-3 mt-2 mx-3 busy-repo">
+                <img [src]="busy.avatar_url" [alt]="busy.full_name" width="32" height="32" style="border-radius: 8px;" class="d-block me-3 mb-1">
+                <a style="font-size: 0.875rem;" [href]="'https://github.com/' + busy.full_name">{{busy.full_name.split('/')[1]}}</a>
+                <div class="mt-2">
+                  <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
+                  <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
+                </div>
               </div>
             </div>
           </div>
-        </ng-container>
+        </div>
       </div>
     </div>
 
     <div class="col-12 col-md-4">
-      <div class="card my-2">
+      <div class="card mb-4 mt-1" style="min-height: 440px;">
         <ng-container *ngIf="!popularRepos.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -137,7 +159,7 @@
         <ng-container *ngIf="popularRepos.length">
           <div class="card-body">
             <div class="card-title">
-              <h5>most popular repos</h5>
+              <h5 class="mb-3">most popular repos</h5>
             </div>
             <ul class="list-group">
               <li *ngFor="let repo of popularReposPage" class="list-group-item">
@@ -147,16 +169,16 @@
                 <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
               </li>
             </ul>
-            <app-pagination [pageSize]="9" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
+            <app-pagination [pageSize]="15" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
           </div>
         </ng-container>
       </div>
     </div>
   </div>
 
-  <div class="row mb-3">
+  <div class="row">
     <div class="col-12">
-      <div class="card my-2">
+      <div class="card mb-4 mt-1">
         <ng-container *ngIf="!commits[0].series.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -179,9 +201,9 @@
     </div>
   </div>
 
-  <div class="row mb-3">
+  <div class="row">
     <div class="col-12">
-      <div class="card my-2">
+      <div class="card mb-4 mt-1">
       <ng-container *ngIf="!contributors.length">
         <div class="spinner-grow text-secondary align-self-center" role="status">
           <span class="visually-hidden">Loading...</span>
@@ -190,7 +212,7 @@
       <ng-container *ngIf="contributors.length">
         <div class="card-body">
           <div class="card-title">
-            <h5>contributions by user <fa-icon class="mx-1" style="cursor: help;" [icon]="faInfo" title="Commits to main/master branches"></fa-icon></h5>
+            <h5>contributions by user <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Commits to main/master branches"></fa-icon></h5>
           </div>
           <div class="table-responsive">
           <table class="table table-hover" style="overflow: hidden;">
@@ -200,7 +222,7 @@
                 <th scope="col">contributor</th>
                 <th scope="col">total commits <span role="button" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'total' ? 'lightsalmon' : ''}" (click)="sortContributors('total')"><fa-icon [icon]="faDown"></fa-icon></span></th>
                 <th scope="col">last month <span role="button" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'month' ? 'lightsalmon' : ''}" (click)="sortContributors('month')"><fa-icon [icon]="faDown"></fa-icon></span></th>
-                <th scope="col"># of repos</th>
+                <th scope="col" class="d-none d-md-table-cell"># of repos</th>
               </tr>
             </thead>
             <tbody>
@@ -216,13 +238,13 @@
                   </td>
                   <td class="pt-3">{{contrib.contributions | number}}</td>
                   <td class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
-                <td class="pt-3" >
-                  <div class="popover_wrapper" style="cursor: pointer;">
-                    {{contrib.repos_count}}
-                    <span class="p-2 mx-1 popover_title"><fa-icon [icon]="faRepo"></fa-icon></span>
-                    <div class="popover_content">
-                      <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo">{{repo.split('/')[1]}}</a>
-                      <span class="d-block mt-2" *ngIf="contrib.repos.length > 3">+{{contrib.repos.length-3}} more</span>
+                  <td class="pt-3 d-none d-md-table-cell" >
+                    <div class="popover_wrapper" style="cursor: pointer;">
+                      {{contrib.repos_count}}
+                      <span class="p-2 mx-1 popover_title"><fa-icon [icon]="faRepo"></fa-icon></span>
+                      <div class="popover_content">
+                        <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo">{{repo.split('/')[1]}}</a>
+                        <span class="d-block mt-2" *ngIf="contrib.repos.length > 3">+{{contrib.repos.length-3}} more</span>
                       </div>
                     </div>
                   </td>
@@ -243,11 +265,11 @@
                         <a *ngIf="contrib.profile.twitter" title="Twitter profile" [href]="'https://twitter.com/' + contrib.profile.twitter" target="_blank" class="mx-2"><fa-icon [icon]="faTwitter"></fa-icon></a>
                       </h5>
                       <p class="my-3" [innerHTML]="contrib.profile.description"></p>
-                      <a class="mx-2" *ngIf="contrib.profile.sponsor_link" target="_blank" [href]="contrib.profile.sponsor_link" style="text-decoration: none; color: deeppink;"><fa-icon [icon]="faHeart"></fa-icon> sponsor</a>
-                      <a class="mx-2" *ngIf="contrib.profile.nano_account" target="_blank" [href]="'https://nano.to/' + contrib.profile.nano_account" style="text-decoration: none; color: cornflowerblue"><span style="font-size: 1.25rem; font-weight:lighter;">Ӿ</span> tip nano</a>
-                  </div>
-                </td>
-              </tr>
+                      <a class="mx-2" *ngIf="contrib.profile.sponsor_link" target="_blank" [href]="contrib.profile.sponsor_link" style="color: deeppink;"><fa-icon [icon]="faHeart"></fa-icon> sponsor</a>
+                      <a class="mx-2" *ngIf="contrib.profile.nano_account" target="_blank" [href]="'https://nano.to/' + contrib.profile.nano_account" style="color: cornflowerblue"><span style="font-size: 1.25rem; font-weight:lighter;">Ӿ</span> tip nano</a>
+                    </div>
+                  </td>
+                </tr>
               </ng-container>
             </tbody>
           </table>
@@ -261,7 +283,7 @@
 
   <div class="row">
     <div class="col-12">
-      <div class="card my-2 card-sm pt-3">
+      <div class="card mb-4 mt-1 card-sm pt-3">
         <div class="card-body">
           <a href="https://twitter.com/GeorgeMamar" target="_blank" class="mx-3">twitter updates</a>
           <a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="mx-3">source</a>
