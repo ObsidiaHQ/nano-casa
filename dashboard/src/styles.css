@@ -143,5 +143,13 @@ a:hover {
     background-color: var(--bg-darker);
     border-radius: 8px;
     min-width: 140px;
-    min-height: 136px;
+    min-height: 160px;
+}
+.busy-repo a {
+    font-size: 0.875rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 110px;
+    display: inline-block;
 }

@@ -111,23 +111,35 @@ async function refreshRepos() {
 }
 
 async function refreshCommitsAndContributors(repos = []) {
-    let allCommits = []; const startTime = new Date();
+    let allCommits = []; 
+    const startTime = new Date();
+    const now = new Date();
+    const lastMonth = new Date(now.setDate(now.getDate()-30));
+    const bulk = models.Repo.collection.initializeUnorderedBulkOp();
 
     for (let i = 0; i < repos.length; i++) {
         let foundAll = false, page = 1;
+        let repo_commits_30d = 0;
+
         while (!foundAll) {
             let activity = (await octo.request(`GET /repos/${repos[i].full_name}/commits`, { per_page: 100, page: page, since: '2014-05-01T14:49:25Z' })).data;
             activity = activity.map(act => ({...act, repo_full_name: repos[i].full_name}));
             allCommits = [...allCommits, ...activity];
 
+            repo_commits_30d += activity.filter(commit => commit.commit.author && new Date(commit.commit.author.date) > lastMonth).length;
+
             foundAll = activity.length < 100;
             if (!foundAll) page++;
         }
+
+        bulk.find({ _id: repos[i]._id }).update(
+            [{ $set: { commits_30d: repo_commits_30d } }]
+        );
     }
 
+    bulk.execute();
+
     const contributors = {};
-    const now = new Date();
-    const lastMonth = new Date(now.setDate(now.getDate()-30));
 
     allCommits = allCommits.filter(commit => !!commit.author);
 
@@ -193,5 +205,3 @@ const task = cron.schedule('08 */2 * * *', async () => {
 const devListTask = cron.schedule('0,30 * * * *', async () => {
     await refreshDevList();
 });
-
-module.exports = { refreshRepos }

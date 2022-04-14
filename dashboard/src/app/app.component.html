@@ -115,7 +115,7 @@
           <ng-container *ngIf="reposData.length">
             <div class="card-body">
               <div class="card-title">
-                <h5>repos created by year</h5>
+                <h5>repos created / year</h5>
               </div>
               <div style="flex:auto; min-width: 0;">
                 <div class="chart" style="width: 100%; height: 417px">
@@ -130,21 +130,28 @@
 
       <div class="col-12 mb-3 md-md-0">
         <div class="card mb-4 mt-1" style="min-height: 220px;">
-          <div class="card-body">
-            <div class="card-title">
-              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 30 days"></fa-icon></h5>
+          <ng-container *ngIf="!busyRepos.length">
+            <div class="spinner-grow text-secondary align-self-center" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
-            <div class="d-flex pb-3" style="overflow-x: auto;">
-              <div *ngFor="let busy of busyRepos | slice:0:10" class="p-3 mt-2 mx-3 busy-repo">
-                <img [src]="busy.avatar_url" [alt]="busy.full_name" width="32" height="32" style="border-radius: 8px;" class="d-block me-3 mb-1">
-                <a style="font-size: 0.875rem;" [href]="'https://github.com/' + busy.full_name">{{busy.full_name.split('/')[1]}}</a>
-                <div class="mt-2">
-                  <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
-                  <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
+          </ng-container>
+          <ng-container *ngIf="busyRepos.length">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 30 days"></fa-icon></h5>
+              </div>
+              <div class="d-flex pb-3" style="overflow-x: auto;">
+                <div *ngFor="let busy of busyRepos | slice:0:15; let last = last" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo">
+                  <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
+                  <a [href]="'https://github.com/' + busy.full_name">{{busy.full_name.split('/')[1]}}</a>
+                  <div class="mt-2">
+                    <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
+                    <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -159,7 +166,7 @@
         <ng-container *ngIf="popularRepos.length">
           <div class="card-body">
             <div class="card-title">
-              <h5 class="mb-3">most popular repos</h5>
+              <h5>most popular repos</h5>
             </div>
             <ul class="list-group">
               <li *ngFor="let repo of popularReposPage" class="list-group-item">
@@ -169,7 +176,7 @@
                 <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
               </li>
             </ul>
-            <app-pagination [pageSize]="15" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
+            <app-pagination [pageSize]="16" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
           </div>
         </ng-container>
       </div>
@@ -231,7 +238,7 @@
                   <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                   <td>
                     <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
-                    <a [href]="'https://github.com/' + contrib.login" class="me-4">{{contrib.login}}</a>
+                    <a [href]="'https://github.com/' + contrib.login" class="me-3">{{contrib.login}}</a>
                     <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
                     <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
                     <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>

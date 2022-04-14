@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
     }
 
     getData(): void {
-        this.http.get('http://localhost:8080/data').subscribe((data: any) => {
+        this.http.get('https://nano.casa/data').subscribe((data: any) => {
             this.contributors = data.contributors;
             this.contributors = this.contributors.map(usr => {
                 const profile = data.devList.find(dl => dl.github.toLowerCase() === usr.login.toLowerCase());
@@ -104,7 +104,7 @@ export class AppComponent implements OnInit {
     setRepos(repos: Repo[]) {
         this.repos = repos;
         this.popularRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
-        this.busyRepos = [...repos].filter(a => (0 + a.prs_30d) > 0).sort((a, b) => b.prs_30d - a.prs_30d);
+        this.busyRepos = [...repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
         this.popularReposNames = this.popularRepos.map(r => r.full_name);
 
         // list years since 2014

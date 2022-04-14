@@ -5,7 +5,6 @@ const path =         require('path');
 const mongoose =     require('mongoose');
 const rateLimit =    require('express-rate-limit');
 const models =       require('./models');
-const { refreshRepos } = require('./cron');
 require('dotenv').config();
 mongoose.connect(process.env.DB_URL);
 
