@@ -24,6 +24,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@swimlane/ngx-charts": "^20.1.0",
     "jw-paginate": "^1.0.4",
+    "ngx-timeago": "^2.0.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

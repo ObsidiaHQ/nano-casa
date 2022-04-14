@@ -6,6 +6,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PaginationComponent } from './paginate.component';
+import { TimeagoModule } from 'ngx-timeago';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { PaginationComponent } from './paginate.component';
     NgxChartsModule,
     BrowserAnimationsModule,
     FontAwesomeModule,
-    HttpClientModule
+    HttpClientModule,
+    TimeagoModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
