@@ -2,12 +2,12 @@
 
   <div class="row">
     <div class="col-12">
-      <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://twitter.com/GeorgeMamar"><fa-icon [icon]="faTwitter"></fa-icon></a>
-      <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://github.com/obsidiaHQ/nano-casa"><fa-icon [icon]="faGithub"></fa-icon></a>
+      <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://twitter.com/GeorgeMamar" aria-label="nano casa Twitter updates"><fa-icon [icon]="faTwitter"></fa-icon></a>
+      <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://github.com/obsidiaHQ/nano-casa" aria-label="nano casa on GitHub"><fa-icon [icon]="faGithub"></fa-icon></a>
       <h3>Monitoring open source development in the nano ecosystem.</h3>
-      <small class="mb-5 d-block">last updated {{misc.last_updated | timeago:false}}</small>
+      <small class="mb-5 d-block">last updated <span *ngIf="misc.last_updated">{{misc.last_updated | timeago:false}}</span></small>
       <p class="fw-light font-italic">
-        Keep in mind that due to the financial use cases of the <a href="https://nano.org" target="_blank">nano</a> protocol, businesses and
+        Keep in mind that due to the financial use cases of the <a href="https://nano.org" target="_blank" aria-label="Nano">nano</a> protocol, businesses and
         startups are more likely to be secretive about their projects.
         These charts are only an indicator of open source activity, not the nano ecosystem in general. <br>
         P.S.: Many repos don't have any topics assigned and are therefore left out of the statistics. If you're a maintainer of a nano-related repo, make sure to tag it to help keep the data as accurate as possible!
@@ -52,7 +52,7 @@
             <h5 class="pt-1">latest repo</h5>
             <h5 class="mb-0">
               <span class="me-3"><fa-icon [icon]="faHistory"></fa-icon></span>
-              <a [href]="'https://github.com/' + repos[repos.length-1].full_name">{{repos[repos.length-1].name}}</a>
+              <a [href]="'https://github.com/' + repos[repos.length-1].full_name" [attr.aria-label]="repos[repos.length-1].name">{{repos[repos.length-1].name}}</a>
             </h5>
           </div>
         </ng-container>
@@ -86,7 +86,7 @@
           <div class="card-body">
             <h5 class="pt-1">{{misc.protocol_milestone.title}} progress</h5>
             <div class="progress">
-              <div class="progress-bar bg-warning" role="progressbar" 
+              <div class="progress-bar bg-warning" role="progressbar" aria-label="progress on latest nano protocol milestone"
                 [ngStyle]="{width: misc.protocol_milestone.closed_issues*100/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues)+'%' }"
                 [attr.aria-valuenow]="misc.protocol_milestone.closed_issues" 
                 [attr.aria-valuemin]="0" 
@@ -143,7 +143,7 @@
               <div class="d-flex pb-3" style="overflow-x: auto;">
                 <div *ngFor="let busy of busyRepos | slice:0:15; let last = last" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo">
                   <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
-                  <a [href]="'https://github.com/' + busy.full_name">{{busy.full_name.split('/')[1]}}</a>
+                  <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                   <div class="mt-2">
                     <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
                     <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
@@ -170,7 +170,7 @@
             </div>
             <ul class="list-group">
               <li *ngFor="let repo of popularReposPage" class="list-group-item">
-                <a [href]="'https://github.com/' + repo.full_name" target="_blank">
+                <a [href]="'https://github.com/' + repo.full_name" target="_blank" [attr.aria-label]="repo.full_name">
                   {{repo.name}}
                 </a>
                 <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
@@ -227,8 +227,8 @@
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">contributor</th>
-                <th scope="col">total commits <span role="button" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'total' ? 'lightsalmon' : ''}" (click)="sortContributors('total')"><fa-icon [icon]="faDown"></fa-icon></span></th>
-                <th scope="col">last month <span role="button" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'month' ? 'lightsalmon' : ''}" (click)="sortContributors('month')"><fa-icon [icon]="faDown"></fa-icon></span></th>
+                <th scope="col">total commits <span role="button" aria-label="Sort contributors by total commits" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'total' ? 'lightsalmon' : ''}" (click)="sortContributors('total')"><fa-icon [icon]="faDown"></fa-icon></span></th>
+                <th scope="col">last month <span role="button" aria-label="Sort contributors by last month's commits" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'month' ? 'lightsalmon' : ''}" (click)="sortContributors('month')"><fa-icon [icon]="faDown"></fa-icon></span></th>
                 <th scope="col" class="d-none d-md-table-cell"># of repos</th>
               </tr>
             </thead>
@@ -237,8 +237,8 @@
                 <tr>
                   <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                   <td>
-                    <img [src]="contrib.avatar_url" width="36" height="36" class="mx-3" style="border-radius: 6px;">
-                    <a [href]="'https://github.com/' + contrib.login" class="me-3">{{contrib.login}}</a>
+                    <img [src]="contrib.avatar_url" [alt]="contrib.login" width="36" height="36" class="mx-3" style="border-radius: 6px;">
+                    <a [href]="'https://github.com/' + contrib.login" class="me-3" [attr.aria-label]="contrib.login">{{contrib.login}}</a>
                     <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
                     <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
                     <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>
@@ -250,13 +250,13 @@
                       {{contrib.repos_count}}
                       <span class="p-2 mx-1 popover_title"><fa-icon [icon]="faRepo"></fa-icon></span>
                       <div class="popover_content">
-                        <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo">{{repo.split('/')[1]}}</a>
+                        <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo" [attr.aria-label]="repo.split('/')[1]">{{repo.split('/')[1]}}</a>
                         <span class="d-block mt-2" *ngIf="contrib.repos.length > 3">+{{contrib.repos.length-3}} more</span>
                       </div>
                     </div>
                   </td>
                   <td class="text-center">
-                    <a class="d-block mt-2 px-2" *ngIf="contrib.profile" data-bs-toggle="collapse" [href]="'#collapse' + contrib.login" role="button" aria-expanded="false" [attr.aria-controls]="'collapse' + contrib.login">
+                    <a class="d-block mt-2 px-2" *ngIf="contrib.profile" data-bs-toggle="collapse" [href]="'#collapse' + contrib.login" role="button" aria-expanded="false" [attr.aria-controls]="'collapse' + contrib.login" aria-label="Show contributor details">
                       <fa-icon [icon]="faMore"></fa-icon>
                     </a>
                   </td>
@@ -267,13 +267,13 @@
                     <div class="p-4">
                       <h5>
                         <span class="me-3">{{contrib.profile.name}}</span>
-                        <a title="View on NanoDevList" [href]="'https://NanoDevList.com/'" target="_blank" class="mx-2"><fa-icon [icon]="faExt"></fa-icon></a>
-                        <a *ngIf="contrib.profile.github" title="GitHub profile" [href]="'https://github.com/' + contrib.profile.github" target="_blank" class="mx-2"><fa-icon [icon]="faGithub"></fa-icon></a>
-                        <a *ngIf="contrib.profile.twitter" title="Twitter profile" [href]="'https://twitter.com/' + contrib.profile.twitter" target="_blank" class="mx-2"><fa-icon [icon]="faTwitter"></fa-icon></a>
+                        <a title="View on NanoDevList" aria-label="View on NanoDevList" [href]="'https://NanoDevList.com/'" target="_blank" class="mx-2"><fa-icon [icon]="faExt"></fa-icon></a>
+                        <a *ngIf="contrib.profile.github" title="GitHub profile" aria-label="GitHub profile" [href]="'https://github.com/' + contrib.profile.github" target="_blank" class="mx-2"><fa-icon [icon]="faGithub"></fa-icon></a>
+                        <a *ngIf="contrib.profile.twitter" title="Twitter profile" aria-label="Twitter profile" [href]="'https://twitter.com/' + contrib.profile.twitter" target="_blank" class="mx-2"><fa-icon [icon]="faTwitter"></fa-icon></a>
                       </h5>
                       <p class="my-3" [innerHTML]="contrib.profile.description"></p>
-                      <a class="mx-2" *ngIf="contrib.profile.sponsor_link" target="_blank" [href]="contrib.profile.sponsor_link" style="color: deeppink;"><fa-icon [icon]="faHeart"></fa-icon> sponsor</a>
-                      <a class="mx-2" *ngIf="contrib.profile.nano_account" target="_blank" [href]="'https://nano.to/' + contrib.profile.nano_account" style="color: cornflowerblue"><span style="font-size: 1.25rem; font-weight:lighter;">Ӿ</span> tip nano</a>
+                      <a class="mx-2" *ngIf="contrib.profile.sponsor_link" target="_blank" aria-label="Sponor on GitHub" [href]="contrib.profile.sponsor_link" style="color: deeppink;"><fa-icon [icon]="faHeart"></fa-icon> sponsor</a>
+                      <a class="mx-2" *ngIf="contrib.profile.nano_account" target="_blank" aria-label="Tip Nano" [href]="'https://nano.to/' + contrib.profile.nano_account" style="color: cornflowerblue"><span style="font-size: 1.25rem; font-weight:lighter;">Ӿ</span> tip nano</a>
                     </div>
                   </td>
                 </tr>
@@ -292,8 +292,8 @@
     <div class="col-12">
       <div class="card mb-4 mt-1 card-sm pt-3">
         <div class="card-body">
-          <a href="https://twitter.com/GeorgeMamar" target="_blank" class="mx-3">twitter updates</a>
-          <a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="mx-3">source</a>
+          <a href="https://twitter.com/GeorgeMamar" aria-label="nano casa Twitter updates" target="_blank" class="mx-3">twitter updates</a>
+          <a href="https://github.com/obsidiaHQ/nano-casa" aria-label="nano casa on GitHub" target="_blank" class="mx-3">source</a>
         </div>
       </div>
     </div>

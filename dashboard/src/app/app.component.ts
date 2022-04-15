@@ -76,7 +76,7 @@ export class AppComponent implements OnInit {
             open_issues: 0,
             closed_issues: 0
         },
-        last_updated: ''
+        last_updated: null
     }
     filterBy: string = 'total';
 
