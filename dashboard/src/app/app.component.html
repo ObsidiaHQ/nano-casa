@@ -1,26 +1,35 @@
-<div class="container my-5">
+<div class="container">
+  <div class="row justify-content-end">
+    <a class="mx-2" style="font-size: 1.5rem; width: 30px;" href="https://github.com/obsidiaHQ/nano-casa" aria-label="nano casa on GitHub"><fa-icon [icon]="faGithub"></fa-icon></a>
+    <a class="mx-2" style="font-size: 1.5rem; width: 30px;" href="https://twitter.com/GeorgeMamar" aria-label="nano casa Twitter updates"><fa-icon [icon]="faTwitter"></fa-icon></a>
+  </div>
+</div>
 
-  <div class="row">
-    <div class="col-12">
-      <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://twitter.com/GeorgeMamar" aria-label="nano casa Twitter updates"><fa-icon [icon]="faTwitter"></fa-icon></a>
-      <a class="mx-2" style="float: right; font-size: 1.5rem;" href="https://github.com/obsidiaHQ/nano-casa" aria-label="nano casa on GitHub"><fa-icon [icon]="faGithub"></fa-icon></a>
-      <h3>Monitoring open source development in the nano ecosystem.</h3>
-      <small class="mb-5 d-block">last updated <span *ngIf="misc.last_updated">{{misc.last_updated | timeago:false}}</span></small>
-      <p class="fw-light font-italic">
-        Keep in mind that due to the financial use cases of the <a href="https://nano.org" target="_blank" aria-label="Nano">nano</a> protocol, businesses and
-        startups are more likely to be secretive about their projects.
-        These charts are only an indicator of open source activity, not the nano ecosystem in general. <br>
-        P.S.: Many repos don't have any topics assigned and are therefore left out of the statistics. If you're a maintainer of a nano-related repo, make sure to tag it to help keep the data as accurate as possible!
+<div class="container mb-5">
+
+  <div class="row mb-3">
+    <section class="col-12">
+      <h3>About</h3>
+      <p>
+        nano.casa monitors the open source development of the <a href="https://nano.org" target="_blank" aria-label="Nano">nano</a> ecosystem, enabling developers and enthusiasts to easily track the progress of their favorite projects,
+        discover new ones and allowing them easier access to the information about who's currently working on what.
       </p>
       <p>
-        Repos being tracked have the following topics:
+        Goal: Drive more engagement by making it easier for people to find and follow developers within the community, as well as show their support via GitHub Sponsorships or nano donations.
+      </p>
+    </section>
+    <section class="col-12">
+      <h3>Methodology</h3>
+      <p>
+        we track GitHub repositories that have any one of the following topics: 
         <span class="badge rounded-pill bg-primary mx-1">nanocurrency</span>
         <span class="badge rounded-pill bg-primary mx-1">nano-currency</span>
         <span class="badge rounded-pill bg-primary mx-1">nano + cryptocurrency</span>
         <span class="badge rounded-pill bg-primary mx-1">nano-cryptocurrency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano + crypto</span>
+        <span class="badge rounded-pill bg-primary mx-1">nano + crypto</span>, 
+        as well as a list of known repos that haven't been tagged yet. <a href="https://github.com/obsidiaHQ/nano-casa/issues/1" target="_blank" aria-label="Suggest known repos">Suggestions are welcome</a>!
       </p>
-    </div>
+    </section>
   </div>
 
   <div class="row">
@@ -91,7 +100,7 @@
                 [attr.aria-valuenow]="misc.protocol_milestone.closed_issues" 
                 [attr.aria-valuemin]="0" 
                 [attr.aria-valuemax]="misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues">
-                <span style="height: 16px;">
+                <span>
                   {{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}} 
                   ({{misc.protocol_milestone.closed_issues/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues) | percent}})
                 </span>
@@ -236,15 +245,15 @@
               <ng-container *ngFor="let contrib of contributorsPage; let i = index;">
                 <tr>
                   <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
-                  <td>
+                  <td style="min-width: 270px;">
                     <img [src]="contrib.avatar_url" [alt]="contrib.login" width="36" height="36" class="mx-3" style="border-radius: 6px;">
                     <a [href]="'https://github.com/' + contrib.login" class="me-3" [attr.aria-label]="contrib.login">{{contrib.login}}</a>
                     <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
                     <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
                     <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>
                   </td>
-                  <td class="pt-3">{{contrib.contributions | number}}</td>
-                  <td class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
+                  <td style="min-width: 120px;" class="pt-3">{{contrib.contributions | number}}</td>
+                  <td style="min-width: 100px;" class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
                   <td class="pt-3 d-none d-md-table-cell" >
                     <div class="popover_wrapper" style="cursor: pointer;">
                       {{contrib.repos_count}}
@@ -289,6 +298,9 @@
   </div>
 
   <div class="row">
+    <div class="col-12">
+      <p><small class="mb-2 d-block">last updated <span *ngIf="misc.last_updated">{{misc.last_updated | timeago:false}}</span></small></p>
+    </div>
     <div class="col-12">
       <div class="card mb-4 mt-1 card-sm pt-3">
         <div class="card-body">
