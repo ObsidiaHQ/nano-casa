@@ -153,3 +153,11 @@ a:hover {
     max-width: 110px;
     display: inline-block;
 }
+.ghost {
+    animation: float 3.2s ease-out infinite;
+}
+@keyframes float {
+    50% {
+       transform: translate(0, 10px);
+    }
+}

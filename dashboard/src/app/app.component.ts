@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor, faArrowDown, faAngleDown, faHeart, faExternalLink, faCodeCommit, faCodePullRequest } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor, faArrowDown, faAngleDown, faHeart, faExternalLink, faCodeCommit, faCodePullRequest, faGhost } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ScaleType } from '@swimlane/ngx-charts';
 
@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
     faExt = faExternalLink;
     faCommit = faCodeCommit;
     faPR = faCodePullRequest;
+    faGhost = faGhost;
 
     reposData = [];
     popularRepos: Repo[] = [];
