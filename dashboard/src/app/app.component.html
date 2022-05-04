@@ -203,6 +203,35 @@
   <div class="row">
     <div class="col-12">
       <div class="card mb-4 mt-1">
+        <ng-container *ngIf="!repos">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="repos">
+          <div class="card-body">
+            <div class="card-title">
+              <h5>recently created</h5>
+            </div>
+            <div class="d-flex pb-3 flex-row-reverse" style="overflow-x: auto;">
+              <div *ngFor="let repo of repos | slice:-25; let first = first" [ngClass]="first ? '' : 'me-4'" class="p-3 mt-2 busy-repo">
+                <img [src]="repo.avatar_url" [alt]="repo.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
+                <a [href]="'https://github.com/' + repo.full_name" [attr.aria-label]="repo.full_name.split('/')[1]">{{repo.full_name.split('/')[1]}}</a>
+                <div class="mt-2">
+                  <span title="{{repo.created_at | date:'mediumDate'}}" class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faHistory"></fa-icon> {{repo.created_at | date:'MMM d'}}</span>
+                  <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4 mt-1">
         <ng-container *ngIf="!commits[0].series.length">
           <div class="spinner-grow text-secondary align-self-center" role="status">
             <span class="visually-hidden">Loading...</span>
