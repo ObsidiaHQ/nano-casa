@@ -94,17 +94,17 @@
         <ng-container *ngIf="contributors.length">
           <div class="card-body">
             <h5 class="pt-1">{{misc.protocol_milestone.title}} progress</h5>
-            <div class="progress">
+            <div class="progress position-relative">
               <div class="progress-bar bg-warning" role="progressbar" aria-label="progress on latest nano protocol milestone"
                 [ngStyle]="{width: misc.protocol_milestone.closed_issues*100/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues)+'%' }"
                 [attr.aria-valuenow]="misc.protocol_milestone.closed_issues" 
                 [attr.aria-valuemin]="0" 
                 [attr.aria-valuemax]="misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues">
-                <span>
-                  {{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}} 
-                  ({{misc.protocol_milestone.closed_issues/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues) | percent}})
-                </span>
               </div>
+              <span class="position-absolute text-white" style="right: 0; left: 0; margin: 0 auto;">
+                {{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}} 
+                ({{misc.protocol_milestone.closed_issues/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues) | percent}})
+              </span>
             </div>
           </div>
         </ng-container>
