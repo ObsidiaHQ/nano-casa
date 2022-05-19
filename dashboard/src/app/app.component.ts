@@ -68,6 +68,7 @@ export class AppComponent implements OnInit {
     contributorsPageIndex = 0;
 
     busyRepos: Repo[] = [];
+    recentRepos: Repo[] = [];
     repos: Repo[] = [];
     contributors: Contributor[] = [];
     commits = [{name: 'commits', series: []}];
@@ -104,6 +105,7 @@ export class AppComponent implements OnInit {
 
     setRepos(repos: Repo[]) {
         this.repos = repos;
+        this.recentRepos = [...repos].reverse();
         this.popularRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
         this.busyRepos = [...repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
         this.popularReposNames = this.popularRepos.map(r => r.full_name);
