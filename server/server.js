@@ -9,8 +9,8 @@ require('dotenv').config();
 mongoose.connect(process.env.DB_URL);
 
 const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	windowMs: 10 * 60 * 1000, // 10 minutes
+	max: 1000, // Limit each IP to 1000 requests per `window` (here, per 10 minutes)
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
@@ -21,11 +21,9 @@ app.use(compression());
 app.use(limiter);
 
 const build_path = './nano-casa';
+const explorer_path = './html'
 app.use(express.static(path.join(__dirname, build_path)));
-
-app.all('/', function (req, res) {
-    res.sendFile(path.resolve(__dirname, build_path, 'index.html'));
-});
+app.use(express.static(path.join(__dirname, explorer_path)));
 
 app.all('/data', async function (req, res) {
     const data = {
@@ -59,6 +57,14 @@ app.all('/data', async function (req, res) {
         devList: await models.Profile.find({}, { _id: 0 })
     };
     res.json(data);
+});
+
+app.get('/explorer', async function (req, res) {
+    res.sendFile(path.resolve(__dirname, explorer_path, 'index.html'));
+});
+
+app.all('/', function (req, res) {
+    res.sendFile(path.resolve(__dirname, build_path, 'index.html'));
 });
 
 app.listen(8080, function() {

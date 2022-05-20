@@ -7,7 +7,7 @@ require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 mongoose.connect(process.env.DB_URL);
 
-const IGNORED_REPOS = ['ITMFLtd/ITCONode', 'onitsoft/nexchange-open-client-react', 'imerkle/binbase_wallet_old', 'BizblocksChains/nexchange-open-client-react', 'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet', 'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo', 'dsvakola/Coin_sorter_counter_system', 'panapina/pina'];
+const IGNORED_REPOS = ['ITMFLtd/ITCONode', 'onitsoft/nexchange-open-client-react', 'imerkle/binbase_wallet_old', 'BizblocksChains/nexchange-open-client-react', 'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet', 'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo', 'dsvakola/Coin_sorter_counter_system', 'panapina/pina', 'Dogenano-xdg/dogenano-node'];
 const KNOWN_REPOS = {
     names: ['appditto/natrium_wallet_flutter', 'appditto/pippin_nano_wallet', 'appditto/nanodart', 'appditto/natrium-wallet-server', 'appditto/natricon', 'appditto/nanopaperwallet', 'appditto/flutter_nano_ffi', 'wezrule/UE4NanoPlugin', 'wezrule/UnityNanoPlugin'],
     repos: []
