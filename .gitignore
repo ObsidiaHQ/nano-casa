@@ -48,3 +48,4 @@ Thumbs.db
 .env
 deploy.sh
 html/
+*.xml
