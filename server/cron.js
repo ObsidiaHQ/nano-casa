@@ -7,9 +7,33 @@ require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 mongoose.connect(process.env.DB_URL);
 
-const IGNORED_REPOS = ['ITMFLtd/ITCONode', 'onitsoft/nexchange-open-client-react', 'imerkle/binbase_wallet_old', 'BizblocksChains/nexchange-open-client-react', 'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet', 'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo', 'dsvakola/Coin_sorter_counter_system', 'panapina/pina', 'Dogenano-xdg/dogenano-node'];
+const IGNORED_REPOS = [
+    'ITMFLtd/ITCONode', 
+    'onitsoft/nexchange-open-client-react', 
+    'imerkle/binbase_wallet_old', 
+    'BizblocksChains/nexchange-open-client-react', 
+    'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet', 
+    'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo', 
+    'dsvakola/Coin_sorter_counter_system', 
+    'panapina/pina', 
+    'Dogenano-xdg/dogenano-node'
+];
 const KNOWN_REPOS = {
-    names: ['appditto/natrium_wallet_flutter', 'appditto/pippin_nano_wallet', 'appditto/nanodart', 'appditto/natrium-wallet-server', 'appditto/natricon', 'appditto/nanopaperwallet', 'appditto/flutter_nano_ffi', 'wezrule/UE4NanoPlugin', 'wezrule/UnityNanoPlugin'],
+    names: [
+        'appditto/natrium_wallet_flutter', 
+        'appditto/pippin_nano_wallet', 
+        'appditto/nanodart', 
+        'appditto/natrium-wallet-server', 
+        'appditto/natricon', 
+        'appditto/nanopaperwallet', 
+        'appditto/flutter_nano_ffi', 
+        'wezrule/UE4NanoPlugin', 
+        'wezrule/UnityNanoPlugin', 
+        'nanocurrency/nano-work-server', 
+        'nanocurrency/protocol', 
+        'bbedward/graham_discord_bot', 
+        'simpago/rsnano-node'
+    ],
     repos: []
 };
 
@@ -141,7 +165,12 @@ async function refreshCommitsAndContributors(repos = []) {
 
     const contributors = {};
 
-    allCommits = allCommits.filter(commit => !!commit.author);
+    const seen = new Set();
+    allCommits = allCommits.filter(commit => {
+        const duplicateSHA = seen.has(commit.sha);
+        seen.add(commit.sha);
+        return !!commit.author && !duplicateSHA;
+    });
 
     allCommits.forEach((commit) =>{
         if (!contributors[commit.author.login]) {
@@ -205,3 +234,10 @@ const task = cron.schedule('08 */2 * * *', async () => {
 const devListTask = cron.schedule('0,30 * * * *', async () => {
     await refreshDevList();
 });
+
+// module.exports = { 
+//     refreshCommitsAndContributors, 
+//     refreshDevList, 
+//     refreshMisc, 
+//     refreshRepos 
+// };
