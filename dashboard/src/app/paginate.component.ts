@@ -14,7 +14,7 @@ import paginate from 'jw-paginate';
     </ul>`,
     styles: [`.pagination {
         margin-bottom: 0;
-        margin-top: 10px;
+        margin-top: 8px;
         display: flex;
         justify-content: center;
     }
