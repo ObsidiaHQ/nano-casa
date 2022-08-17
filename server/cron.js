@@ -85,6 +85,9 @@ async function refreshRepos() {
         }, {
             topic: 'nano+currency+in:description',
             repos: []
+        }, {
+            topic: 'topic:raiblocks',
+            repos: []
         }
     ];
 
