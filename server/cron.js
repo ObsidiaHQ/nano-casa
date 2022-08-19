@@ -142,31 +142,23 @@ async function refreshCommitsAndContributors(repos = []) {
     const startTime = new Date();
     const now = new Date();
     const lastMonth = new Date(now.setDate(now.getDate()-30));
-    const bulk = models.Repo.collection.initializeUnorderedBulkOp();
 
     for (let i = 0; i < repos.length; i++) {
         let foundAll = false, page = 1;
-        let repo_commits_30d = 0;
 
         while (!foundAll) {
             let activity = (await octo.request(`GET /repos/${repos[i].full_name}/commits`, { per_page: 100, page: page, since: '2014-05-01T14:49:25Z' })).data;
             activity = activity.map(act => ({...act, repo_full_name: repos[i].full_name}));
             allCommits = [...allCommits, ...activity];
 
-            repo_commits_30d += activity.filter(commit => commit.commit.author && new Date(commit.commit.author.date) > lastMonth).length;
-
             foundAll = activity.length < 100;
             if (!foundAll) page++;
         }
-
-        bulk.find({ _id: repos[i]._id }).update(
-            [{ $set: { commits_30d: repo_commits_30d } }]
-        );
     }
 
-    bulk.execute();
-
     const contributors = {};
+    const reposToUpdate = {};
+    const bulk = models.Repo.collection.initializeUnorderedBulkOp();
 
     const seen = new Set();
     allCommits = allCommits.filter(commit => {
@@ -175,7 +167,8 @@ async function refreshCommitsAndContributors(repos = []) {
         return !!commit.author && !duplicateSHA;
     });
 
-    allCommits.forEach((commit) =>{
+    for (let i = 0; i < allCommits.length; i++) {
+        const commit = allCommits[i];
         if (!contributors[commit.author.login]) {
             contributors[commit.author.login] = { 
                 avatar_url: commit.author.avatar_url, 
@@ -185,14 +178,23 @@ async function refreshCommitsAndContributors(repos = []) {
                 repos: []
             }
         }
-        if (contributors[commit.author.login]) {
-            contributors[commit.author.login].contributions += 1, 
-            contributors[commit.author.login].repos = [...contributors[commit.author.login].repos, commit.repo_full_name]
+        contributors[commit.author.login].contributions += 1;
+        contributors[commit.author.login].repos = [...contributors[commit.author.login].repos, commit.repo_full_name];
 
-            if (new Date(commit.commit.author?.date) > lastMonth)
-                contributors[commit.author.login].last_month += 1;
+        if (new Date(commit.commit.author?.date) > lastMonth) {
+            contributors[commit.author.login].last_month += 1;
+            reposToUpdate[commit.repo_full_name] = reposToUpdate[commit.repo_full_name] ?? 0;
+            reposToUpdate[commit.repo_full_name] += 1;
         }
+    }
+
+    Object.keys(reposToUpdate).forEach(name => {
+        bulk.find({ full_name: name }).updateOne(
+            [{ $set: { commits_30d: reposToUpdate[name] } }]
+        );
     });
+    bulk.execute();
+    
 
     const endTime1 = new Date();
     const timeDiff1 = Math.round((endTime1 - startTime) / 1000);
