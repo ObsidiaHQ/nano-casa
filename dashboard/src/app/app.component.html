@@ -114,6 +114,43 @@
   </div>
 
   <div class="row">
+    <div class="col-12">
+      <div class="card mb-4 mt-1">
+        <ng-container *ngIf="!repos.length">
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="repos.length">
+          <div class="card-body">
+            <div class="card-title">
+              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 30 days"></fa-icon></h5>
+            </div>
+            <ng-container *ngIf="busyRepos.length">
+              <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
+                <div *ngFor="let busy of busyRepos | slice:0:20; let last = last" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                  <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
+                  <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
+                  <div class="mt-2">
+                    <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
+                    <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!busyRepos.length">
+              <div class="text-center" style="opacity: 0.8;">
+                <fa-icon style="font-size: 3rem;" class="ghost d-block mb-2" [icon]="faGhost"></fa-icon>
+                <span class="mt-1">things are quite right now</span>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-12 col-md-8">
       <div class="col-12 mb-4">
         <div class="card mb-4 mt-1">
@@ -193,43 +230,6 @@
             </div>
           </ng-container>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4 mt-1">
-        <ng-container *ngIf="!repos.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="repos.length">
-          <div class="card-body">
-            <div class="card-title">
-              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 30 days"></fa-icon></h5>
-            </div>
-            <ng-container *ngIf="busyRepos.length">
-              <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
-                <div *ngFor="let busy of busyRepos | slice:0:20; let last = last" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
-                  <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
-                  <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
-                  <div class="mt-2">
-                    <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
-                    <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
-                  </div>
-                </div>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="!busyRepos.length">
-              <div class="text-center" style="opacity: 0.8;">
-                <fa-icon style="font-size: 3rem;" class="ghost d-block mb-2" [icon]="faGhost"></fa-icon>
-                <span class="mt-1">things are quite right now</span>
-              </div>
-            </ng-container>
-          </div>
-        </ng-container>
       </div>
     </div>
   </div>
