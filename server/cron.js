@@ -62,6 +62,7 @@ async function refreshMisc() {
 async function refreshRepos() {
     const startTime = new Date(), now = new Date();
     const lastMonth = new Date(now.setDate(now.getDate()-30));
+    const lastWeek = new Date(now.setDate(now.getDate()-7));
 
     const queries = [
         {
@@ -120,6 +121,7 @@ async function refreshRepos() {
             let pulls = (await octo.request(`GET /repos/${uniqueRepos[i].full_name}/pulls`, { per_page: 100, page: page })).data;
             pulls = pulls.filter(pr => new Date(pr.created_at) > lastMonth);
             uniqueRepos[i].prs_30d += pulls.length;
+            uniqueRepos[i].prs_7d += pulls.filter(pr => new Date(pr.created_at) > lastWeek).length;
 
             foundAll = pulls.length < 100;
             if (!foundAll) page++;
@@ -142,6 +144,7 @@ async function refreshCommitsAndContributors(repos = []) {
     const startTime = new Date();
     const now = new Date();
     const lastMonth = new Date(now.setDate(now.getDate()-30));
+    const lastWeek = new Date(now.setDate(now.getDate()-7));
 
     for (let i = 0; i < repos.length; i++) {
         let foundAll = false, page = 1;
@@ -183,14 +186,16 @@ async function refreshCommitsAndContributors(repos = []) {
 
         if (new Date(commit.commit.author?.date) > lastMonth) {
             contributors[commit.author.login].last_month += 1;
-            reposToUpdate[commit.repo_full_name] = reposToUpdate[commit.repo_full_name] ?? 0;
-            reposToUpdate[commit.repo_full_name] += 1;
+            reposToUpdate[commit.repo_full_name] = reposToUpdate[commit.repo_full_name] ?? {_30d: 0, _7d: 0};
+            reposToUpdate[commit.repo_full_name]._30d += 1;
+            if (new Date(commit.commit.author?.date) > lastWeek)
+                reposToUpdate[commit.repo_full_name]._7d += 1;
         }
     }
 
     Object.keys(reposToUpdate).forEach(name => {
         bulk.find({ full_name: name }).updateOne(
-            [{ $set: { commits_30d: reposToUpdate[name] } }]
+            [{ $set: { commits_30d: reposToUpdate[name]._30d, commits_7d: reposToUpdate[name]._7d } }]
         );
     });
     bulk.execute();
@@ -230,7 +235,7 @@ async function refreshDevList() {
     return devs;
 }
 
-const task = cron.schedule('08 */2 * * *', async () => {
+const task = cron.schedule('35 */2 * * *', async () => {
     await refreshMisc();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);

@@ -7,7 +7,9 @@ const Repo = mongoose.model('Repo', new mongoose.Schema({
     stargazers_count: Number,
     avatar_url:       String,
     prs_30d:          Number,
-    commits_30d:      Number
+    prs_7d:           Number,
+    commits_30d:      Number,
+    commits_7d:       Number
 }));
 const Commit = mongoose.model('Commit', new mongoose.Schema({
     repo_full_name:   String,

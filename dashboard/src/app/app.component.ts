@@ -10,7 +10,9 @@ interface Repo {
     created_at:       string,
     stargazers_count: number,
     prs_30d:          number,
+    prs_7d:           number,
     commits_30d:      number,
+    commits_7d:       number,
     avatar_url:       string  
 }
 interface Commit {
@@ -80,7 +82,8 @@ export class AppComponent implements OnInit {
         },
         last_updated: null
     }
-    filterBy: string = 'total';
+    filterBy: 'month' | 'total' = 'total';
+    busyLastWeek = false;
 
     constructor(private http: HttpClient) { }
 
@@ -139,5 +142,14 @@ export class AppComponent implements OnInit {
         if (this.filterBy === by) return;
         this.filterBy = by;
         this.contributors = [...this.contributors].sort((a,b) => by === 'total' ? (b.contributions - a.contributions) : (b.last_month - a.last_month));
+    }
+
+    filterBusyRepos(lastWeekOnly: boolean) {
+        this.busyLastWeek = lastWeekOnly;
+        if (lastWeekOnly) {
+            this.busyRepos = [...this.repos].filter(a => (a.commits_7d + a.prs_7d) > 0).sort((a, b) => (b.commits_7d + b.prs_7d) - (a.commits_7d + a.prs_7d));    
+            return;
+        }
+        this.busyRepos = [...this.repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
     }
 }

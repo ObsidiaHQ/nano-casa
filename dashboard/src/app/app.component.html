@@ -124,7 +124,10 @@
         <ng-container *ngIf="repos.length">
           <div class="card-body">
             <div class="card-title">
-              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 30 days"></fa-icon></h5>
+              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 7 or 30 days"></fa-icon>
+                <a role="button" class="ms-3 opacity-50" [ngStyle]="{'text-decoration': busyLastWeek ? 'underline' : ''}" title="Last week" (click)="filterBusyRepos(true)">7d</a>
+                <a role="button" class="ms-3 opacity-50" [ngStyle]="{'text-decoration': !busyLastWeek ? 'underline' : ''}" title="Last month" (click)="filterBusyRepos(false)">30d</a>
+              </h5>
             </div>
             <ng-container *ngIf="busyRepos.length">
               <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
@@ -132,7 +135,7 @@
                   <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
                   <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                   <div class="mt-2">
-                    <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busy.commits_30d || 0}} commits</span>
+                    <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busyLastWeek ? busy.commits_7d : busy.commits_30d || 0}} commits</span>
                     <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
                   </div>
                 </div>
