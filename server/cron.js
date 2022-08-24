@@ -60,9 +60,9 @@ async function refreshMisc() {
 }
 
 async function refreshRepos() {
-    const startTime = new Date(), now = new Date();
-    const lastMonth = new Date(now.setDate(now.getDate()-30));
-    const lastWeek = new Date(now.setDate(now.getDate()-7));
+    const startTime = new Date();
+    const lastMonth = new Date(new Date().setDate(new Date().getDate()-30));
+    const lastWeek = new Date(new Date().setDate(new Date().getDate()-7));
 
     const queries = [
         {
@@ -117,6 +117,7 @@ async function refreshRepos() {
     for (let i = 0; i < uniqueRepos.length; i++) {
         let foundAll = false, page = 1;
         uniqueRepos[i].prs_30d = 0;
+        uniqueRepos[i].prs_7d = 0;
         while (!foundAll) {
             let pulls = (await octo.request(`GET /repos/${uniqueRepos[i].full_name}/pulls`, { per_page: 100, page: page })).data;
             pulls = pulls.filter(pr => new Date(pr.created_at) > lastMonth);
@@ -128,7 +129,7 @@ async function refreshRepos() {
         }
     }
 
-    const normalized = uniqueRepos.map(({ id, name, full_name, html_url, created_at, stargazers_count, owner, prs_30d }) => new models.Repo({ id, name, full_name, html_url, created_at, stargazers_count, avatar_url: owner.avatar_url, prs_30d }));
+    const normalized = uniqueRepos.map(({ id, name, full_name, html_url, created_at, stargazers_count, owner, prs_30d, prs_7d }) => new models.Repo({ id, name, full_name, html_url, created_at, stargazers_count, avatar_url: owner.avatar_url, prs_30d, prs_7d }));
     await models.Repo.collection.drop();
     await models.Repo.collection.insertMany(normalized);
 
@@ -142,9 +143,8 @@ async function refreshRepos() {
 async function refreshCommitsAndContributors(repos = []) {
     let allCommits = []; 
     const startTime = new Date();
-    const now = new Date();
-    const lastMonth = new Date(now.setDate(now.getDate()-30));
-    const lastWeek = new Date(now.setDate(now.getDate()-7));
+    const lastMonth = new Date(new Date().setDate(new Date().getDate()-30));
+    const lastWeek = new Date(new Date().setDate(new Date().getDate()-7));
 
     for (let i = 0; i < repos.length; i++) {
         let foundAll = false, page = 1;
@@ -235,7 +235,7 @@ async function refreshDevList() {
     return devs;
 }
 
-const task = cron.schedule('35 */2 * * *', async () => {
+const task = cron.schedule('0 */2 * * *', async () => {
     await refreshMisc();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
