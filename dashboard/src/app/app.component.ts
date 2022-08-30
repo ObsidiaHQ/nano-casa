@@ -152,4 +152,12 @@ export class AppComponent implements OnInit {
         }
         this.busyRepos = [...this.repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
     }
+
+    trackByName(index, item) {
+        return item.full_name;
+    }
+
+    trackByLogin(index, item) {
+        return item.login;
+    }
 }

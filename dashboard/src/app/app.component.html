@@ -131,7 +131,7 @@
             </div>
             <ng-container *ngIf="busyRepos.length">
               <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
-                <div *ngFor="let busy of busyRepos | slice:0:20; let last = last" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                <div *ngFor="let busy of busyRepos | slice:0:20; trackBy: trackByName; let last = last;" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
                   <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
                   <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                   <div class="mt-2">
@@ -191,7 +191,7 @@
                 <h5>recently created</h5>
               </div>
               <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
-                <div *ngFor="let repo of recentRepos | slice:0:25; let last = last; let first = first" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                <div *ngFor="let repo of recentRepos | slice:0:25; trackBy: trackByName; let last = last; let first = first" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
                   <img [src]="repo.avatar_url" [alt]="repo.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
                   <a [href]="'https://github.com/' + repo.full_name" [attr.aria-label]="repo.full_name.split('/')[1]">{{repo.full_name.split('/')[1]}}</a>
                   <div class="mt-2">
@@ -222,7 +222,7 @@
                 <h5>most popular repos</h5>
               </div>
               <ul class="list-group">
-                <li *ngFor="let repo of popularReposPage" class="list-group-item">
+                <li *ngFor="let repo of popularReposPage; trackBy: trackByName" class="list-group-item">
                   <a [href]="'https://github.com/' + repo.full_name" target="_blank" [attr.aria-label]="repo.full_name">
                     {{repo.name}}
                   </a>
@@ -287,7 +287,7 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let contrib of contributorsPage; let i = index;">
+              <ng-container *ngFor="let contrib of contributorsPage; trackBy: trackByLogin; let i = index;">
                 <tr>
                   <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                   <td style="min-width: 270px;">
