@@ -32,7 +32,13 @@ const KNOWN_REPOS = {
         'nanocurrency/nano-work-server', 
         'nanocurrency/protocol', 
         'bbedward/graham_discord_bot', 
-        'simpago/rsnano-node'
+        'simpago/rsnano-node',
+        'tjl-dev/npass',
+        'guilhermelawless/nano-dpow',
+        'icarusglider/PyRai',
+        'cronoh/nanovault-ws',
+        'cronoh/nanovault-server',
+        'npy0/nanopy'
     ],
     repos: []
 };
