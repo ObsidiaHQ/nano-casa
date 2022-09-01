@@ -38,7 +38,11 @@ const KNOWN_REPOS = {
         'icarusglider/PyRai',
         'cronoh/nanovault-ws',
         'cronoh/nanovault-server',
-        'npy0/nanopy'
+        'npy0/nanopy',
+        'unyieldinggrace/nanofusion',
+        'anarkrypto/confirmy-block',
+        'accept-nano/accept-nano',
+        'accept-nano/accept-nano-client'
     ],
     repos: []
 };
