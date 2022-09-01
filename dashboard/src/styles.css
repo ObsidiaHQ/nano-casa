@@ -54,6 +54,7 @@
     --border-light: rgb(53, 73, 90);
     --bg-darker: hsl(211, 28%, 17%);
     --bg-dark: hsl(211, 28%, 21%);
+    --bg-dark-badge: hsl(211, 28%, 25%);
     --bg-light1: rgb(184, 176, 141);
     --bg-light2: rgb(207, 192, 189);
     --bg-light3: rgb(242, 212, 146);
@@ -71,6 +72,10 @@ tr, thead, th {
 .bg-primary {
     background-color: var(--bg-light2) !important;
     color: var(--secondary-text);
+}
+.badge.bg-primary {
+    background-color: var(--bg-dark-badge) !important;
+    color: var(--primary-text);
 }
 .bg-warning {
     background-color: var(--bg-light4) !important;
