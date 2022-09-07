@@ -42,7 +42,10 @@ const KNOWN_REPOS = {
         'unyieldinggrace/nanofusion',
         'anarkrypto/confirmy-block',
         'accept-nano/accept-nano',
-        'accept-nano/accept-nano-client'
+        'accept-nano/accept-nano-client',
+        'cryptocode/nanocap',
+        'mitche50/NanoTipBot',
+        'danhitchcock/nano_tipper_z'
     ],
     repos: []
 };
