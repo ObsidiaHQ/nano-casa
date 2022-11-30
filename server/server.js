@@ -25,7 +25,7 @@ const explorer_path = './html'
 app.use(express.static(path.join(__dirname, build_path)));
 app.use(express.static(path.join(__dirname, explorer_path)));
 
-app.all('/data', async function (req, res) {
+app.get('/data', async function (req, res) {
     const data = {
         repos: await models.Repo.find({}, { _id: 0 }).sort({ created_at: 'asc' }).lean(),
         contributors: await models.Contributor.aggregate([
@@ -63,7 +63,11 @@ app.get('/explorer', async function (req, res) {
     res.sendFile(path.resolve(__dirname, explorer_path, 'index.html'));
 });
 
-app.all('/', function (req, res) {
+app.get('/ping', function (req, res) {
+    res.status(200).send('pong');
+});
+
+app.get('/', function (req, res) {
     res.sendFile(path.resolve(__dirname, build_path, 'index.html'));
 });
 
