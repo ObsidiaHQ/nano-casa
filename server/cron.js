@@ -1,4 +1,4 @@
-const cron =         require('node-cron');
+const Cron =         require('croner');
 const { Octokit } =  require('octokit');
 const mongoose =     require('mongoose');
 const models =       require('./models');
@@ -45,7 +45,8 @@ const KNOWN_REPOS = {
         'accept-nano/accept-nano-client',
         'cryptocode/nanocap',
         'mitche50/NanoTipBot',
-        'danhitchcock/nano_tipper_z'
+        'danhitchcock/nano_tipper_z',
+        'AuliaYF/easyraikit-python'
     ],
     repos: []
 };
@@ -247,14 +248,10 @@ async function refreshDevList() {
     await models.Profile.collection.insertMany(devs);
     return devs;
 }
-
-const task = cron.schedule('0 */2 * * *', async () => {
-    await refreshMisc();
+const job = new Cron("0 * * * *", async () => {
+	await refreshMisc();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
-});
-
-const devListTask = cron.schedule('0,30 * * * *', async () => {
     await refreshDevList();
 });
 
