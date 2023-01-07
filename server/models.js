@@ -23,14 +23,11 @@ const Contributor = mongoose.model('Contributor', new mongoose.Schema({
     last_month:       Number,
     repos:            [String]
 }));
-const Misc = mongoose.model('Misc', new mongoose.Schema({
-    protocol_milestone: {
-        title:         String,
-        open_issues:   Number,
-        closed_issues: Number
-    },
-    last_updated: Date
-}));
+const Milestone = mongoose.model('Milestone', new mongoose.Schema({
+    title:         String,
+    open_issues:   Number,
+    closed_issues: Number
+}, { timestamps: { createdAt: 'created_at', updatedAt: false } }));
 const Profile = mongoose.model('Profile', new mongoose.Schema({
     name:              String,
     github:            String,
@@ -41,4 +38,4 @@ const Profile = mongoose.model('Profile', new mongoose.Schema({
     tags:              [String]
 }));
 
-module.exports = { Repo, Commit, Contributor, Misc, Profile };
+module.exports = { Repo, Commit, Contributor, Milestone, Profile };

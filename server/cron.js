@@ -46,31 +46,26 @@ const KNOWN_REPOS = {
         'cryptocode/nanocap',
         'mitche50/NanoTipBot',
         'danhitchcock/nano_tipper_z',
-        'AuliaYF/easyraikit-python'
+        'AuliaYF/easyraikit-python',
+        'vitorcremonez/nano-vanity'
     ],
     repos: []
 };
 
-async function refreshMisc() {
+async function refreshMilestones() {
     const startTime = new Date();
     const milestones = (await octo.request('GET /repos/nanocurrency/nano-node/milestones')).data;
-    const open = milestones.filter(m => m.state == 'open').sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)));
-    const latest = open.filter(m => m.title.toLowerCase().startsWith('v'));
+    const latest = milestones
+                    .filter(m => m.state == 'open' && m.title.toLowerCase().startsWith('v'))
+                    .sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)));
 
-    const normalized = new models.Misc({
-        protocol_milestone: {
-            title: latest[0]?.title || open[0]?.title || 'inactive',
-            open_issues: latest[0]?.open_issues || open[0]?.open_issues || 0,
-            closed_issues: latest[0]?.closed_issues || open[0]?.closed_issues || 0
-        }, 
-        last_updated: new Date()
-    });
-    await models.Misc.collection.drop();
-    await models.Misc.collection.insertOne(normalized);
+    const normalized = latest.map(({title, open_issues, closed_issues}) => new models.Milestone({title, open_issues, closed_issues}));
+    await models.Milestone.collection.drop();
+    await models.Milestone.insertMany(normalized);
 
     const endTime = new Date();
     const timeDiff = Math.round((endTime - startTime) / 1000);
-    console.log("refreshed misc in", timeDiff, "seconds");
+    console.log("refreshed milestones in", timeDiff, "seconds");
 }
 
 async function refreshRepos() {
@@ -249,7 +244,7 @@ async function refreshDevList() {
     return devs;
 }
 const job = new Cron("0 * * * *", async () => {
-	await refreshMisc();
+	await refreshMilestones();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
     await refreshDevList();
@@ -258,6 +253,6 @@ const job = new Cron("0 * * * *", async () => {
 // module.exports = { 
 //     refreshCommitsAndContributors, 
 //     refreshDevList, 
-//     refreshMisc, 
+//     refreshMilestones, 
 //     refreshRepos 
 // };

@@ -53,7 +53,7 @@ app.get('/data', async function (req, res) {
         }, { 
             $project: { date: { $concat: [{ $toString: '$_id.year' }, '|', { $toString: '$_id.week' }] }, count: 1, _id: 0 } 
         }]),
-        misc: await models.Misc.findOne({ _id: { '$ne': null }}, { _id: 0 }).lean(),
+        milestones: await models.Milestone.find({}, { _id: 0 }).lean(),
         devList: await models.Profile.find({}, { _id: 0 }).lean()
     };
     res.json(data);

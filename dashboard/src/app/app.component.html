@@ -99,17 +99,17 @@
         </ng-container>
         <ng-container *ngIf="contributors.length">
           <div class="card-body">
-            <h5 class="pt-1">{{misc.protocol_milestone.title}} progress</h5>
+            <h5 class="pt-1">{{milestones[0].title}}</h5>
             <div class="progress position-relative">
               <div class="progress-bar bg-warning" role="progressbar" aria-label="progress on latest nano protocol milestone"
-                [ngStyle]="{width: misc.protocol_milestone.closed_issues*100/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues)+'%' }"
-                [attr.aria-valuenow]="misc.protocol_milestone.closed_issues" 
+                [ngStyle]="{width: milestones[0].closed_issues*100/(milestones[0].open_issues + milestones[0].closed_issues)+'%' }"
+                [attr.aria-valuenow]="milestones[0].closed_issues" 
                 [attr.aria-valuemin]="0" 
-                [attr.aria-valuemax]="misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues">
+                [attr.aria-valuemax]="milestones[0].open_issues + milestones[0].closed_issues">
               </div>
               <span class="position-absolute text-white" style="right: 0; left: 0; margin: 0 auto;">
-                {{misc.protocol_milestone.closed_issues}}/{{misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues}} 
-                ({{misc.protocol_milestone.closed_issues/(misc.protocol_milestone.open_issues + misc.protocol_milestone.closed_issues) | percent}})
+                {{milestones[0].closed_issues}}/{{milestones[0].open_issues + milestones[0].closed_issues}} 
+                ({{milestones[0].closed_issues/(milestones[0].open_issues + milestones[0].closed_issues) | percent}})
               </span>
             </div>
           </div>
@@ -349,7 +349,7 @@
 
   <div class="row">
     <div class="col-12">
-      <p><small class="mb-2 d-block">last updated <span *ngIf="misc.last_updated">{{misc.last_updated | timeago:false}}</span></small></p>
+      <p><small class="mb-2 d-block">last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago:false}}</span></small></p>
     </div>
     <div class="col-12">
       <div class="card mt-1 card-sm">

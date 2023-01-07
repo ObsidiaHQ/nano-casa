@@ -28,13 +28,11 @@ interface Contributor {
     repos_count:      number,
     profile:          any
 }
-interface Misc {
-    protocol_milestone: {
-        title:         string,
-        open_issues:   number,
-        closed_issues: number
-    },
-    last_updated: any
+interface Milestone {
+    title:         string,
+    open_issues:   number,
+    closed_issues: number,
+    created_at:    string
 }
 
 @Component({
@@ -74,14 +72,7 @@ export class AppComponent implements OnInit {
     repos: Repo[] = [];
     contributors: Contributor[] = [];
     commits = [{name: 'commits', series: []}];
-    misc: Misc = {
-        protocol_milestone: {
-            title: '',
-            open_issues: 0,
-            closed_issues: 0
-        },
-        last_updated: null
-    }
+    milestones: Milestone[] = [];
     filterBy: 'month' | 'total' = 'total';
     busyLastWeek = false;
 
@@ -100,7 +91,7 @@ export class AppComponent implements OnInit {
                     profile.description = profile.description.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
                 return ({...usr, profile });
             });
-            this.misc = data.misc;
+            this.milestones = data.milestones;
             this.setRepos(data.repos);
             this.setCommits(data.commits);
         });
