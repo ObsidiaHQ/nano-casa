@@ -13,6 +13,7 @@ const Repo = mongoose.model(
         prs_7d: Number,
         commits_30d: Number,
         commits_7d: Number,
+        description: String,
     })
 );
 const Commit = mongoose.model(

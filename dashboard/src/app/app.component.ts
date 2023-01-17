@@ -13,7 +13,8 @@ interface Repo {
     prs_7d:           number,
     commits_30d:      number,
     commits_7d:       number,
-    avatar_url:       string  
+    avatar_url:       string,
+    description:      string
 }
 interface Commit {
     count:            number, 

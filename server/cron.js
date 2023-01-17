@@ -187,6 +187,7 @@ async function refreshRepos() {
             owner,
             prs_30d,
             prs_7d,
+            description,
         }) =>
             new models.Repo({
                 id,
@@ -199,6 +200,7 @@ async function refreshRepos() {
                 avatar_url: owner.avatar_url,
                 prs_30d,
                 prs_7d,
+                description,
             })
     );
     await models.Repo.collection.drop();
@@ -364,6 +366,33 @@ const job = new Cron('0 * * * *', async () => {
     await refreshCommitsAndContributors(repos);
     await refreshDevList();
 });
+
+// returns a random index weighted inversely
+function getSpotlight(repos) {
+    const weights = repos.map(({ stargazers_count, commits_30d, prs_30d }) => {
+        const activity = commits_30d + prs_30d || 0;
+        return activity / repos.length + 1 / (stargazers_count + 1);
+    });
+
+    let total = 0;
+    for (let weight of weights) {
+        total += weight;
+    }
+
+    let max = weights[0];
+    const random = Math.random() * total;
+    console.log(random, total);
+
+    for (let index = 0; index < weights.length; index++) {
+        if (random < max) {
+            return repos[index];
+        } else if (index === weights.length - 1) {
+            return repos[weights.length - 1];
+        }
+        max += weights[index + 1];
+    }
+    return repos[Math.floor(Math.random() * items.length)];
+}
 
 // module.exports = {
 //     refreshCommitsAndContributors,
