@@ -27,9 +27,18 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@tabler/core/dist/css/tabler.min.css",
+              "./node_modules/@tabler/core/dist/css/tabler-flags.min.css",
+              "./node_modules/@tabler/core/dist/css/tabler-payments.min.css",
+              "./node_modules/@tabler/core/dist/css/tabler-vendors.min.css",
+              "./node_modules/@tabler/core/dist/css/demo.min.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/@tabler/core/dist/js/tabler.min.js",
+              "./node_modules/@tabler/core/dist/js/demo.min.js",
+              "./node_modules/@tabler/core/dist/js/demo-theme.min.js"
+            ]
           },
           "configurations": {
             "production": {

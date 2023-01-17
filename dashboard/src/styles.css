@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files
 :root {
     --bs-blue: rgb(242, 149, 89);
     --bs-indigo: #6610f2;
@@ -88,12 +88,7 @@ a, thead th {
 a:hover {
     color: var(--bg-light4);
 }
-.card {
-    background-color: var(--bg-dark);
-    border-radius: 14px;
-    min-height: 200px;
-    justify-content: center;
-}
+
 .card-sm {
     min-height: 100px;
     text-align: center;
@@ -165,4 +160,29 @@ a:hover {
     50% {
        transform: translate(0, 10px);
     }
+} */
+@font-face {
+    font-family: 'Noto Sans';
+    src: url('assets/NotoSans-Regular.ttf') format('truetype'), url('assets/NotoSans-Medium.ttf') format('truetype'), url('assets/NotoSans-Thin.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+body {
+    font-family: 'Noto Sans';
+    text-rendering: optimizeLegibility;
+}
+.card {
+    min-height: 74px;
+    justify-content: center;
+}
+a {
+    color: #4492ee
+}
+a:hover {
+    cursor: pointer;
+}
+.badge {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
 }
