@@ -186,3 +186,17 @@ a:hover {
     vertical-align: middle;
     line-height: normal;
 }
+.ngx-charts .gridline-path, .ngx-charts text {
+    stroke: rgba(var(--tblr-muted-rgb),0.2) !important;
+    fill: rgba(var(--tblr-muted-rgb),1) !important;
+}
+.avatar.avatar-sm {
+    object-fit: cover;
+    width: 30px !important;
+    height: 30px !important;
+    max-width: initial;
+}
+.badge:hover .icon-tabler-star {
+    fill: orange;
+    cursor: pointer;
+}

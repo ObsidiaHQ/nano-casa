@@ -74,10 +74,10 @@
                   </span>
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="./#">
+                  <a class="dropdown-item" href="https://nano.casa/explorer">
                     Node Explorer
                   </a>
-                  <a class="dropdown-item" href="./#">
+                  <a class="dropdown-item" href="https://github.com/obsidiaHQ/nano-casa/issues/1" target="_blank">
                     Add a Project
                   </a>
                 </div>
@@ -240,11 +240,79 @@
 
         </div>
 
+        <div class="row">
+          <div class="col-12 col-md-8 mt-3">
+            <div class="card">
+              <ng-container *ngIf="!commits[0].series.length">
+                <div class="spinner-grow text-secondary align-self-center" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="commits[0].series.length">
+
+                <div class="card-body">
+                  <div class="card-title">
+                    <h3>Weekly activity</h3>
+                  </div>
+                  <div style="flex:auto; min-width: 0;">
+                    <div class="chart" style="width: 100%; height: 417px">
+                      <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="commits" scheme="horizon" [schemeType]="ScaleType.Ordinal">
+                      </ngx-charts-area-chart>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          <div class="col-12 col-md-4 mt-3">
+            <div class="card" style="height: 489px;">
+              <div class="card-table table-responsive">
+                <table class="table table-vcenter">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Commit</th>
+                      <th class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock-hour-8" width="24" height="24"
+                          viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <circle cx="12" cy="12" r="9"></circle>
+                          <path d="M12 12l-3 2"></path>
+                          <path d="M12 7v5"></path>
+                        </svg></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let commit of contributors|slice:0:11">
+                      <td class="w-1 py-1">
+                        <img class="avatar avatar-sm" src="{{commit.avatar_url}}" [alt]="commit.login" [title]="commit.login">
+                      </td>
+                      <td class="td-truncate py-1">
+                        <div class="text-truncate opacity-80">
+                          Fix dart Sass compatibility (#29755)
+                        </div>
+                      </td>
+                      <td class="text-nowrap text-muted py-1">28 Nov 2019</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="col-12 mt-3">
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Projects</h3>
+              <div class="ms-4 lh-1">
+                <div class="dropdown">
+                  <a class="dropdown-toggle text-muted" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Most popular</a>
+                  <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item active" href="#">Most popular</a>
+                    <a class="dropdown-item" href="#">Most recent</a>
+                  </div>
+                </div>
+              </div>
               <div class="ms-auto d-inline-block">
                 <input type="text" class="form-control form-control-sm" aria-label="Search invoice" placeholder="Search">
               </div>
@@ -264,20 +332,22 @@
                       <div class="d-flex py-1 align-items-center">
                         <div class="flex-fill">
                           <div class="font-weight-medium">
-                            <a href="https://github.com/{{repo.full_name}}" target="_blank">{{repo.name}}</a>
-                            <span class="badge bg-yellow-lt ms-2">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-star" width="24" height="24" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path>
-                              </svg>
-                              {{repo.stargazers_count}}
-                            </span>
+                            <a href="https://github.com/{{repo.full_name}}" target="_blank">
+                              <span>{{repo.name}}</span>
+                              <span class="badge bg-yellow-lt ms-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-star" width="24" height="24" viewBox="0 0 24 24"
+                                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                  <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path>
+                                </svg>
+                                {{repo.stargazers_count}}
+                              </span>
+                            </a>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td data-label="Title">
+                    <td data-label="Description">
                       <span class="opacity-75">{{repo.description}}</span>
                     </td>
                     <td>
@@ -298,6 +368,7 @@
         <div class="row text-center align-items-center flex-row-reverse">
           <div class="col-lg-auto ms-lg-auto">
             <ul class="list-inline list-inline-dots mb-0">
+              <li class="list-inline-item text-secondary">Last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago:false}}</span></li>
               <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
               <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
               </li>
