@@ -291,7 +291,7 @@
                           Fix dart Sass compatibility (#29755)
                         </div>
                       </td>
-                      <td class="text-nowrap text-muted py-1">28 Nov 2019</td>
+                      <td class="text-nowrap text-muted py-1">{{'28 Nov 2019' | timeago:true}}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -323,7 +323,15 @@
                   <tr>
                     <th>Name</th>
                     <th>Description</th>
-                    <th class="w-1"></th>
+                    <th class="text-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock-hour-8" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M12 12l-3 2"></path>
+                        <path d="M12 7v5"></path>
+                      </svg>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -350,7 +358,8 @@
                     <td data-label="Description">
                       <span class="opacity-75">{{repo.description}}</span>
                     </td>
-                    <td>
+                    <td data-label="Date created" class="text-muted" [title]="repo.created_at | date">
+                      {{repo.created_at | timeago}}
                     </td>
                   </tr>
                 </tbody>
@@ -473,7 +482,7 @@
         <div class="row text-center align-items-center flex-row-reverse">
           <div class="col-lg-auto ms-lg-auto">
             <ul class="list-inline list-inline-dots mb-0">
-              <li class="list-inline-item text-secondary">Last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago:false}}</span></li>
+              <li class="list-inline-item text-secondary">Last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago:true}}</span></li>
               <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
               <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
               </li>
