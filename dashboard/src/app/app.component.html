@@ -282,7 +282,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let commit of contributors|slice:0:11">
+                    <tr *ngFor="let commit of contributors|slice:0:12">
                       <td class="w-1 py-1">
                         <img class="avatar avatar-sm" src="{{commit.avatar_url}}" [alt]="commit.login" [title]="commit.login">
                       </td>
@@ -327,9 +327,9 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let repo of popularReposPage">
+                  <tr *ngFor="let repo of popularReposPage; trackBy: trackByName">
                     <td data-label="Name" class="py-2">
-                      <div class="d-flex py-1 align-items-center">
+                      <div class="d-flex align-items-center">
                         <div class="flex-fill">
                           <div class="font-weight-medium">
                             <a href="https://github.com/{{repo.full_name}}" target="_blank">
@@ -357,6 +357,111 @@
               </table>
             </div>
             <app-pagination [pageSize]="16" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
+          </div>
+        </div>
+
+        <div class="col-12 mt-3">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Contributors</h3>
+              <div class="ms-auto d-inline-block">
+                <input type="text" class="form-control form-control-sm" aria-label="Search invoice" placeholder="Search">
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-vcenter table-mobile-md card-table">
+                <thead>
+                  <tr>
+                    <th width="30px">#</th>
+                    <th>Name</th>
+                    <th>Total commits</th>
+                    <th>Last month</th>
+                    <th class="w-1"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of contributorsPage; let i = index; trackBy: trackByLogin;">
+                    <td class="py-2" scope="row">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
+                    <td data-label="Name" class="py-2">
+                      <div class="d-flex align-items-center">
+                        <img class="avatar me-3" [src]="user.avatar_url">
+                        <div class="flex-fill">
+                          <div class="font-weight-medium">
+                            <a class="me-2" href="https://github.com/{{user.login}}" target="_blank">
+                              <span>{{user.login}}</span>
+                            </a>
+                            <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo" *ngIf="contributedToNode(user.repos)">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-award" width="24" height="24" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <circle cx="12" cy="9" r="6"></circle>
+                                <path d="M12.002 15.003l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889"></path>
+                                <path d="M6.802 12.003l-3.4 5.89l3.598 -.233l1.598 3.232l3.4 -5.889"></path>
+                              </svg>
+                            </span>
+                            <span class="badge bg-purple-lt ms-2 cursor-help" title="Contributed to 10 repos or more" *ngIf="user.repos.length >= 10">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-meteor" width="24" height="24" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M21 3l-5 9h5l-6.891 7.086a6.5 6.5 0 1 1 -8.855 -9.506l7.746 -6.58l-1 5l9 -5z"></path>
+                                <circle cx="9.5" cy="14.5" r="2.5"></circle>
+                              </svg>
+                            </span>
+                            <span class="badge bg-orange-lt ms-2 cursor-help" title="Contributed to a popular repo" *ngIf="hasPopularRepo(user.repos)">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-north-star" width="24" height="24" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M3 12h18"></path>
+                                <path d="M12 21v-18"></path>
+                                <path d="M7.5 7.5l9 9"></path>
+                                <path d="M7.5 16.5l9 -9"></path>
+                              </svg>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-2" data-label="Total commits">
+                      <span class="opacity-75">{{user.contributions | number}}</span>
+                    </td>
+                    <td class="py-2" data-label="Last month">
+                      <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
+                    </td>
+                    <td class="py-2">
+                      <div class="btn-list flex-nowrap">
+                        <a href="#" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-heart" width="24" height="24" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="6.4241271" y1="20.224079" x2="16.844126" y2="4.2240787" />
+                            <line x1="6.9741268" y1="11.874079" x2="16.664125" y2="11.874079" />
+                            <line x1="6.9741268" y1="14.584079" x2="16.664125" y2="14.584079" />
+                            <line x1="17.294127" y1="20.224079" x2="6.8741269" y2="4.2240787" />
+                          </svg>
+                        </a>
+                        <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-red-lt w-100 btn-icon" title="Sponsor">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-heart" width="24" height="24" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
+                          </svg>
+                        </a>
+                        <a href="#" class="btn bg-indigo-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-circle" width="24" height="24" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <circle cx="12" cy="10" r="3"></circle>
+                            <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
+                          </svg>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <app-pagination [pageSize]="40" [items]="contributors"
+              (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
           </div>
         </div>
 
@@ -391,5 +496,24 @@
         </div>
       </div>
     </footer>
+  </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-profile" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Large modal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci animi beatae delectus deleniti dolorem eveniet facere fuga iste nemo nesciunt nihil
+        odio perspiciatis, quia quis reprehenderit sit tempora totam unde.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+      </div>
+    </div>
   </div>
 </div>
