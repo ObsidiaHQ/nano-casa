@@ -62,20 +62,20 @@ export class AppComponent implements OnInit {
     faGhost = faGhost;
 
     reposData = [];
-    popularRepos: Repo[] = [];
-    popularReposNames: string[] = [];
-    popularReposPage: Repo[] = [];
+    reposNames: string[] = [];
+    reposPage: Repo[] = [];
     contributorsPage: Contributor[] = [];
     contributorsPageIndex = 0;
 
     busyRepos: Repo[] = [];
-    recentRepos: Repo[] = [];
     repos: Repo[] = [];
+    sortedRepos: Repo[] = [];
     contributors: Contributor[] = [];
     commits = [{name: 'commits', series: []}];
     milestones: Milestone[] = [];
     filterBy: 'month' | 'total' = 'total';
     busyLastWeek = false;
+    REPO_SORT: 'date' | 'stars' = 'date';
 
     constructor(private http: HttpClient) { }
 
@@ -100,10 +100,9 @@ export class AppComponent implements OnInit {
 
     setRepos(repos: Repo[]) {
         this.repos = repos;
-        this.recentRepos = [...repos].reverse();
-        this.popularRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
-        this.busyRepos = [...repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
-        this.popularReposNames = this.popularRepos.map(r => r.full_name);
+        this.sortRepos(this.REPO_SORT);
+        this.busyRepos = [...this.repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
+        this.reposNames = this.repos.map(r => r.full_name);
 
         // list years since 2014
         const YEARS = Array.from(Array(new Date().getFullYear() - 2013), (_, i) => (i + 2014).toString());
@@ -123,7 +122,7 @@ export class AppComponent implements OnInit {
     }
 
     hasPopularRepo(repos: string[]) {
-        return repos.some(r => this.popularReposNames.indexOf(r) >= 0 && this.popularReposNames.indexOf(r) < 10 && r != 'nanocurrency/nano-node');
+        return repos.some(r => this.reposNames.indexOf(r) >= 0 && this.reposNames.indexOf(r) < 10 && r != 'nanocurrency/nano-node');
     }
 
     contributedToNode(repos: string[]) {
@@ -143,6 +142,15 @@ export class AppComponent implements OnInit {
             return;
         }
         this.busyRepos = [...this.repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
+    }
+
+    sortRepos(by: 'date' | 'stars') {
+        if (by === 'date') {
+            this.sortedRepos = [...this.repos].reverse();
+        } else {
+            this.sortedRepos = [...this.repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
+        }
+        this.REPO_SORT = by;
     }
 
     trackByName(index, item) {
