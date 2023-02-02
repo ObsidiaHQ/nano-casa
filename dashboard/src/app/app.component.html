@@ -248,18 +248,13 @@
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </ng-container>
-              <ng-container *ngIf="commits[0].series.length">
+              <ng-container *ngIf="options.series[0].data.length">
 
                 <div class="card-body">
                   <div class="card-title">
                     <h3>Weekly activity</h3>
                   </div>
-                  <div style="flex:auto; min-width: 0;">
-                    <div class="chart" style="width: 100%; height: 417px">
-                      <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="commits" scheme="horizon" [schemeType]="ScaleType.Ordinal">
-                      </ngx-charts-area-chart>
-                    </div>
-                  </div>
+                  <div echarts [options]="options" class="chart"></div>
                 </div>
               </ng-container>
             </div>
@@ -270,7 +265,7 @@
                 <table class="table table-vcenter">
                   <thead>
                     <tr>
-                      <th>User</th>
+                      <th>Repo</th>
                       <th>Commit</th>
                       <th class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock-hour-8" width="24" height="24"
                           viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -282,16 +277,17 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let commit of contributors|slice:0:12">
+                    <tr *ngFor="let event of events">
                       <td class="w-1 py-1">
-                        <img class="avatar avatar-sm" src="{{commit.avatar_url}}" [alt]="commit.login" [title]="commit.login">
+                        <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
+                            [alt]="event.repo_full_name" [title]="event.repo_full_name"></a>
                       </td>
                       <td class="td-truncate py-1">
                         <div class="text-truncate opacity-80">
-                          Fix dart Sass compatibility (#29755)
+                          {{event.message}}
                         </div>
                       </td>
-                      <td class="text-nowrap text-muted py-1">{{'28 Nov 2019' | timeago:true}}</td>
+                      <td class="text-nowrap text-muted py-1">{{event.date | timeago:true}}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -336,7 +332,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let repo of sortedRepos; trackBy: trackByName">
+                  <tr *ngFor="let repo of reposPage; trackBy: trackByName">
                     <td data-label="Name" class="py-2">
                       <div class="d-flex align-items-center">
                         <div class="flex-fill">
