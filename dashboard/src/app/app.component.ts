@@ -63,7 +63,8 @@ export class AppComponent implements OnInit {
   REPO_SORT: 'date' | 'stars' = 'date';
   events: Commit[] = [];
 
-  options: EChartsOption;
+  commitsChartOpts: EChartsOption;
+  reposChartOpts: EChartsOption;
 
   constructor(private http: HttpClient) {}
 
@@ -88,7 +89,7 @@ export class AppComponent implements OnInit {
       this.milestones = data.milestones;
       this.events = data.events;
       this.setRepos(data.repos);
-      this.initChart(data.commits);
+      this.initCharts(data.commits, data.repos);
     });
   }
 
@@ -99,26 +100,57 @@ export class AppComponent implements OnInit {
       .filter((a) => a.commits_30d + a.prs_30d > 0)
       .sort((a, b) => b.commits_30d + b.prs_30d - (a.commits_30d + a.prs_30d));
     this.reposNames = this.repos.map((r) => r.full_name);
+  }
 
+  initCharts(commits: ChartCommit[], repos: Repo[]) {
     // list years since 2014
     const YEARS = Array.from(Array(new Date().getFullYear() - 2013), (_, i) =>
       (i + 2014).toString()
     );
     const YEARS_DICT = {};
     for (const year of YEARS) {
-      YEARS_DICT[year] = { name: year, value: 0 };
+      YEARS_DICT[year] = 0;
     }
-
     repos.forEach((repo, i) => {
       const year = new Date(repo.created_at).getFullYear();
-      YEARS_DICT[year].value += 1;
+      YEARS_DICT[year] += 1;
     });
 
-    this.reposData = Object.values(YEARS_DICT);
-  }
+    this.reposChartOpts = {
+      animation: true,
+      animationEasing: 'elasticOut',
+      animationDuration: 1200,
+      tooltip: {
+        trigger: 'axis',
+        position: function (pt) {
+          return [pt[0], '10%'];
+        },
+      },
+      grid: {
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+      },
+      xAxis: {
+        show: false,
+        data: Object.keys(YEARS_DICT),
+      },
+      yAxis: {
+        show: false,
+      },
+      series: [
+        {
+          data: Object.values(YEARS_DICT),
+          type: 'bar',
+          itemStyle: {
+            color: '#993255',
+          },
+        },
+      ],
+    };
 
-  initChart(commits: ChartCommit[]) {
-    this.options = {
+    this.commitsChartOpts = {
       animation: true,
       animationEasing: 'elasticOut',
       animationDuration: 1200,
@@ -160,7 +192,6 @@ export class AppComponent implements OnInit {
       ],
       series: [
         {
-          animation: true,
           name: 'Commits',
           symbol: 'none',
           type: 'line',

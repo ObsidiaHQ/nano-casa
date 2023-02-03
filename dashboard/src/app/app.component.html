@@ -96,76 +96,39 @@
 
           <div class="col-12 col-md-3">
             <div class="card">
-              <ng-container *ngIf="!repos.length">
-                <div class="card-body d-flex justify-content-center">
-                  <div class="spinner-grow text-secondary align-self-center" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              </ng-container>
-              <div *ngIf="repos.length" class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-auto">
-                    <span class="bg-teal-lt text-white avatar">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-git-merge" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <circle cx="7" cy="18" r="2"></circle>
-                        <circle cx="7" cy="6" r="2"></circle>
-                        <circle cx="17" cy="12" r="2"></circle>
-                        <line x1="7" y1="8" x2="7" y2="16"></line>
-                        <path d="M7 8a4 4 0 0 0 4 4h4"></path>
-                      </svg>
-                    </span>
-                  </div>
-                  <div class="col">
-                    <h3 class="mb-0" [countUp]="repos.length"></h3>
-                    <div class="text-muted">
-                      Projects
+              <div class="card-body pb-0">
+                <ng-container *ngIf="!repos.length">
+                  <div class="card-body d-flex justify-content-center">
+                    <div class="spinner-grow text-secondary align-self-center" role="status">
+                      <span class="visually-hidden">Loading...</span>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-3">
-            <div class="card">
-              <ng-container *ngIf="!repos.length">
-                <div class="card-body d-flex justify-content-center">
-                  <div class="spinner-grow text-secondary align-self-center" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                </ng-container>
+                <ng-container *ngIf="repos.length">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Projects</div>
                   </div>
-                </div>
-              </ng-container>
-              <div *ngIf="repos.length" class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-auto">
-                    <span class="bg-pink-lt text-white avatar">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-history" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <polyline points="12 8 12 12 14 14"></polyline>
-                        <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
-                      </svg>
-                    </span>
-                  </div>
-                  <div class="col">
-                    <h3 class="mb-0">
-                      <a target="_blank" href="https://github.com/{{repos[repos.length-1]?.full_name}}">
+                  <div class="d-flex align-items-baseline">
+                    <div class="h2 mb-2 me-2" [countUp]="repos.length"></div>
+                    <div class="me-auto">
+                      <span class="text-pink d-inline-flex align-items-center lh-1">
                         {{repos[repos.length-1]?.name}}
-                      </a>
-                    </h3>
-                    <div class="text-muted">
-                      Latest Project
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1 small" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <polyline points="12 8 12 12 14 14"></polyline>
+                          <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+                        </svg>
+                      </span>
                     </div>
                   </div>
-                </div>
+                </ng-container>
+                <div echarts [options]="reposChartOpts" style="height: 70px;"></div>
               </div>
             </div>
           </div>
 
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-3 col-lg-2">
             <div class="card">
               <ng-container *ngIf="!contributors.length">
                 <div class="card-body d-flex justify-content-center">
@@ -174,26 +137,24 @@
                   </div>
                 </div>
               </ng-container>
+              <div class="card-stamp">
+                <div class="card-stamp-icon bg-lime-lt">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+                  </svg>
+                </div>
+              </div>
               <div *ngIf="contributors.length" class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-auto">
-                    <span class="bg-azure-lt text-white avatar">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
-                      </svg>
-                    </span>
-                  </div>
-                  <div class="col">
-                    <h3 class="mb-0" [countUp]="contributors.length"></h3>
-                    <div class="text-muted">
-                      Contributors
-                    </div>
-                  </div>
+                <div class="d-flex align-items-center">
+                  <div class="subheader">Contributors</div>
+                </div>
+                <div class="d-flex align-items-baseline">
+                  <div class="h2 mb-2 me-2" [countUp]="contributors.length"></div>
                 </div>
               </div>
             </div>
@@ -234,6 +195,25 @@
             </div>
           </div>
 
+          <div class="col-12 col-md-4">
+            <div class="card spotlight">
+              <a href="#">
+                <div class="ribbon ribbon-top bg-yellow">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
+                  </svg>
+                </div>
+                <div class="card-body">
+                  <h3 class="card-title">Spotlight</h3>
+                  <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto at consectetur culpa ducimus eum fuga fugiat, ipsa
+                    iusto, modi nostrum recusandae reiciendis saepe.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
         </div>
 
         <div class="row">
@@ -243,7 +223,7 @@
                 <div class="card-title">
                   <h3>Weekly activity</h3>
                 </div>
-                <div echarts [options]="options" class="chart"></div>
+                <div echarts [options]="commitsChartOpts" class="chart"></div>
               </div>
             </div>
           </div>
