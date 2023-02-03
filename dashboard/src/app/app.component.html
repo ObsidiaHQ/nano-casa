@@ -281,7 +281,7 @@
                             {{event.message}}
                           </div>
                         </td>
-                        <td class="text-nowrap text-muted py-1">{{event.date | timeago:true}}</td>
+                        <td class="text-nowrap text-muted py-1">{{event.date | timeago}}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -357,7 +357,7 @@
                 </tbody>
               </table>
             </div>
-            <app-pagination [pageSize]="16" [items]="sortedRepos" (changePage)="reposPage = $event.items"></app-pagination>
+            <app-pagination [pageSize]="15" [items]="sortedRepos" (changePage)="reposPage = $event.items"></app-pagination>
           </div>
         </div>
 
@@ -377,7 +377,7 @@
                     <th>Name</th>
                     <th>Total commits</th>
                     <th>Last month</th>
-                    <th class="w-1"></th>
+                    <th class="w-1">Sponsor</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -393,7 +393,7 @@
                             </a>
                             <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo" *ngIf="contributedToNode(user.repos)">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-award" width="24" height="24" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                stroke-width="2" stroke="currentColor" fill="#17a2b8" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                 <circle cx="12" cy="9" r="6"></circle>
                                 <path d="M12.002 15.003l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889"></path>
@@ -439,7 +439,15 @@
                             <line x1="17.294127" y1="20.224079" x2="6.8741269" y2="4.2240787" />
                           </svg>
                         </a>
-                        <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-red-lt w-100 btn-icon" title="Sponsor">
+                        <a target="_blank" href="https://patreon.com/" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-patreon" width="24" height="24" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M3 3h3v18h-3z"></path>
+                            <path d="M15 9.5m-6.5 0a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0"></path>
+                          </svg>
+                        </a>
+                        <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
                           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-heart" width="24" height="24" viewBox="0 0 24 24"
                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -474,7 +482,7 @@
         <div class="row text-center align-items-center flex-row-reverse">
           <div class="col-lg-auto ms-lg-auto">
             <ul class="list-inline list-inline-dots mb-0">
-              <li class="list-inline-item text-secondary">Last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago:true}}</span></li>
+              <li class="list-inline-item text-secondary">Last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago}}</span></li>
               <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
               <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
               </li>

@@ -1,23 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  faCodeBranch,
-  faHistory,
-  faInfoCircle,
-  faMedal,
-  faStar,
-  faUsers,
-  faStarOfLife,
-  faMeteor,
-  faArrowDown,
-  faAngleDown,
-  faHeart,
-  faExternalLink,
-  faCodeCommit,
-  faCodePullRequest,
-  faGhost,
-} from '@fortawesome/free-solid-svg-icons';
-import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { graphic, EChartsOption } from 'echarts';
 
 interface Repo {
@@ -65,24 +47,6 @@ interface Milestone {
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  faRepo = faCodeBranch;
-  faUser = faUsers;
-  faStar = faStar;
-  faHistory = faHistory;
-  faInfo = faInfoCircle;
-  faTwitter = faTwitter;
-  faGithub = faGithub;
-  faMedal = faMedal;
-  faStarOL = faStarOfLife;
-  faMeteor = faMeteor;
-  faDown = faArrowDown;
-  faMore = faAngleDown;
-  faHeart = faHeart;
-  faExt = faExternalLink;
-  faCommit = faCodeCommit;
-  faPR = faCodePullRequest;
-  faGhost = faGhost;
-
   reposData = [];
   reposNames: string[] = [];
   reposPage: Repo[] = [];
