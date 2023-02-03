@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PaginationComponent } from './paginate.component';
 import { TimeagoModule } from 'ngx-timeago';
+import { CountUpModule } from 'ngx-countup';
 
 @NgModule({
   declarations: [AppComponent, PaginationComponent],
@@ -19,6 +20,7 @@ import { TimeagoModule } from 'ngx-timeago';
     FontAwesomeModule,
     HttpClientModule,
     TimeagoModule.forRoot(),
+    CountUpModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

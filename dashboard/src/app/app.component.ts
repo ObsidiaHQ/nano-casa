@@ -93,95 +93,13 @@ export class AppComponent implements OnInit {
   repos: Repo[] = [];
   sortedRepos: Repo[] = [];
   contributors: Contributor[] = [];
-  commits = [{ name: 'commits', series: [] }];
   milestones: Milestone[] = [];
   filterBy: 'month' | 'total' = 'total';
   busyLastWeek = false;
   REPO_SORT: 'date' | 'stars' = 'date';
   events: Commit[] = [];
 
-  options: EChartsOption = {
-    animation: true,
-    animationEasing: 'quadraticOut',
-    animationDelay: function (idx) {
-      // delay for later data is larger
-      return idx * 10;
-    },
-    tooltip: {
-      trigger: 'axis',
-      position: function (pt) {
-        return [pt[0], '10%'];
-      },
-    },
-    grid: {
-      left: 34,
-      top: 30,
-      right: 10,
-      bottom: 80,
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: [],
-    },
-    yAxis: {
-      splitLine: {
-        lineStyle: {
-          color: '#243049',
-        },
-      },
-      type: 'value',
-    },
-    dataZoom: [
-      {
-        type: 'inside',
-        start: 0,
-        end: 100,
-      },
-      {
-        start: 0,
-        end: 100,
-      },
-    ],
-    series: [
-      {
-        animation: true,
-        name: 'Commits',
-        symbol: 'none',
-        type: 'line',
-        smooth: true,
-        sampling: 'lttb',
-        data: [],
-        lineStyle: {
-          width: 0,
-        },
-        itemStyle: {
-          color: new graphic.LinearGradient(0, 0, 1, 0, [
-            {
-              offset: 0,
-              color: '#70BAEB',
-            },
-            {
-              offset: 1,
-              color: '#0C8297',
-            },
-          ]),
-        },
-        areaStyle: {
-          color: new graphic.LinearGradient(0, 0, 1, 0, [
-            {
-              offset: 0,
-              color: '#70BAEB',
-            },
-            {
-              offset: 1,
-              color: '#0C8297',
-            },
-          ]),
-        },
-      },
-    ],
-  };
+  options: EChartsOption;
 
   constructor(private http: HttpClient) {}
 
@@ -204,11 +122,9 @@ export class AppComponent implements OnInit {
         return { ...usr, profile };
       });
       this.milestones = data.milestones;
-      this.setRepos(data.repos);
-      this.setCommits(data.commits);
-      this.options.xAxis['data'] = data.commits.map((com) => com.date);
-      this.options.series[0].data = data.commits.map((com) => com.count);
       this.events = data.events;
+      this.setRepos(data.repos);
+      this.initChart(data.commits);
     });
   }
 
@@ -237,11 +153,85 @@ export class AppComponent implements OnInit {
     this.reposData = Object.values(YEARS_DICT);
   }
 
-  setCommits(commits: ChartCommit[]) {
-    this.commits[0].series = commits.map((com) => ({
-      name: com.date,
-      value: com.count,
-    }));
+  initChart(commits: ChartCommit[]) {
+    this.options = {
+      animation: true,
+      animationEasing: 'elasticOut',
+      animationDuration: 1200,
+      tooltip: {
+        trigger: 'axis',
+        position: function (pt) {
+          return [pt[0], '10%'];
+        },
+      },
+      grid: {
+        left: 34,
+        top: 30,
+        right: 10,
+        bottom: 80,
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: commits.map((com) => com.date),
+      },
+      yAxis: {
+        splitLine: {
+          lineStyle: {
+            color: '#243049',
+          },
+        },
+        type: 'value',
+      },
+      dataZoom: [
+        {
+          type: 'inside',
+          start: 10,
+          end: 100,
+        },
+        {
+          start: 10,
+          end: 100,
+        },
+      ],
+      series: [
+        {
+          animation: true,
+          name: 'Commits',
+          symbol: 'none',
+          type: 'line',
+          sampling: 'lttb',
+          data: commits.map((com) => com.count),
+          lineStyle: {
+            width: 0,
+          },
+          itemStyle: {
+            color: new graphic.LinearGradient(0, 0, 1, 0, [
+              {
+                offset: 0,
+                color: '#70BAEB',
+              },
+              {
+                offset: 1,
+                color: '#0C8297',
+              },
+            ]),
+          },
+          areaStyle: {
+            color: new graphic.LinearGradient(0, 0, 1, 0, [
+              {
+                offset: 0,
+                color: '#70BAEB',
+              },
+              {
+                offset: 1,
+                color: '#0C8297',
+              },
+            ]),
+          },
+        },
+      ],
+    };
   }
 
   hasPopularRepo(repos: string[]) {

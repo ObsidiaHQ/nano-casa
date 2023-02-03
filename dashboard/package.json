@@ -25,6 +25,7 @@
     "@tabler/core": "^1.0.0-beta16",
     "echarts": "^5.4.1",
     "jw-paginate": "^1.0.4",
+    "ngx-countup": "^13.1.0",
     "ngx-echarts": "^8.0.1",
     "ngx-timeago": "^2.0.0",
     "rxjs": "~7.4.0",

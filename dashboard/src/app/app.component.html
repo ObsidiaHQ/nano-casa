@@ -119,9 +119,7 @@
                     </span>
                   </div>
                   <div class="col">
-                    <div class="font-weight-medium">
-                      {{repos.length}}
-                    </div>
+                    <h3 class="mb-0" [countUp]="repos.length"></h3>
                     <div class="text-muted">
                       Projects
                     </div>
@@ -153,11 +151,11 @@
                     </span>
                   </div>
                   <div class="col">
-                    <div class="font-weight-medium">
+                    <h3 class="mb-0">
                       <a target="_blank" href="https://github.com/{{repos[repos.length-1]?.full_name}}">
                         {{repos[repos.length-1]?.name}}
                       </a>
-                    </div>
+                    </h3>
                     <div class="text-muted">
                       Latest Project
                     </div>
@@ -191,9 +189,7 @@
                     </span>
                   </div>
                   <div class="col">
-                    <div class="font-weight-medium">
-                      {{contributors.length}}
-                    </div>
+                    <h3 class="mb-0" [countUp]="contributors.length"></h3>
                     <div class="text-muted">
                       Contributors
                     </div>
@@ -242,56 +238,55 @@
 
         <div class="row">
           <div class="col-12 col-md-8 mt-3">
-            <div class="card">
-              <ng-container *ngIf="!commits[0].series.length">
+            <div class="card" style="height: 484px;">
+              <div class="card-body">
+                <div class="card-title">
+                  <h3>Weekly activity</h3>
+                </div>
+                <div echarts [options]="options" class="chart"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4 mt-3">
+            <div class="card" style="height: 484px;">
+              <ng-container *ngIf="!events.length">
                 <div class="spinner-grow text-secondary align-self-center" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </ng-container>
-              <ng-container *ngIf="options.series[0].data.length">
-
-                <div class="card-body">
-                  <div class="card-title">
-                    <h3>Weekly activity</h3>
-                  </div>
-                  <div echarts [options]="options" class="chart"></div>
+              <ng-container *ngIf="events.length">
+                <div class="card-table table-responsive" style=" scrollbar-width: thin;">
+                  <table class="table table-vcenter">
+                    <thead>
+                      <tr>
+                        <th>Repo</th>
+                        <th>Commit</th>
+                        <th class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock-hour-8" width="24" height="24"
+                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path d="M12 12l-3 2"></path>
+                            <path d="M12 7v5"></path>
+                          </svg></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let event of events">
+                        <td class="w-1 py-1">
+                          <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
+                              [alt]="event.repo_full_name" [title]="event.repo_full_name"></a>
+                        </td>
+                        <td class="td-truncate py-1">
+                          <div class="text-truncate opacity-80">
+                            {{event.message}}
+                          </div>
+                        </td>
+                        <td class="text-nowrap text-muted py-1">{{event.date | timeago:true}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </ng-container>
-            </div>
-          </div>
-          <div class="col-12 col-md-4 mt-3">
-            <div class="card" style="height: 489px;">
-              <div class="card-table table-responsive">
-                <table class="table table-vcenter">
-                  <thead>
-                    <tr>
-                      <th>Repo</th>
-                      <th>Commit</th>
-                      <th class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock-hour-8" width="24" height="24"
-                          viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                          <circle cx="12" cy="12" r="9"></circle>
-                          <path d="M12 12l-3 2"></path>
-                          <path d="M12 7v5"></path>
-                        </svg></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let event of events">
-                      <td class="w-1 py-1">
-                        <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
-                            [alt]="event.repo_full_name" [title]="event.repo_full_name"></a>
-                      </td>
-                      <td class="td-truncate py-1">
-                        <div class="text-truncate opacity-80">
-                          {{event.message}}
-                        </div>
-                      </td>
-                      <td class="text-nowrap text-muted py-1">{{event.date | timeago:true}}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         </div>
