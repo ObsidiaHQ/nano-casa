@@ -94,73 +94,54 @@
       <div class="container-xl">
         <div class="row row-cards">
 
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-4">
             <div class="card">
               <div class="card-body pb-0">
                 <ng-container *ngIf="!repos.length">
-                  <div class="card-body d-flex justify-content-center">
+                  <div class="d-flex justify-content-center">
                     <div class="spinner-grow text-secondary align-self-center" role="status">
                       <span class="visually-hidden">Loading...</span>
                     </div>
                   </div>
                 </ng-container>
                 <ng-container *ngIf="repos.length">
-                  <div class="d-flex align-items-center">
-                    <div class="subheader">Projects</div>
-                  </div>
-                  <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="repos.length"></div>
-                    <div class="me-auto">
-                      <span class="text-pink d-inline-flex align-items-center lh-1">
-                        {{repos[repos.length-1]?.name}}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1 small" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                          <polyline points="12 8 12 12 14 14"></polyline>
-                          <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
-                        </svg>
-                      </span>
+                  <div class="row">
+                    <div class="col-12 col-md-7">
+                      <div class="d-flex align-items-center">
+                        <div class="subheader">Projects</div>
+                      </div>
+                      <div class="d-flex align-items-baseline">
+                        <div class="h2 mb-2 me-2" [countUp]="repos.length"></div>
+                        <div class="me-auto">
+                          <span class="text-pink d-inline-flex align-items-center lh-1">
+                            {{repos[repos.length-1]?.name}}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1 small" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                              stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                              <polyline points="12 8 12 12 14 14"></polyline>
+                              <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-5">
+                      <div class="d-flex align-items-center">
+                        <div class="subheader">Contributors</div>
+                      </div>
+                      <div class="d-flex align-items-baseline">
+                        <div class="h2 mb-2 me-2" [countUp]="contributors.length"></div>
+                      </div>
                     </div>
                   </div>
+
                 </ng-container>
                 <div echarts [options]="reposChartOpts" style="height: 70px;"></div>
               </div>
             </div>
           </div>
 
-          <div class="col-12 col-md-3 col-lg-2">
-            <div class="card">
-              <ng-container *ngIf="!contributors.length">
-                <div class="card-body d-flex justify-content-center">
-                  <div class="spinner-grow text-secondary align-self-center" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              </ng-container>
-              <div class="card-stamp">
-                <div class="card-stamp-icon bg-lime-lt">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
-                  </svg>
-                </div>
-              </div>
-              <div *ngIf="contributors.length" class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="subheader">Contributors</div>
-                </div>
-                <div class="d-flex align-items-baseline">
-                  <div class="h2 mb-2 me-2" [countUp]="contributors.length"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-4">
             <div class="card">
               <ng-container *ngIf="!milestones.length">
                 <div class="card-body d-flex justify-content-center">
@@ -170,24 +151,50 @@
                 </div>
               </ng-container>
               <div *ngIf="milestones.length" class="card-body">
-                <div class="row align-items-center">
-                  <div class="col">
-                    <div class="row g-2 align-items-center">
-                      <div class="col-auto">
-                        {{milestones[0].closed_issues/(milestones[0].open_issues + milestones[0].closed_issues) | percent}}
-                      </div>
-                      <div class="col">
-                        <div class="progress progress-sm">
-                          <div class="progress-bar bg-purple" role="progressbar"
-                            [ngStyle]="{width: milestones[0].closed_issues*100/(milestones[0].open_issues + milestones[0].closed_issues)+'%' }"
-                            [attr.aria-valuenow]="milestones[0].closed_issues" [attr.aria-valuemin]="0"
-                            [attr.aria-valuemax]="milestones[0].open_issues + milestones[0].closed_issues">
+                <div class="card-stamp">
+                  <div class="card-stamp-icon bg-purple-lt">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-target-arrow" width="24" height="24" viewBox="0 0 24 24"
+                      stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                      <path d="M12 7a5 5 0 1 0 5 5"></path>
+                      <path d="M13 3.055a9 9 0 1 0 7.941 7.945"></path>
+                      <path d="M15 6v3h3l3 -3h-3v-3z"></path>
+                      <path d="M15 9l-3 3"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div class="subheader">Milestones</div>
+                </div>
+                <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                  <div class="carousel-indicators carousel-indicators-dot">
+                    <button *ngFor="let milestone of milestones; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
+                      [ngClass]="{'active': i === 0}" [attr.data-bs-slide-to]="i"></button>
+                  </div>
+                  <div class="carousel-inner">
+                    <div class="carousel-item" *ngFor="let milestone of milestones; let i = index" [ngClass]="{'active': i === 0}">
+                      <div class="row align-items-center">
+                        <div class="col">
+                          <div class="row g-2 align-items-center">
+                            <div class="col-auto h2">
+                              {{milestone.closed_issues/(milestone.open_issues + milestone.closed_issues) | percent}}
+                            </div>
+                            <div class="col">
+                              <div class="progress progress-sm">
+                                <div class="progress-bar bg-purple" role="progressbar"
+                                  [ngStyle]="{width: milestone.closed_issues*100/(milestone.open_issues + milestone.closed_issues)+'%' }"
+                                  [attr.aria-valuenow]="milestone.closed_issues" [attr.aria-valuemin]="0"
+                                  [attr.aria-valuemax]="milestone.open_issues + milestone.closed_issues">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="text-muted mt-1">
+                            {{milestone.title}} ({{milestone.closed_issues}}/{{milestone.closed_issues+milestone.open_issues}})
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="text-muted">
-                      {{milestones[0].title}} ({{milestones[0].closed_issues}}/{{milestones[0].closed_issues+milestones[0].open_issues}})
                     </div>
                   </div>
                 </div>
@@ -195,9 +202,18 @@
             </div>
           </div>
 
+
+
           <div class="col-12 col-md-4">
             <div class="card spotlight">
-              <a href="#">
+              <ng-container *ngIf="!repos.length">
+                <div class="card-body d-flex justify-content-center">
+                  <div class="spinner-grow text-secondary align-self-center" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              </ng-container>
+              <a href="#" *ngIf="repos.length">
                 <div class="ribbon ribbon-top bg-yellow">
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                     fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -206,9 +222,13 @@
                   </svg>
                 </div>
                 <div class="card-body">
-                  <h3 class="card-title">Spotlight</h3>
-                  <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto at consectetur culpa ducimus eum fuga fugiat, ipsa
-                    iusto, modi nostrum recusandae reiciendis saepe.</p>
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Spotlight</div>
+                  </div>
+                  <div class="d-flex align-items-baseline">
+                    <div class="h2 mb-2 me-2">{{repos[31].name}}</div>
+                  </div>
+                  <p class="text-muted">{{repos[31].description}}</p>
                 </div>
               </a>
             </div>
