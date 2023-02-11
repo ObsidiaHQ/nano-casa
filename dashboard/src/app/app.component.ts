@@ -73,7 +73,7 @@ export class AppComponent implements OnInit {
   }
 
   getData(): void {
-    this.http.get('http://localhost:8080/data').subscribe((data: any) => {
+    this.http.get('https://nano.casa/data').subscribe((data: any) => {
       this.contributors = data.contributors;
       this.contributors = this.contributors.map((usr) => {
         const profile = data.devList.find(
