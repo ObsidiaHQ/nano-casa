@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { graphic, EChartsOption } from 'echarts';
+import { environment } from 'src/environments/environment';
 
 interface Repo {
   name: string;
@@ -73,7 +74,7 @@ export class AppComponent implements OnInit {
   }
 
   getData(): void {
-    this.http.get('https://nano.casa/data').subscribe((data: any) => {
+    this.http.get(environment.api).subscribe((data: any) => {
       this.contributors = data.contributors;
       this.contributors = this.contributors.map((usr) => {
         const profile = data.devList.find(
@@ -89,7 +90,10 @@ export class AppComponent implements OnInit {
       this.milestones = data.milestones;
       this.events = data.events;
       this.setRepos(data.repos);
+      setTimeout(() => {
+        // needed for animations to work
       this.initCharts(data.commits, data.repos);
+      }, 200);
     });
   }
 
