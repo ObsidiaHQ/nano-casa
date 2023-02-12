@@ -6,6 +6,13 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 mongoose.connect(process.env.DB_URL);
+const createClient = require('redis').createClient;
+const redis = createClient({
+    url: process.env.REDIS_URL,
+});
+
+redis.on('error', (err) => console.log('Redis Client Error', err));
+redis.connect();
 
 const IGNORED_REPOS = [
     'ITMFLtd/ITCONode',
@@ -52,8 +59,12 @@ const KNOWN_REPOS = {
     repos: [],
 };
 
+async function rate() {
+    console.log((await octo.request('GET /rate_limit')).data.resources.core);
+}
+
 async function refreshMilestones() {
-    const startTime = new Date();
+    console.time('refreshed_milestones');
     const milestones = (
         await octo.request('GET /repos/nanocurrency/nano-node/milestones')
     ).data;
@@ -63,20 +74,25 @@ async function refreshMilestones() {
         )
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    const normalized = latest.map(
-        ({ title, open_issues, closed_issues }) =>
-            new models.Milestone({ title, open_issues, closed_issues })
-    );
+    const normalized = latest
+        .map(
+            ({ title, open_issues, closed_issues, html_url }) =>
+                new models.Milestone({
+                    title,
+                    open_issues,
+                    closed_issues,
+                    url: html_url,
+                })
+        )
+        .sort((a, b) => b.title.localeCompare(a.title));
     await models.Milestone.collection.drop();
     await models.Milestone.insertMany(normalized);
 
-    const endTime = new Date();
-    const timeDiff = Math.round((endTime - startTime) / 1000);
-    console.log('refreshed milestones in', timeDiff, 'seconds');
+    console.timeEnd('refreshed_milestones');
 }
 
 async function refreshRepos() {
-    const startTime = new Date();
+    console.time('fetched_repos');
     const lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
     const lastWeek = new Date(new Date().setDate(new Date().getDate() - 7));
 
@@ -133,16 +149,13 @@ async function refreshRepos() {
         }
     }
 
-    for (let i = 0; i < KNOWN_REPOS.names.length; i++) {
-        const res = (await octo.request(`GET /repos/${KNOWN_REPOS.names[i]}`))
-            .data;
-        KNOWN_REPOS.repos = [...KNOWN_REPOS.repos, res];
-    }
+    const repoRequests = KNOWN_REPOS.names.map((name) =>
+        octo.request(`GET /repos/${name}`).then((res) => res.data)
+    );
 
-    const allRepos = [
-        ...queries.map((q) => q.repos).flat(),
-        ...KNOWN_REPOS.repos,
-    ];
+    const results = await Promise.all(repoRequests);
+
+    const allRepos = [...queries.map((q) => q.repos).flat(), ...results];
 
     const uniqueRepos = allRepos.filter(function ({ full_name }) {
         return (
@@ -151,6 +164,9 @@ async function refreshRepos() {
             !IGNORED_REPOS.includes(full_name)
         );
     }, new Set());
+
+    console.timeEnd('fetched_repos');
+    console.time('fetched_pulls');
 
     for (let i = 0; i < uniqueRepos.length; i++) {
         let foundAll = false,
@@ -174,6 +190,9 @@ async function refreshRepos() {
             if (!foundAll) page++;
         }
     }
+    console.timeEnd('fetched_pulls');
+
+    console.time('refreshed_repos');
 
     const normalized = uniqueRepos.map(
         ({
@@ -206,16 +225,14 @@ async function refreshRepos() {
     await models.Repo.collection.drop();
     await models.Repo.collection.insertMany(normalized);
 
-    const endTime = new Date();
-    const timeDiff = Math.round((endTime - startTime) / 1000);
-    console.log('refreshed repos in', timeDiff, 'seconds');
+    console.timeEnd('refreshed_repos');
 
     return normalized;
 }
 
 async function refreshCommitsAndContributors(repos = []) {
     let allCommits = [];
-    const startTime = new Date();
+    console.time('fetched_commits');
     const lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
     const lastWeek = new Date(new Date().setDate(new Date().getDate() - 7));
 
@@ -234,6 +251,7 @@ async function refreshCommitsAndContributors(repos = []) {
             activity = activity.map((act) => ({
                 ...act,
                 repo_full_name: repos[i].full_name,
+                avatar_url: repos[i].avatar_url,
             }));
             allCommits = [...allCommits, ...activity];
 
@@ -241,6 +259,8 @@ async function refreshCommitsAndContributors(repos = []) {
             if (!foundAll) page++;
         }
     }
+    console.timeEnd('fetched_commits');
+    console.time('updated_prs');
 
     const contributors = {};
     const reposToUpdate = {};
@@ -250,7 +270,7 @@ async function refreshCommitsAndContributors(repos = []) {
     allCommits = allCommits.filter((commit) => {
         const duplicateSHA = seen.has(commit.sha);
         seen.add(commit.sha);
-        return !!commit.author && !duplicateSHA;
+        return !isEmpty(commit.author) && !duplicateSHA;
     });
 
     for (let i = 0; i < allCommits.length; i++) {
@@ -293,9 +313,8 @@ async function refreshCommitsAndContributors(repos = []) {
     });
     bulk.execute();
 
-    const endTime1 = new Date();
-    const timeDiff1 = Math.round((endTime1 - startTime) / 1000);
-    console.log('fetched commits in', timeDiff1, 'seconds');
+    console.timeEnd('updated_prs');
+    console.time('refreshed_commits');
 
     const normalizedContribs = Object.values(contributors).map(
         ({ avatar_url, login, contributions, repos, last_month }) =>
@@ -310,24 +329,20 @@ async function refreshCommitsAndContributors(repos = []) {
     await models.Contributor.collection.drop();
     await models.Contributor.collection.insertMany(normalizedContribs);
 
-    const endTime2 = new Date();
-    const timeDiff2 = Math.round((endTime2 - endTime1) / 1000);
-    console.log('refreshed users in', timeDiff2, 'seconds');
-
     const normalizedCommits = allCommits.map(
         (commit) =>
             new models.Commit({
                 repo_full_name: commit.repo_full_name,
                 author: commit.author.login,
                 date: commit.commit.author?.date,
+                avatar_url: commit.avatar_url,
+                message: commit.commit.message,
             })
     );
     await models.Commit.collection.drop();
     await models.Commit.collection.insertMany(normalizedCommits);
 
-    const endTime3 = new Date();
-    const timeDiff3 = Math.round((endTime3 - endTime2) / 1000);
-    console.log('refreshed commits in', timeDiff3, 'seconds');
+    console.timeEnd('refreshed_commits');
 }
 
 async function refreshDevList() {
@@ -360,12 +375,83 @@ async function refreshDevList() {
     await models.Profile.collection.insertMany(devs);
     return devs;
 }
-const job = new Cron('0 * * * *', async () => {
-    await refreshMilestones();
-    const repos = await refreshRepos();
-    await refreshCommitsAndContributors(repos);
-    await refreshDevList();
-});
+
+function isEmpty(obj) {
+    for (var x in obj) {
+        return false;
+    }
+    return true;
+}
+
+async function queryDB() {
+    const data = {
+        repos: await models.Repo.find({}, { _id: 0 })
+            .sort({ created_at: 'asc' })
+            .lean(),
+        contributors: await models.Contributor.aggregate([
+            {
+                $project: {
+                    contributions: 1,
+                    last_month: 1,
+                    repos_count: { $size: '$repos' },
+                    repos: 1,
+                    login: 1,
+                    avatar_url: 1,
+                    _id: 0,
+                },
+            },
+            { $sort: { contributions: -1, repos_count: -1 } },
+        ]),
+        commits: await models.Commit.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: {
+                            $year: {
+                                $dateFromString: {
+                                    dateString: '$date',
+                                    format: '%Y-%m-%dT%H:%M:%SZ',
+                                },
+                            },
+                        },
+                        week: {
+                            $week: {
+                                $dateFromString: {
+                                    dateString: '$date',
+                                    format: '%Y-%m-%dT%H:%M:%SZ',
+                                },
+                            },
+                        },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: { '_id.year': 1, '_id.week': 1 },
+            },
+            {
+                $project: {
+                    date: {
+                        $concat: [
+                            { $toString: '$_id.year' },
+                            '|',
+                            { $toString: '$_id.week' },
+                        ],
+                    },
+                    count: 1,
+                    _id: 0,
+                },
+            },
+        ]),
+        milestones: await models.Milestone.find({}, { _id: 0 }).lean(),
+        devList: await models.Profile.find({}, { _id: 0 }).lean(),
+        events: await models.Commit.find({}, { _id: 0 })
+            .sort({ date: 'desc' })
+            .limit(35)
+            .lean(),
+    };
+    return data;
+}
 
 // returns a random index weighted inversely
 function getSpotlight(repos) {
@@ -394,9 +480,19 @@ function getSpotlight(repos) {
     return repos[Math.floor(Math.random() * items.length)];
 }
 
-// module.exports = {
-//     refreshCommitsAndContributors,
-//     refreshDevList,
-//     refreshMilestones,
-//     refreshRepos
-// };
+const job = new Cron('7 * * * *', async () => {
+    await refreshMilestones();
+    const repos = await refreshRepos();
+    await refreshCommitsAndContributors(repos);
+    await refreshDevList();
+    await redis.json.set('data', '.', await queryDB());
+});
+
+module.exports = {
+    refreshCommitsAndContributors,
+    refreshDevList,
+    refreshMilestones,
+    refreshRepos,
+    rate,
+    queryDB,
+};

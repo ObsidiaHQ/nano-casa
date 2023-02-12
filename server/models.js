@@ -22,6 +22,8 @@ const Commit = mongoose.model(
         repo_full_name: String,
         author: String, // commit.author.login
         date: String, // commit.commit.author.date
+        message: String,
+        avatar_url: String,
     })
 );
 const Contributor = mongoose.model(
@@ -41,6 +43,7 @@ const Milestone = mongoose.model(
             title: String,
             open_issues: Number,
             closed_issues: Number,
+            url: String,
         },
         { timestamps: { createdAt: 'created_at', updatedAt: false } }
     )
