@@ -260,7 +260,6 @@ async function refreshCommitsAndContributors(repos = []) {
         }
     }
     console.timeEnd('fetched_commits');
-    console.time('updated_prs');
 
     const contributors = {};
     const reposToUpdate = {};
@@ -311,9 +310,9 @@ async function refreshCommitsAndContributors(repos = []) {
             },
         ]);
     });
-    bulk.execute();
 
-    console.timeEnd('updated_prs');
+    if (bulk.length) bulk.execute();
+
     console.time('refreshed_commits');
 
     const normalizedContribs = Object.values(contributors).map(
@@ -480,7 +479,7 @@ function getSpotlight(repos) {
     return repos[Math.floor(Math.random() * items.length)];
 }
 
-const job = new Cron('7 * * * *', async () => {
+const job = new Cron('10 * * * *', async () => {
     await refreshMilestones();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
