@@ -5,6 +5,7 @@ const models = require('./models');
 const fetch = require('node-fetch');
 require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const REPOS = require('./repos.json');
 mongoose.connect(process.env.DB_URL);
 const createClient = require('redis').createClient;
 const redis = createClient({
@@ -13,51 +14,6 @@ const redis = createClient({
 
 redis.on('error', (err) => console.log('Redis Client Error', err));
 redis.connect();
-
-const IGNORED_REPOS = [
-    'ITMFLtd/ITCONode',
-    'onitsoft/nexchange-open-client-react',
-    'imerkle/binbase_wallet_old',
-    'BizblocksChains/nexchange-open-client-react',
-    'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet',
-    'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo',
-    'dsvakola/Coin_sorter_counter_system',
-    'panapina/pina',
-    'Dogenano-xdg/dogenano-node',
-];
-const KNOWN_REPOS = {
-    names: [
-        'appditto/natrium_wallet_flutter',
-        'appditto/pippin_nano_wallet',
-        'appditto/nanodart',
-        'appditto/natrium-wallet-server',
-        'appditto/natricon',
-        'appditto/nanopaperwallet',
-        'appditto/flutter_nano_ffi',
-        'wezrule/UE4NanoPlugin',
-        'wezrule/UnityNanoPlugin',
-        'nanocurrency/nano-work-server',
-        'nanocurrency/protocol',
-        'bbedward/graham_discord_bot',
-        'simpago/rsnano-node',
-        'tjl-dev/npass',
-        'guilhermelawless/nano-dpow',
-        'icarusglider/PyRai',
-        'cronoh/nanovault-ws',
-        'cronoh/nanovault-server',
-        'npy0/nanopy',
-        'unyieldinggrace/nanofusion',
-        'anarkrypto/confirmy-block',
-        'accept-nano/accept-nano',
-        'accept-nano/accept-nano-client',
-        'cryptocode/nanocap',
-        'mitche50/NanoTipBot',
-        'danhitchcock/nano_tipper_z',
-        'AuliaYF/easyraikit-python',
-        'vitorcremonez/nano-vanity',
-    ],
-    repos: [],
-};
 
 async function rate() {
     console.log((await octo.request('GET /rate_limit')).data.resources.core);
@@ -149,7 +105,7 @@ async function refreshRepos() {
         }
     }
 
-    const repoRequests = KNOWN_REPOS.names.map((name) =>
+    const repoRequests = REPOS.known.map((name) =>
         octo.request(`GET /repos/${name}`).then((res) => res.data)
     );
 
@@ -161,7 +117,7 @@ async function refreshRepos() {
         return (
             !this.has(full_name) &&
             this.add(full_name) &&
-            !IGNORED_REPOS.includes(full_name)
+            !REPOS.ignored.includes(full_name)
         );
     }, new Set());
 
