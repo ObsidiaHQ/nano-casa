@@ -51,54 +51,20 @@ async function refreshRepos() {
     console.time('fetched_repos');
     const lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
     const lastWeek = new Date(new Date().setDate(new Date().getDate() - 7));
+    let allRepos = [];
 
-    const queries = [
-        {
-            topic: 'topic:nanocurrency',
-            repos: [],
-        },
-        {
-            topic: 'topic:cryptocurrency+topic:nano',
-            repos: [],
-        },
-        {
-            topic: 'topic:nano-currency',
-            repos: [],
-        },
-        {
-            topic: 'topic:nano-cryptocurrency',
-            repos: [],
-        },
-        {
-            topic: 'topic:crypto+topic:nano',
-            repos: [],
-        },
-        {
-            topic: 'nanocurrency+in:description',
-            repos: [],
-        },
-        {
-            topic: 'nano+currency+in:description',
-            repos: [],
-        },
-        {
-            topic: 'topic:raiblocks',
-            repos: [],
-        },
-    ];
-
-    for (let i = 0; i < queries.length; i++) {
+    for (let i = 0; i < REPOS.queries.length; i++) {
         let foundAll = false,
             page = 1;
         while (!foundAll) {
             const res = (
                 await octo.request('GET /search/repositories', {
-                    q: queries[i].topic,
+                    q: REPOS.queries[i],
                     per_page: 100,
                     page: page,
                 })
             ).data.items;
-            queries[i].repos = [...queries[i].repos, ...res];
+            allRepos = [...allRepos, ...res];
 
             foundAll = res.length < 100;
             if (!foundAll) page++;
@@ -108,10 +74,9 @@ async function refreshRepos() {
     const repoRequests = REPOS.known.map((name) =>
         octo.request(`GET /repos/${name}`).then((res) => res.data)
     );
+    const knownResults = await Promise.all(repoRequests);
 
-    const results = await Promise.all(repoRequests);
-
-    const allRepos = [...queries.map((q) => q.repos).flat(), ...results];
+    allRepos = [...allRepos, ...knownResults];
 
     const uniqueRepos = allRepos.filter(function ({ full_name }) {
         return (

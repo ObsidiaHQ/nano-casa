@@ -39,5 +39,15 @@
         "dsvakola/Coin_sorter_counter_system",
         "panapina/pina",
         "Dogenano-xdg/dogenano-node"
+    ],
+    "queries": [
+        "topic:nanocurrency",
+        "topic:cryptocurrency+topic:nano",
+        "topic:nano-currency",
+        "topic:nano-cryptocurrency",
+        "topic:crypto+topic:nano",
+        "nanocurrency+in:description",
+        "nano+currency+in:description",
+        "topic:raiblocks"
     ]
 }
