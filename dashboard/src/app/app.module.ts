@@ -1,26 +1,26 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgxEchartsModule } from 'ngx-echarts';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AppComponent } from './app.component';
 import { PaginationComponent } from './paginate.component';
+import { NgxEchartsModule } from 'ngx-echarts';
 import { TimeagoModule } from 'ngx-timeago';
 import { CountUpModule } from 'ngx-countup';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent, PaginationComponent],
   imports: [
     BrowserModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),
-    BrowserAnimationsModule,
-    FontAwesomeModule,
-    HttpClientModule,
     TimeagoModule.forRoot(),
     CountUpModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

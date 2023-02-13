@@ -2,45 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { graphic, EChartsOption } from 'echarts';
 import { environment } from 'src/environments/environment';
-
-interface Repo {
-  name: string;
-  full_name: string;
-  created_at: string;
-  stargazers_count: number;
-  prs_30d: number;
-  prs_7d: number;
-  commits_30d: number;
-  commits_7d: number;
-  avatar_url: string;
-  description: string;
-}
-interface ChartCommit {
-  count: number;
-  date: string;
-}
-interface Commit {
-  repo_full_name: string;
-  author: string;
-  message: string;
-  avatar_url: string;
-  date: string;
-}
-interface Contributor {
-  login: string;
-  avatar_url: string;
-  contributions: number;
-  last_month: number;
-  repos: string[];
-  repos_count: number;
-  profile: any;
-}
-interface Milestone {
-  title: string;
-  open_issues: number;
-  closed_issues: number;
-  created_at: string;
-}
+import {
+  ChartCommit,
+  Commit,
+  Contributor,
+  Milestone,
+  Repo,
+} from './interfaces';
 
 @Component({
   selector: 'app-root',
@@ -48,24 +16,28 @@ interface Milestone {
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  reposData = [];
+  repos: Repo[] = [];
   reposNames: string[] = [];
+  busyRepos: Repo[] = [];
+  busyLastWeek = false;
   reposPage: Repo[] = [];
+  sortedRepos: Repo[] = [];
+  REPO_SORT: 'date' | 'stars' = 'date';
+  reposQuery = '';
+
+  contributors: Contributor[] = [];
+  sortedContributors: Contributor[] = [];
   contributorsPage: Contributor[] = [];
   contributorsPageIndex = 0;
+  CONTRIB_SORT: 'month' | 'total' = 'total';
+  contributorsQuery = '';
 
-  busyRepos: Repo[] = [];
-  repos: Repo[] = [];
-  sortedRepos: Repo[] = [];
-  contributors: Contributor[] = [];
   milestones: Milestone[] = [];
-  filterBy: 'month' | 'total' = 'total';
-  busyLastWeek = false;
-  REPO_SORT: 'date' | 'stars' = 'date';
   events: Commit[] = [];
 
   commitsChartOpts: EChartsOption;
   reposChartOpts: EChartsOption;
+  selectedUser: Contributor = {} as Contributor;
 
   constructor(private http: HttpClient) {}
 
@@ -75,8 +47,7 @@ export class AppComponent implements OnInit {
 
   getData(): void {
     this.http.get(environment.api).subscribe((data: any) => {
-      this.contributors = data.contributors;
-      this.contributors = this.contributors.map((usr) => {
+      this.contributors = data.contributors.map((usr) => {
         const profile = data.devList.find(
           (dl) => dl.github.toLowerCase() === usr.login.toLowerCase()
         );
@@ -87,12 +58,13 @@ export class AppComponent implements OnInit {
           );
         return { ...usr, profile };
       });
+      this.sortedContributors = this.contributors;
       this.milestones = data.milestones;
       this.events = data.events;
       this.setRepos(data.repos);
       setTimeout(() => {
         // needed for animations to work
-      this.initCharts(data.commits, data.repos);
+        this.initCharts(data.commits, data.repos);
       }, 200);
     });
   }
@@ -248,9 +220,9 @@ export class AppComponent implements OnInit {
   }
 
   sortContributors(by: 'month' | 'total') {
-    if (this.filterBy === by) return;
-    this.filterBy = by;
-    this.contributors = [...this.contributors].sort((a, b) =>
+    if (this.CONTRIB_SORT === by) return;
+    this.CONTRIB_SORT = by;
+    this.sortedContributors = [...this.contributors].sort((a, b) =>
       by === 'total'
         ? b.contributions - a.contributions
         : b.last_month - a.last_month
@@ -270,15 +242,39 @@ export class AppComponent implements OnInit {
       .sort((a, b) => b.commits_30d + b.prs_30d - (a.commits_30d + a.prs_30d));
   }
 
-  sortRepos(by: 'date' | 'stars') {
+  sortRepos(by: 'date' | 'stars', source: Repo[] = this.repos) {
     if (by === 'date') {
-      this.sortedRepos = [...this.repos].reverse();
+      this.sortedRepos = [...source].reverse();
     } else {
-      this.sortedRepos = [...this.repos].sort(
+      this.sortedRepos = [...source].sort(
         (a, b) => b.stargazers_count - a.stargazers_count
       );
     }
     this.REPO_SORT = by;
+  }
+
+  filterRepos(query: string) {
+    if (!query) this.sortedRepos = this.repos;
+    if (query.length < 3) return;
+    query = query.toLowerCase();
+    this.sortedRepos = this.repos.filter(
+      (r) =>
+        r.full_name.toLowerCase().includes(query) ||
+        r.description?.toLowerCase().includes(query)
+    );
+    this.sortRepos(this.REPO_SORT, this.sortedRepos);
+  }
+
+  filterContributors(query: string) {
+    if (!query) this.sortedContributors = this.contributors;
+    if (query.length < 3) return;
+    query = query.toLowerCase();
+    this.sortedContributors = this.contributors.filter(
+      (c) =>
+        c.login.toLowerCase().includes(query) ||
+        c.repos.findIndex((re) => re.toLowerCase().includes(query)) > -1
+    );
+    this.sortContributors(this.CONTRIB_SORT);
   }
 
   trackByName(index, item) {
