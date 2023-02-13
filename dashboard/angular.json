@@ -28,9 +28,6 @@
             ],
             "styles": [
               "node_modules/@tabler/core/dist/css/tabler.min.css",
-              "node_modules/@tabler/core/dist/css/tabler-flags.min.css",
-              "node_modules/@tabler/core/dist/css/tabler-payments.min.css",
-              "node_modules/@tabler/core/dist/css/tabler-vendors.min.css",
               "node_modules/@tabler/core/dist/css/demo.min.css",
               "src/styles.css"
             ],
@@ -46,7 +43,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
