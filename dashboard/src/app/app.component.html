@@ -222,6 +222,67 @@
         </div>
 
         <div class="row">
+          <div class="col-12 mt-3">
+            <div class="card">
+              <ng-container *ngIf="!repos.length">
+                <div class="spinner-grow text-secondary align-self-center" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="repos.length">
+                <div class="card-header">
+                  <h3 class="card-title">Keeping busy</h3>
+                  <div class="ms-3 lh-1">
+                    <div class="dropdown">
+                      <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{busyLastWeek ?
+                        'Last week' : 'Last month'}}</a>
+                      <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item" [ngClass]="{active: busyLastWeek}" (click)="filterBusyRepos(true)">Last week</a>
+                        <a class="dropdown-item" [ngClass]="{active: !busyLastWeek}" (click)="filterBusyRepos(false)">Last month</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <ng-container *ngIf="busyRepos.length">
+                    <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
+                      <div *ngFor="let busy of busyRepos | slice:0:20; trackBy: trackByName; let last = last;" [ngClass]="last ? '' : 'me-4'"
+                        class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                        <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
+                        <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
+                        <div class="mt-2">
+                          <span class="text-muted mb-1" style="font-size: 0.8rem;" title="Commits">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-git-commit" width="24" height="24" viewBox="0 0 24 24"
+                              stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+                              <path d="M12 3l0 6"></path>
+                              <path d="M12 15l0 6"></path>
+                            </svg>
+                            {{busyLastWeek ? busy.commits_7d : busy.commits_30d || 0}}</span>
+                          <span class="mx-2 text-muted mb-1" style="font-size: 0.8rem;" title="Pull requests">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-git-pull-request" width="24" height="24"
+                              viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                              <path d="M6 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                              <path d="M6 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                              <path d="M18 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                              <path d="M6 8l0 8"></path>
+                              <path d="M11 6h5a2 2 0 0 1 2 2v8"></path>
+                              <path d="M14 9l-3 -3l3 -3"></path>
+                            </svg>
+                            {{busy.prs_30d}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
           <div class="col-12 col-md-8 mt-3">
             <div class="card" style="height: 484px;">
               <div class="card-body">
@@ -263,7 +324,7 @@
                           </a>
                         </td>
                         <td class="td-truncate py-1">
-                          <div class="text-truncate opacity-80">
+                          <div class="text-truncate opacity-80" title="By {{event.author}}">
                             {{event.message}}
                           </div>
                         </td>
@@ -281,9 +342,10 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Projects</h3>
-              <div class="ms-4 lh-1">
+              <div class="ms-3 lh-1">
                 <div class="dropdown">
-                  <a class="dropdown-toggle text-muted" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{REPO_SORT === 'date' ?
+                  <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{REPO_SORT === 'date'
+                    ?
                     'Most recent' : 'Most popular'}}</a>
                   <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item" [ngClass]="{active: REPO_SORT === 'stars'}" (click)="sortRepos('stars')">Most popular</a>
