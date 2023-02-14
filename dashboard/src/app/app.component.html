@@ -354,8 +354,8 @@
                 </div>
               </div>
               <div class="ms-auto d-inline-block">
-                <input type="text" class="form-control form-control-sm" aria-label="Search repos" placeholder="Search" [(ngModel)]="reposQuery"
-                  (ngModelChange)="filterRepos($event)">
+                <input type="text" class="form-control form-control-sm" aria-label="Search repos" placeholder="Search by name/description"
+                  [(ngModel)]="reposQuery" (ngModelChange)="filterRepos($event)">
               </div>
             </div>
             <div class="table-responsive">
@@ -415,8 +415,8 @@
             <div class="card-header">
               <h3 class="card-title">Contributors</h3>
               <div class="ms-auto d-inline-block">
-                <input type="text" class="form-control form-control-sm" aria-label="Search users" placeholder="Search" [(ngModel)]="contributorsQuery"
-                  (ngModelChange)="filterContributors($event)">
+                <input type="text" class="form-control form-control-sm" aria-label="Search users" placeholder="Search by username/repos"
+                  [(ngModel)]="contributorsQuery" (ngModelChange)="filterContributors($event)">
               </div>
             </div>
             <div class="table-responsive">
