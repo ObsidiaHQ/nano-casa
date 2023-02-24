@@ -1,14 +1,15 @@
 const Cron = require('croner');
 const { Octokit } = require('octokit');
-const mongoose = require('mongoose');
 const models = require('./models');
-const fetch = require('node-fetch');
 require('dotenv').config();
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const REPOS = require('./repos.json');
-mongoose.connect(process.env.DB_URL);
+const { queryDB } = require('./server');
 const createClient = require('redis').createClient;
 const redis = createClient({
+    // host: 'localhost',
+    // port: process.env.REDIS_PORT || 6379,
+    // password: process.env.REDIS_PASS,
     url: process.env.REDIS_URL,
 });
 
@@ -265,112 +266,11 @@ async function refreshCommitsAndContributors(repos = []) {
     console.timeEnd('refreshed_commits');
 }
 
-async function refreshDevList() {
-    const url = '/repos/Joohansson/nanodevlist/contents/donatees';
-    const devs = [];
-    let devsRes = (await octo.request(`GET ${url}`)).data;
-    for (let i = 0; i < devsRes.length; i++) {
-        const {
-            name,
-            github,
-            twitter,
-            sponsor_link,
-            nano_account,
-            description,
-            tags,
-        } = await (await fetch(`${devsRes[i].download_url}`)).json();
-        devs.push(
-            new models.Profile({
-                name,
-                github,
-                twitter,
-                sponsor_link,
-                nano_account,
-                description,
-                tags,
-            })
-        );
-    }
-    await models.Profile.collection.drop();
-    await models.Profile.collection.insertMany(devs);
-    return devs;
-}
-
 function isEmpty(obj) {
     for (var x in obj) {
         return false;
     }
     return true;
-}
-
-async function queryDB() {
-    const data = {
-        repos: await models.Repo.find({}, { _id: 0 })
-            .sort({ created_at: 'asc' })
-            .lean(),
-        contributors: await models.Contributor.aggregate([
-            {
-                $project: {
-                    contributions: 1,
-                    last_month: 1,
-                    repos_count: { $size: '$repos' },
-                    repos: 1,
-                    login: 1,
-                    avatar_url: 1,
-                    _id: 0,
-                },
-            },
-            { $sort: { contributions: -1, repos_count: -1 } },
-        ]),
-        commits: await models.Commit.aggregate([
-            {
-                $group: {
-                    _id: {
-                        year: {
-                            $year: {
-                                $dateFromString: {
-                                    dateString: '$date',
-                                    format: '%Y-%m-%dT%H:%M:%SZ',
-                                },
-                            },
-                        },
-                        week: {
-                            $week: {
-                                $dateFromString: {
-                                    dateString: '$date',
-                                    format: '%Y-%m-%dT%H:%M:%SZ',
-                                },
-                            },
-                        },
-                    },
-                    count: { $sum: 1 },
-                },
-            },
-            {
-                $sort: { '_id.year': 1, '_id.week': 1 },
-            },
-            {
-                $project: {
-                    date: {
-                        $concat: [
-                            { $toString: '$_id.year' },
-                            '|',
-                            { $toString: '$_id.week' },
-                        ],
-                    },
-                    count: 1,
-                    _id: 0,
-                },
-            },
-        ]),
-        milestones: await models.Milestone.find({}, { _id: 0 }).lean(),
-        devList: await models.Profile.find({}, { _id: 0 }).lean(),
-        events: await models.Commit.find({}, { _id: 0 })
-            .sort({ date: 'desc' })
-            .limit(35)
-            .lean(),
-    };
-    return data;
 }
 
 // returns a random index weighted inversely
@@ -404,7 +304,6 @@ const job = new Cron('10 * * * *', async () => {
     await refreshMilestones();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
-    await refreshDevList();
     await redis.json.set('data', '.', await queryDB());
 });
 
@@ -414,5 +313,4 @@ module.exports = {
     refreshMilestones,
     refreshRepos,
     rate,
-    queryDB,
 };
