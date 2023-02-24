@@ -293,7 +293,7 @@ export class AppComponent implements OnInit {
   }
 
   editProfile() {
-    this.selectedUser = this.contributors.find(
+    this.selectedUser = this.sortedContributors.find(
       (c) => c.login === this.loggedUser._id
     );
   }

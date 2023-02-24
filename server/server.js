@@ -40,7 +40,8 @@ passport.use(
                 },
                 { upsert: true, new: true }
             )
-                .then((user) => {
+                .then(async (user) => {
+                    updateProfilesCache(user);
                     return done(null, user);
                 })
                 .catch((err) => done(err, null));
@@ -66,7 +67,7 @@ app.use(passport.initialize());
 // Rate limiter
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 1000, // Limit each IP to 1000 requests per `window` (here, per 10 minutes)
+    max: 500, // Limit each IP to 500 requests per `window` (here, per 10 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
@@ -84,12 +85,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Router
 app.get('/data', async (req, res) => {
-    let cached = await redis.json.get('data', '.');
+    let cached = await redis.json.get('data', '$');
     if (cached) {
         res.json(cached);
     } else {
-        await redis.json.set('data', '.', await queryDB());
-        res.json(await redis.json.get('data', '.'));
+        await redis.json.set('data', '$', await queryDB());
+        res.json(await redis.json.get('data', '$'));
     }
 });
 
@@ -149,7 +150,10 @@ app.post('/set-profile', async (req, res) => {
         },
         { new: true }
     )
-        .then((usr) => res.status(201).send(usr))
+        .then(async (usr) => {
+            updateProfilesCache(usr);
+            res.status(201).send(usr);
+        })
         .catch(() => res.status(500).send());
 });
 
@@ -169,6 +173,20 @@ app.get('/explorer', async (req, res) => {
 app.listen(8080, () => {
     console.log('server running at http://localhost:8080');
 });
+
+async function updateProfilesCache(updatedUser) {
+    let contribs =
+        (await redis.json.get('data', {
+            path: ['$.contributors'],
+        })) || [];
+    contribs = contribs[0].map((c) => {
+        if (c.login === updatedUser._id) {
+            return { ...c, profile: updatedUser };
+        }
+        return c;
+    });
+    redis.json.set('data', '$.contributors', contribs);
+}
 
 async function queryDB() {
     const data = {

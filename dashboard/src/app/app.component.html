@@ -661,7 +661,7 @@
             {{selectedUser.profile?.bio}}
           </div>
 
-          <div class="subheader mt-3 mb-2">Contributed to</div>
+          <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
           <div>
             <a *ngFor="let repo of selectedUser.repos" href="https://github.com/{{repo}}"><span
                 class="badge badge-outline text-azure me-2 mb-2 p-2">{{repo}}</span></a>
