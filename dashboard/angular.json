@@ -33,8 +33,7 @@
             ],
             "scripts": [
               "node_modules/@tabler/core/dist/js/tabler.min.js",
-              "node_modules/@tabler/core/dist/js/demo.min.js",
-              "node_modules/@tabler/core/dist/js/demo-theme.min.js"
+              "node_modules/@tabler/core/dist/js/demo.min.js"
             ]
           },
           "configurations": {
