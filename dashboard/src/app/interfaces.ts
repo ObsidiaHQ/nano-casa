@@ -28,11 +28,28 @@ export interface Contributor {
   last_month: number;
   repos: string[];
   repos_count: number;
-  profile: any;
+  profile: Profile;
 }
 export interface Milestone {
   title: string;
   open_issues: number;
   closed_issues: number;
   created_at: string;
+}
+export interface Profile {
+  _id: string;
+  avatar_url: string;
+  bio: string;
+  twitter_username: string;
+  website: string;
+  nano_address: string;
+  gh_sponsors: boolean;
+  patreon_url: string;
+}
+export interface ServerResponse {
+  repos: Repo[];
+  commits: ChartCommit[];
+  contributors: Contributor[];
+  milestones: Milestone[];
+  events: Commit[];
 }

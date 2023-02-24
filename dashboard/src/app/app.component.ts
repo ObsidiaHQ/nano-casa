@@ -7,7 +7,9 @@ import {
   Commit,
   Contributor,
   Milestone,
+  Profile,
   Repo,
+  ServerResponse,
 } from './interfaces';
 
 @Component({
@@ -34,39 +36,43 @@ export class AppComponent implements OnInit {
 
   milestones: Milestone[] = [];
   events: Commit[] = [];
+  profiles: Profile[] = [];
 
   commitsChartOpts: EChartsOption;
   reposChartOpts: EChartsOption;
   selectedUser: Contributor = {} as Contributor;
+  loggedUser: Profile;
+  editMode = false;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.getData();
+    this.fetchUser();
   }
 
   getData(): void {
-    this.http.get(environment.api).subscribe((data: any) => {
-      this.contributors = data.contributors.map((usr) => {
-        const profile = data.devList.find(
-          (dl) => dl.github.toLowerCase() === usr.login.toLowerCase()
-        );
-        if (profile)
-          profile.description = profile.description.replace(
-            /\[(.*?)\]\((.*?)\)/gim,
-            "<a href='$2'>$1</a>"
-          );
-        return { ...usr, profile };
+    this.http
+      .get(`${environment.api}/data`)
+      .subscribe((data: ServerResponse) => {
+        this.contributors = data.contributors.map((usr) => {
+          if (usr.profile) {
+            usr.profile.bio = usr.profile.bio?.replace(
+              /\[(.*?)\]\((.*?)\)/gim,
+              "<a href='$2'>$1</a>"
+            );
+          }
+          return usr;
+        });
+        this.sortedContributors = this.contributors;
+        this.milestones = data.milestones;
+        this.events = data.events;
+        this.setRepos(data.repos);
+        setTimeout(() => {
+          // needed for animations to work
+          this.initCharts(data.commits, data.repos);
+        }, 200);
       });
-      this.sortedContributors = this.contributors;
-      this.milestones = data.milestones;
-      this.events = data.events;
-      this.setRepos(data.repos);
-      setTimeout(() => {
-        // needed for animations to work
-        this.initCharts(data.commits, data.repos);
-      }, 200);
-    });
   }
 
   setRepos(repos: Repo[]) {
@@ -74,7 +80,7 @@ export class AppComponent implements OnInit {
     this.sortRepos(this.REPO_SORT);
     this.busyRepos = [...this.repos]
       .filter((a) => a.commits_30d + a.prs_30d > 0)
-      .sort((a, b) => b.commits_30d + b.prs_30d - (a.commits_30d + a.prs_30d));
+      .sort((a, b) => b.commits_30d + b.prs_30d - a.commits_30d - a.prs_30d);
     this.reposNames = this.repos.map((r) => r.full_name);
   }
 
@@ -272,7 +278,8 @@ export class AppComponent implements OnInit {
     this.sortedContributors = this.contributors.filter(
       (c) =>
         c.login.toLowerCase().includes(query) ||
-        c.repos.findIndex((re) => re.toLowerCase().includes(query)) > -1
+        c.repos.findIndex((re) => re.toLowerCase().includes(query)) > -1 ||
+        c.profile?.bio?.toLowerCase().includes(query)
     );
     this.sortContributors(this.CONTRIB_SORT);
   }
@@ -283,5 +290,43 @@ export class AppComponent implements OnInit {
 
   trackByLogin(index, item) {
     return item.login;
+  }
+
+  editProfile() {
+    this.selectedUser = this.contributors.find(
+      (c) => c.login === this.loggedUser._id
+    );
+  }
+
+  fetchUser() {
+    this.http
+      .get(`${environment.api}/auth/user`)
+      .subscribe((user: Profile) => (this.loggedUser = user));
+  }
+
+  logIn() {
+    window.open('/auth/github', '_self');
+  }
+
+  logOut() {
+    this.http
+      .get(`${environment.api}/logout`)
+      .subscribe(() => (this.loggedUser = null));
+  }
+
+  updateProfile() {
+    this.http
+      .post(`${environment.api}/set-profile`, this.loggedUser)
+      .subscribe((usr: Profile) => {
+        this.sortedContributors = this.sortedContributors.map((c) => {
+          if (c.login === usr._id) {
+            return { ...c, profile: usr };
+          }
+          return c;
+        });
+        this.loggedUser = usr;
+        this.editProfile();
+        this.editMode = false;
+      });
   }
 }
