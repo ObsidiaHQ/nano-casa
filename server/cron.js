@@ -7,10 +7,10 @@ const REPOS = require('./repos.json');
 const { queryDB } = require('./server');
 const createClient = require('redis').createClient;
 const redis = createClient({
-    // host: 'localhost',
-    // port: process.env.REDIS_PORT || 6379,
-    // password: process.env.REDIS_PASS,
-    url: process.env.REDIS_URL,
+    host: 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASS,
+    //url: process.env.REDIS_URL,
 });
 
 redis.on('error', (err) => console.log('Redis Client Error', err));

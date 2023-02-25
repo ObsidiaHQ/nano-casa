@@ -13,7 +13,10 @@ const app = express();
 // Redis
 const createClient = require('redis').createClient;
 const redis = createClient({
-    url: process.env.REDIS_URL,
+    host: 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASS,
+    //url: process.env.REDIS_URL,
 });
 redis.on('error', (err) => console.log('Redis Client Error', err));
 redis.connect();
@@ -127,7 +130,6 @@ app.get('/logout', (req, res, next) => {
 
 app.post('/set-profile', async (req, res) => {
     if (!req.isAuthenticated()) {
-        console.log('not authed');
         return res.status(401).send();
     }
     const {
@@ -174,18 +176,13 @@ app.listen(8080, () => {
     console.log('server running at http://localhost:8080');
 });
 
-async function updateProfilesCache(updatedUser) {
-    let contribs =
-        (await redis.json.get('data', {
-            path: ['$.contributors'],
-        })) || [];
-    contribs = contribs[0].map((c) => {
-        if (c.login === updatedUser._id) {
-            return { ...c, profile: updatedUser };
-        }
-        return c;
-    });
-    redis.json.set('data', '$.contributors', contribs);
+async function updateProfilesCache(updatedProfile) {
+    const path = `$.contributors[?(@.login == '${updatedProfile._id}')]`;
+    let user = (await redis.json.get('data', { path: [path] }))[0];
+    if (user) {
+        user.profile = updatedProfile;
+        redis.json.set('data', path, user);
+    }
 }
 
 async function queryDB() {
