@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
   sortedContributors: Contributor[] = [];
   contributorsPage: Contributor[] = [];
   contributorsPageIndex = 0;
-  CONTRIB_SORT: 'month' | 'total' = 'total';
+  CONTRIB_SORT: 'month' | 'total' = 'month';
   contributorsQuery = '';
 
   milestones: Milestone[] = [];
@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
           }
           return usr;
         });
-        this.sortedContributors = this.contributors;
+        this.sortContributors(this.CONTRIB_SORT);
         this.milestones = data.milestones;
         this.events = data.events;
         this.setRepos(data.repos);
@@ -226,7 +226,6 @@ export class AppComponent implements OnInit {
   }
 
   sortContributors(by: 'month' | 'total') {
-    if (this.CONTRIB_SORT === by) return;
     this.CONTRIB_SORT = by;
     this.sortedContributors = [...this.contributors].sort((a, b) =>
       by === 'total'
