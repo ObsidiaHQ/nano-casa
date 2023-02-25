@@ -513,6 +513,18 @@
                     </td>
                     <td class="py-2" data-label="Total commits">
                       <span class="opacity-75">{{user.contributions | number}}</span>
+                      <span class="badge bg-indigo-lt ms-2 cursor-help" title="Contributed to {{user.repos_count}} repos">
+                        {{user.repos_count}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <path d="M12 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                          <path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                          <path d="M17 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                          <path d="M7 8v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2v-2"></path>
+                          <path d="M12 12l0 4"></path>
+                        </svg>
+                      </span>
                     </td>
                     <td class="py-2" data-label="Last month">
                       <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
@@ -546,7 +558,7 @@
                             <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
                           </svg>
                         </a>
-                        <a href="#" class="btn bg-indigo-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
+                        <a href="#" class="btn bg-blue-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
                           (click)="selectedUser = user">
                           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
