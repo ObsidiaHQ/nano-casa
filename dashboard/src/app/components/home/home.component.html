@@ -6,24 +6,24 @@
       <div class="col-12 col-md-4">
         <div class="card">
           <div class="card-body pb-0">
-            <ng-container *ngIf="!api.data.value.repos.length">
+            <ng-container *ngIf="!shared.data.value.repos.length">
               <div class="d-flex justify-content-center">
                 <div class="spinner-grow text-secondary align-self-center" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </div>
             </ng-container>
-            <ng-container *ngIf="api.data.value.repos.length">
+            <ng-container *ngIf="shared.data.value.repos.length">
               <div class="row">
                 <div class="col-12 col-md-7">
                   <div class="d-flex align-items-center">
                     <div class="subheader">Projects</div>
                   </div>
                   <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="api.data.value.repos.length"></div>
+                    <div class="h2 mb-2 me-2" [countUp]="shared.data.value.repos.length"></div>
                     <div class="me-auto">
                       <span class="text-pink d-inline-flex align-items-center lh-1">
-                        {{api.data.value.repos[api.data.value.repos.length-1]?.name}}
+                        {{shared.data.value.repos[shared.data.value.repos.length-1]?.name}}
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1 small" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                           stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -39,7 +39,7 @@
                     <div class="subheader">Contributors</div>
                   </div>
                   <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="api.data.value.contributors.length"></div>
+                    <div class="h2 mb-2 me-2" [countUp]="shared.data.value.contributors.length"></div>
                   </div>
                 </div>
               </div>
@@ -52,14 +52,14 @@
 
       <div class="col-12 col-md-4">
         <div class="card">
-          <ng-container *ngIf="!api.data.value.milestones.length">
+          <ng-container *ngIf="!shared.data.value.milestones.length">
             <div class="card-body d-flex justify-content-center">
               <div class="spinner-grow text-secondary align-self-center" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
           </ng-container>
-          <div *ngIf="api.data.value.milestones.length" class="card-body">
+          <div *ngIf="shared.data.value.milestones.length" class="card-body">
             <div class="card-stamp">
               <div class="card-stamp-icon bg-purple-lt">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
@@ -78,11 +78,11 @@
             </div>
             <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
               <div class="carousel-indicators carousel-indicators-dot">
-                <button *ngFor="let milestone of api.data.value.milestones; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
+                <button *ngFor="let milestone of shared.data.value.milestones; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
                   [ngClass]="{'active': i === 0}" [attr.data-bs-slide-to]="i"></button>
               </div>
               <div class="carousel-inner">
-                <div class="carousel-item" *ngFor="let milestone of api.data.value.milestones; let i = index" [ngClass]="{'active': i === 0}">
+                <div class="carousel-item" *ngFor="let milestone of shared.data.value.milestones; let i = index" [ngClass]="{'active': i === 0}">
                   <div class="row align-items-center">
                     <div class="col">
                       <div class="row g-2 align-items-center">
@@ -116,14 +116,14 @@
 
       <div class="col-12 col-md-4">
         <div class="card spotlight">
-          <ng-container *ngIf="!api.data.value.repos.length">
+          <ng-container *ngIf="!shared.data.value.repos.length">
             <div class="card-body d-flex justify-content-center">
               <div class="spinner-grow text-secondary align-self-center" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
           </ng-container>
-          <a href="#" *ngIf="api.data.value.repos.length">
+          <a href="#" *ngIf="shared.data.value.repos.length">
             <div class="ribbon ribbon-top bg-yellow">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -136,9 +136,9 @@
                 <div class="subheader">Spotlight</div>
               </div>
               <div class="d-flex align-items-baseline">
-                <div class="h2 mb-2 me-2">{{api.data.value.repos[31].name}}</div>
+                <div class="h2 mb-2 me-2">{{shared.data.value.repos[31].name}}</div>
               </div>
-              <p class="text-muted">{{api.data.value.repos[31].description}}</p>
+              <p class="text-muted">{{shared.data.value.repos[31].description}}</p>
             </div>
           </a>
         </div>
@@ -149,12 +149,12 @@
     <div class="row">
       <div class="col-12 mt-3">
         <div class="card">
-          <ng-container *ngIf="!api.data.value.repos.length">
+          <ng-container *ngIf="!shared.data.value.repos.length">
             <div class="spinner-grow text-secondary align-self-center" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </ng-container>
-          <ng-container *ngIf="api.data.value.repos.length">
+          <ng-container *ngIf="shared.data.value.repos.length">
             <div class="card-header">
               <h3 class="card-title">Keeping busy</h3>
               <div class="ms-3 lh-1">
@@ -220,12 +220,12 @@
       </div>
       <div class="col-12 col-md-4 mt-3">
         <div class="card" style="height: 484px;">
-          <ng-container *ngIf="!api.data.value.events.length">
+          <ng-container *ngIf="!shared.data.value.events.length">
             <div class="spinner-grow text-secondary align-self-center" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </ng-container>
-          <ng-container *ngIf="api.data.value.events.length">
+          <ng-container *ngIf="shared.data.value.events.length">
             <div class="card-table table-responsive" style=" scrollbar-width: thin;">
               <table class="table table-vcenter">
                 <thead>
@@ -242,7 +242,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let event of api.data.value.events">
+                  <tr *ngFor="let event of shared.data.value.events">
                     <td class="w-1 py-1">
                       <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
                           [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
@@ -465,7 +465,7 @@
                       </svg>
                     </a>
                     <a href="#" class="btn bg-blue-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
-                      (click)="api.selectUser(user)">
+                      (click)="shared.selectUser(user)">
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

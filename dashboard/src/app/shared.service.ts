@@ -2,18 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, take } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import {
-  Commit,
-  Contributor,
-  Milestone,
-  Profile,
-  ServerResponse,
-} from './interfaces';
+import { Contributor, Profile, ServerResponse } from './interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ApiService {
+export class SharedService {
   loggedUser = new BehaviorSubject<Profile>(null);
   selectedUser = new BehaviorSubject<Contributor>(null);
   data = new BehaviorSubject<ServerResponse>({

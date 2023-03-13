@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from './api.service';
+import { SharedService } from './shared.service';
 import { Contributor, Profile, ServerResponse } from './interfaces';
 
 @Component({
@@ -11,12 +11,14 @@ export class AppComponent implements OnInit {
   data: ServerResponse;
   selectedUser: Contributor;
 
-  constructor(public api: ApiService) {}
+  constructor(public shared: SharedService) {}
 
   ngOnInit() {
-    this.api.loggedUser.subscribe((user: Profile) => (this.loggedUser = user));
-    this.api.data.subscribe((data: ServerResponse) => (this.data = data));
-    this.api.selectedUser.subscribe(
+    this.shared.loggedUser.subscribe(
+      (user: Profile) => (this.loggedUser = user)
+    );
+    this.shared.data.subscribe((data: ServerResponse) => (this.data = data));
+    this.shared.selectedUser.subscribe(
       (user: Contributor) => (this.selectedUser = user)
     );
   }

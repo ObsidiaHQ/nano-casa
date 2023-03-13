@@ -7,7 +7,7 @@ import {
   Repo,
   ServerResponse,
 } from '../../interfaces';
-import { ApiService } from 'src/app/api.service';
+import { SharedService } from 'src/app/shared.service';
 
 @Component({
   selector: 'app-home',
@@ -35,18 +35,20 @@ export class HomeComponent implements OnInit {
   loggedUser: Profile;
   editMode = false;
 
-  constructor(public api: ApiService) {}
+  constructor(public shared: SharedService) {}
 
   ngOnInit() {
     this.getData();
-    this.api.loggedUser.subscribe((user: Profile) => (this.loggedUser = user));
-    this.api.selectedUser.subscribe(
+    this.shared.loggedUser.subscribe(
+      (user: Profile) => (this.loggedUser = user)
+    );
+    this.shared.selectedUser.subscribe(
       (user: Contributor) => (this.selectedUser = user)
     );
   }
 
   getData(): void {
-    this.api.data.subscribe((data: ServerResponse) => {
+    this.shared.data.subscribe((data: ServerResponse) => {
       this.sortContributors(this.CONTRIB_SORT);
       this.sortRepos(this.REPO_SORT);
       this.busyRepos = [...data.repos]
@@ -203,7 +205,7 @@ export class HomeComponent implements OnInit {
 
   sortContributors(by: 'month' | 'total') {
     this.CONTRIB_SORT = by;
-    this.sortedContributors = [...this.api.data.value.contributors].sort(
+    this.sortedContributors = [...this.shared.data.value.contributors].sort(
       (a, b) =>
         by === 'total'
           ? b.contributions - a.contributions
@@ -214,17 +216,20 @@ export class HomeComponent implements OnInit {
   filterBusyRepos(lastWeekOnly: boolean) {
     this.busyLastWeek = lastWeekOnly;
     if (lastWeekOnly) {
-      this.busyRepos = [...this.api.data.value.repos]
+      this.busyRepos = [...this.shared.data.value.repos]
         .filter((a) => a.commits_7d + a.prs_7d > 0)
         .sort((a, b) => b.commits_7d + b.prs_7d - (a.commits_7d + a.prs_7d));
       return;
     }
-    this.busyRepos = [...this.api.data.value.repos]
+    this.busyRepos = [...this.shared.data.value.repos]
       .filter((a) => a.commits_30d + a.prs_30d > 0)
       .sort((a, b) => b.commits_30d + b.prs_30d - (a.commits_30d + a.prs_30d));
   }
 
-  sortRepos(by: 'date' | 'stars', source: Repo[] = this.api.data.value.repos) {
+  sortRepos(
+    by: 'date' | 'stars',
+    source: Repo[] = this.shared.data.value.repos
+  ) {
     if (by === 'date') {
       this.sortedRepos = [...source].reverse();
     } else {
@@ -236,10 +241,10 @@ export class HomeComponent implements OnInit {
   }
 
   filterRepos(query: string) {
-    if (!query) this.sortedRepos = this.api.data.value.repos;
+    if (!query) this.sortedRepos = this.shared.data.value.repos;
     if (query.length < 3) return;
     query = query.toLowerCase();
-    this.sortedRepos = this.api.data.value.repos.filter(
+    this.sortedRepos = this.shared.data.value.repos.filter(
       (r) =>
         r.full_name.toLowerCase().includes(query) ||
         r.description?.toLowerCase().includes(query)
@@ -248,10 +253,10 @@ export class HomeComponent implements OnInit {
   }
 
   filterContributors(query: string) {
-    if (!query) this.sortedContributors = this.api.data.value.contributors;
+    if (!query) this.sortedContributors = this.shared.data.value.contributors;
     if (query.length < 3) return;
     query = query.toLowerCase();
-    this.sortedContributors = this.api.data.value.contributors.filter(
+    this.sortedContributors = this.shared.data.value.contributors.filter(
       (c) =>
         c.login.toLowerCase().includes(query) ||
         c.repos.findIndex((re) => re.toLowerCase().includes(query)) > -1 ||
@@ -261,15 +266,15 @@ export class HomeComponent implements OnInit {
   }
 
   updateProfile() {
-    this.api.updateProfile().subscribe((usr: Profile) => {
+    this.shared.updateProfile().subscribe((usr: Profile) => {
       this.sortedContributors = this.sortedContributors.map((c) => {
         if (c.login === usr._id) {
           return { ...c, profile: usr };
         }
         return c;
       });
-      this.api.loggedUser.next(usr);
-      this.api.selectUser(null, true);
+      this.shared.loggedUser.next(usr);
+      this.shared.selectUser(null, true);
       this.editMode = false;
     });
   }
