@@ -8,15 +8,16 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const session = require('express-session');
 require('dotenv').config();
 const models = require('./models');
+//const { rate, refreshNodeEvents } = require('./cron');
 const app = express();
 
 // Redis
 const createClient = require('redis').createClient;
 const redis = createClient({
-    host: 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASS,
-    //url: process.env.REDIS_URL,
+    // host: 'localhost',
+    // port: process.env.REDIS_PORT || 6379,
+    // password: process.env.REDIS_PASS,
+    url: process.env.REDIS_URL,
 });
 redis.on('error', (err) => console.log('Redis Client Error', err));
 redis.connect();
@@ -161,7 +162,7 @@ app.post('/set-profile', async (req, res) => {
 
 app.get('/ping', async (req, res) => {
     rate();
-    res.status(200).send('pong');
+    res.status(200).send(await refreshNodeEvents());
 });
 
 app.get('/', (req, res) => {
@@ -262,7 +263,7 @@ async function queryDB() {
         milestones: await models.Milestone.find({}, { _id: 0 }).lean(),
         events: await models.Commit.find({}, { _id: 0 })
             .sort({ date: 'desc' })
-            .limit(35)
+            .limit(40)
             .lean(),
     };
     return data;

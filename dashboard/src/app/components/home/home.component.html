@@ -1,0 +1,621 @@
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-cards">
+
+      <div class="col-12 col-md-4">
+        <div class="card">
+          <div class="card-body pb-0">
+            <ng-container *ngIf="!api.data.value.repos.length">
+              <div class="d-flex justify-content-center">
+                <div class="spinner-grow text-secondary align-self-center" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="api.data.value.repos.length">
+              <div class="row">
+                <div class="col-12 col-md-7">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Projects</div>
+                  </div>
+                  <div class="d-flex align-items-baseline">
+                    <div class="h2 mb-2 me-2" [countUp]="api.data.value.repos.length"></div>
+                    <div class="me-auto">
+                      <span class="text-pink d-inline-flex align-items-center lh-1">
+                        {{api.data.value.repos[api.data.value.repos.length-1]?.name}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1 small" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <polyline points="12 8 12 12 14 14"></polyline>
+                          <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-5">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Contributors</div>
+                  </div>
+                  <div class="d-flex align-items-baseline">
+                    <div class="h2 mb-2 me-2" [countUp]="api.data.value.contributors.length"></div>
+                  </div>
+                </div>
+              </div>
+
+            </ng-container>
+            <div echarts [options]="reposChartOpts" style="height: 70px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="card">
+          <ng-container *ngIf="!api.data.value.milestones.length">
+            <div class="card-body d-flex justify-content-center">
+              <div class="spinner-grow text-secondary align-self-center" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </ng-container>
+          <div *ngIf="api.data.value.milestones.length" class="card-body">
+            <div class="card-stamp">
+              <div class="card-stamp-icon bg-purple-lt">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                  <path d="M12 7a5 5 0 1 0 5 5"></path>
+                  <path d="M13 3.055a9 9 0 1 0 7.941 7.945"></path>
+                  <path d="M15 6v3h3l3 -3h-3v-3z"></path>
+                  <path d="M15 9l-3 3"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <div class="subheader">Milestones</div>
+            </div>
+            <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
+              <div class="carousel-indicators carousel-indicators-dot">
+                <button *ngFor="let milestone of api.data.value.milestones; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
+                  [ngClass]="{'active': i === 0}" [attr.data-bs-slide-to]="i"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item" *ngFor="let milestone of api.data.value.milestones; let i = index" [ngClass]="{'active': i === 0}">
+                  <div class="row align-items-center">
+                    <div class="col">
+                      <div class="row g-2 align-items-center">
+                        <div class="col-auto h2">
+                          {{milestone.closed_issues/(milestone.open_issues + milestone.closed_issues) | percent}}
+                        </div>
+                        <div class="col">
+                          <div class="progress progress-sm">
+                            <div class="progress-bar bg-purple" role="progressbar"
+                              [ngStyle]="{width: milestone.closed_issues*100/(milestone.open_issues + milestone.closed_issues)+'%' }"
+                              [attr.aria-valuenow]="milestone.closed_issues" [attr.aria-valuemin]="0"
+                              [attr.aria-valuemax]="milestone.open_issues + milestone.closed_issues">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <a class="text-muted mt-1 d-block"
+                        href="https://github.com/nanocurrency/nano-node/milestone{{milestone.number ? '/' + milestone.number : 's'}}" target="_blank">
+                        {{milestone.title}} ({{milestone.closed_issues}}/{{milestone.closed_issues+milestone.open_issues}})
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="col-12 col-md-4">
+        <div class="card spotlight">
+          <ng-container *ngIf="!api.data.value.repos.length">
+            <div class="card-body d-flex justify-content-center">
+              <div class="spinner-grow text-secondary align-self-center" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </ng-container>
+          <a href="#" *ngIf="api.data.value.repos.length">
+            <div class="ribbon ribbon-top bg-yellow">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="subheader">Spotlight</div>
+              </div>
+              <div class="d-flex align-items-baseline">
+                <div class="h2 mb-2 me-2">{{api.data.value.repos[31].name}}</div>
+              </div>
+              <p class="text-muted">{{api.data.value.repos[31].description}}</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-12 mt-3">
+        <div class="card">
+          <ng-container *ngIf="!api.data.value.repos.length">
+            <div class="spinner-grow text-secondary align-self-center" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="api.data.value.repos.length">
+            <div class="card-header">
+              <h3 class="card-title">Keeping busy</h3>
+              <div class="ms-3 lh-1">
+                <div class="dropdown">
+                  <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{busyLastWeek ?
+                    'Last week' : 'Last month'}}</a>
+                  <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item" [ngClass]="{active: busyLastWeek}" (click)="filterBusyRepos(true)">Last week</a>
+                    <a class="dropdown-item" [ngClass]="{active: !busyLastWeek}" (click)="filterBusyRepos(false)">Last month</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <ng-container *ngIf="busyRepos.length">
+                <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
+                  <div *ngFor="let busy of busyRepos | slice:0:20; trackBy: trackByName; let last = last;" [ngClass]="last ? '' : 'me-4'"
+                    class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                    <img [src]="busy.avatar_url" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
+                    <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
+                    <div class="mt-2">
+                      <span class="text-muted mb-1" style="font-size: 0.8rem;" title="Commits">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+                          <path d="M12 3l0 6"></path>
+                          <path d="M12 15l0 6"></path>
+                        </svg>
+                        {{busyLastWeek ? busy.commits_7d : busy.commits_30d || 0}}</span>
+                      <span class="mx-2 text-muted mb-1" style="font-size: 0.8rem;" title="Pull requests">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <path d="M6 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                          <path d="M6 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                          <path d="M18 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                          <path d="M6 8l0 8"></path>
+                          <path d="M11 6h5a2 2 0 0 1 2 2v8"></path>
+                          <path d="M14 9l-3 -3l3 -3"></path>
+                        </svg>
+                        {{busy.prs_30d}}</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-md-8 mt-3">
+        <div class="card" style="height: 484px;">
+          <div class="card-body">
+            <div class="card-title">
+              <h3>Weekly activity</h3>
+            </div>
+            <div echarts [options]="commitsChartOpts" class="chart"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4 mt-3">
+        <div class="card" style="height: 484px;">
+          <ng-container *ngIf="!api.data.value.events.length">
+            <div class="spinner-grow text-secondary align-self-center" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="api.data.value.events.length">
+            <div class="card-table table-responsive" style=" scrollbar-width: thin;">
+              <table class="table table-vcenter">
+                <thead>
+                  <tr>
+                    <th>Repo</th>
+                    <th>Commit</th>
+                    <th class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M12 12l-3 2"></path>
+                        <path d="M12 7v5"></path>
+                      </svg></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let event of api.data.value.events">
+                    <td class="w-1 py-1">
+                      <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
+                          [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
+                      </a>
+                    </td>
+                    <td class="td-truncate py-1">
+                      <div class="text-truncate opacity-80" title="By {{event.author}}">
+                        {{event.message}}
+                      </div>
+                    </td>
+                    <td class="text-nowrap text-muted py-1">{{event.date | timeago}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-3">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Projects</h3>
+          <div class="ms-3 lh-1">
+            <div class="dropdown">
+              <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{REPO_SORT === 'date'
+                ?
+                'Most recent' : 'Most popular'}}</a>
+              <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" [ngClass]="{active: REPO_SORT === 'stars'}" (click)="sortRepos('stars')">Most popular</a>
+                <a class="dropdown-item" [ngClass]="{active: REPO_SORT === 'date'}" (click)="sortRepos('date')">Most recent</a>
+              </div>
+            </div>
+          </div>
+          <div class="ms-auto d-inline-block">
+            <input type="text" class="form-control form-control-sm" aria-label="Search repos" placeholder="Search by name/description" [(ngModel)]="reposQuery"
+              (ngModelChange)="filterRepos($event)">
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-vcenter card-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="text-center" width="136px">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 12l-3 2"></path>
+                    <path d="M12 7v5"></path>
+                  </svg>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let repo of reposPage; trackBy: trackByName">
+                <td data-label="Name" class="py-2">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-fill">
+                      <div class="font-weight-medium">
+                        <a href="https://github.com/{{repo.full_name}}" target="_blank">
+                          <span>{{repo.name}}</span>
+                          <span class="badge bg-yellow-lt ms-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                              stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                              <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path>
+                            </svg>
+                            {{repo.stargazers_count}}
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td data-label="Description">
+                  <span class="opacity-75">{{repo.description}}</span>
+                </td>
+                <td data-label="Date created" class="text-muted" [title]="repo.created_at | date">
+                  {{repo.created_at | timeago}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <app-pagination [pageSize]="15" [items]="sortedRepos" (changePage)="reposPage = $event.items"></app-pagination>
+      </div>
+    </div>
+
+    <div class="col-12 mt-3">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Contributors</h3>
+          <div class="ms-auto d-inline-block">
+            <input type="text" class="form-control form-control-sm" aria-label="Search users" placeholder="Search by username/repos"
+              [(ngModel)]="contributorsQuery" (ngModelChange)="filterContributors($event)">
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-vcenter card-table">
+            <thead>
+              <tr>
+                <th width="30px">#</th>
+                <th>Name</th>
+                <th (click)="sortContributors('total')">Total commits <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler ptr" width="24"
+                    height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <ng-container *ngIf="CONTRIB_SORT === 'total'; else singleDown">
+                      <path d="M7 7l5 5l5 -5"></path>
+                      <path d="M7 13l5 5l5 -5"></path>
+                    </ng-container>
+                    <ng-template #singleDown>
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </ng-template>
+                  </svg></th>
+                <th (click)="sortContributors('month')">Past 30 days <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler ptr" width="24" height="24"
+                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <ng-container *ngIf="CONTRIB_SORT === 'month'; else singleDown">
+                      <path d="M7 7l5 5l5 -5"></path>
+                      <path d="M7 13l5 5l5 -5"></path>
+                    </ng-container>
+                    <ng-template #singleDown>
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </ng-template>
+                  </svg></th>
+                <th class="w-1">Sponsor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of contributorsPage; let i = index; trackBy: trackByLogin;">
+                <td class="py-2" scope="row">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
+                <td data-label="Name" class="py-2">
+                  <div class="d-flex align-items-center">
+                    <img class="avatar me-3" [src]="user.avatar_url" loading="lazy">
+                    <div class="flex-fill">
+                      <div class="font-weight-medium">
+                        <a class="me-2" href="https://github.com/{{user.login}}" target="_blank">
+                          <span>{{user.login}}</span>
+                        </a>
+                        <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo" *ngIf="contributedToNode(user.repos)">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" fill="#17a2b8" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <circle cx="12" cy="9" r="6"></circle>
+                            <path d="M12.002 15.003l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889"></path>
+                            <path d="M6.802 12.003l-3.4 5.89l3.598 -.233l1.598 3.232l3.4 -5.889"></path>
+                          </svg>
+                        </span>
+                        <span class="badge bg-purple-lt ms-2 cursor-help" title="Contributed to 10 repos or more" *ngIf="user.repos.length >= 10">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M21 3l-5 9h5l-6.891 7.086a6.5 6.5 0 1 1 -8.855 -9.506l7.746 -6.58l-1 5l9 -5z"></path>
+                            <circle cx="9.5" cy="14.5" r="2.5"></circle>
+                          </svg>
+                        </span>
+                        <span class="badge bg-orange-lt ms-2 cursor-help" title="Contributed to a popular repo" *ngIf="hasPopularRepo(user.repos)">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M3 12h18"></path>
+                            <path d="M12 21v-18"></path>
+                            <path d="M7.5 7.5l9 9"></path>
+                            <path d="M7.5 16.5l9 -9"></path>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-2" data-label="Total commits">
+                  <span class="opacity-75">{{user.contributions | number}}</span>
+                  <span class="badge bg-indigo-lt ms-2 cursor-help" title="Contributed to {{user.repos_count}} repos">
+                    {{user.repos_count}}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                      stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M12 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M17 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                      <path d="M7 8v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2v-2"></path>
+                      <path d="M12 12l0 4"></path>
+                    </svg>
+                  </span>
+                </td>
+                <td class="py-2" data-label="Past 30 days">
+                  <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
+                </td>
+                <td class="py-2">
+                  <div class="btn-list flex-nowrap">
+                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile.nano_address}}"
+                      class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6.4241271" y1="20.224079" x2="16.844126" y2="4.2240787" />
+                        <line x1="6.9741268" y1="11.874079" x2="16.664125" y2="11.874079" />
+                        <line x1="6.9741268" y1="14.584079" x2="16.664125" y2="14.584079" />
+                        <line x1="17.294127" y1="20.224079" x2="6.8741269" y2="4.2240787" />
+                      </svg>
+                    </a>
+                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="https://patreon.com/{{user.profile.patreon_url}}"
+                      class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M3 3h3v18h-3z"></path>
+                        <path d="M15 9.5m-6.5 0a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0"></path>
+                      </svg>
+                    </a>
+                    <a *ngIf="user.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt w-100 btn-icon"
+                      title="Sponsor on GitHub">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
+                      </svg>
+                    </a>
+                    <a href="#" class="btn bg-blue-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
+                      (click)="api.selectUser(user)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <circle cx="12" cy="10" r="3"></circle>
+                        <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <app-pagination [pageSize]="40" [items]="sortedContributors"
+          (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-profile" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" *ngIf="selectedUser">
+      <div class="modal-body pt-5">
+        <img [src]="selectedUser.avatar_url" class="profile avatar" [alt]="selectedUser.login">
+        <ng-container *ngIf="!editMode; else editTemplate">
+          <div class="row">
+            <div class="col-12 col-md-4 my-1">
+              <a *ngIf="selectedUser.profile?.website" href="https://{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M19.5 7a9 9 0 0 0 -7.5 -4a8.991 8.991 0 0 0 -7.484 4"></path>
+                  <path d="M11.5 3a16.989 16.989 0 0 0 -1.826 4"></path>
+                  <path d="M12.5 3a16.989 16.989 0 0 1 1.828 4"></path>
+                  <path d="M19.5 17a9 9 0 0 1 -7.5 4a8.991 8.991 0 0 1 -7.484 -4"></path>
+                  <path d="M11.5 21a16.989 16.989 0 0 1 -1.826 -4"></path>
+                  <path d="M12.5 21a16.989 16.989 0 0 0 1.828 -4"></path>
+                  <path d="M2 10l1 4l1.5 -4l1.5 4l1 -4"></path>
+                  <path d="M17 10l1 4l1.5 -4l1.5 4l1 -4"></path>
+                  <path d="M9.5 10l1 4l1.5 -4l1.5 4l1 -4"></path>
+                </svg>
+              </a>
+              <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path
+                    d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5">
+                  </path>
+                </svg>
+              </a>
+              <a *ngIf="selectedUser.profile?.twitter_username" href="https://twitter.com/{{selectedUser.profile.twitter_username}}" target="_blank"
+                class="h4 px-2" title="Follow on Twitter">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path
+                    d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z">
+                  </path>
+                </svg>
+              </a>
+            </div>
+            <div class="col-12 col-md-4"></div>
+            <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
+              <a *ngIf="selectedUser.profile?.nano_address" href="https://nano.to/{{selectedUser.profile.nano_address}}" target="_blank"
+                class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="6.4241271" y1="20.224079" x2="16.844126" y2="4.2240787" />
+                  <line x1="6.9741268" y1="11.874079" x2="16.664125" y2="11.874079" />
+                  <line x1="6.9741268" y1="14.584079" x2="16.664125" y2="14.584079" />
+                  <line x1="17.294127" y1="20.224079" x2="6.8741269" y2="4.2240787" />
+                </svg>
+              </a>
+              <a *ngIf="selectedUser.profile?.patreon_url" target="_blank" [href]="selectedUser.profile.patreon_url" class="btn bg-white-lt w-100 btn-icon"
+                title="Become a patron">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M3 3h3v18h-3z"></path>
+                  <path d="M15 9.5m-6.5 0a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0"></path>
+                </svg>
+              </a>
+              <a *ngIf="selectedUser.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{selectedUser.login}}"
+                class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div *ngIf="selectedUser.profile?.bio" class="subheader mt-3 mb-2">About {{selectedUser.login}}</div>
+          <div>
+            {{selectedUser.profile?.bio}}
+          </div>
+
+          <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
+          <div>
+            <a *ngFor="let repo of selectedUser.repos" href="https://github.com/{{repo}}"><span
+                class="badge badge-outline text-azure me-2 mb-2 p-2">{{repo}}</span></a>
+          </div>
+        </ng-container>
+        <ng-template #editTemplate>
+          <div class="row">
+            <div class="col-12 col-md-4 mb-3">
+              <label class="form-label">Website</label>
+              <input type="text" class="form-control" placeholder="website, blog, etc" [(ngModel)]="loggedUser.website">
+            </div>
+            <div class="col-12 col-md-4 mb-3">
+              <label class="form-label">Twitter handle</label>
+              <input type="text" class="form-control" placeholder="username" [(ngModel)]="loggedUser.twitter_username">
+            </div>
+            <div class="col-12 col-md-4 mb-3">
+              <label class="form-label">Patreon</label>
+              <input type="text" class="form-control" placeholder="link to your Patreon" [(ngModel)]="loggedUser.patreon_url">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 col-md-7 mb-3">
+              <label class="form-label">Nano address</label>
+              <input type="text" class="form-control" placeholder="xno_123abc.. or nano.to username" [(ngModel)]="loggedUser.nano_address">
+            </div>
+
+            <div class="col-auto pt-md-4 mb-3">
+              <label class="form-check">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="loggedUser.gh_sponsors" [checked]="loggedUser.gh_sponsors">
+                <span class="form-check-label">GitHub Sponsors?</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">About</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="loggedUser.bio"></textarea>
+          </div>
+        </ng-template>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
+        <button *ngIf="loggedUser && selectedUser.login === loggedUser._id && !editMode" type="button" class="btn btn-success"
+          (click)="editMode = true">Edit</button>
+        <button *ngIf="loggedUser && editMode" type="button" class="btn btn-primary" (click)="updateProfile()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

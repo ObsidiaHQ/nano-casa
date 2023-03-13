@@ -7,10 +7,10 @@ const REPOS = require('./repos.json');
 const { queryDB } = require('./server');
 const createClient = require('redis').createClient;
 const redis = createClient({
-    host: 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASS,
-    //url: process.env.REDIS_URL,
+    // host: 'localhost',
+    // port: process.env.REDIS_PORT || 6379,
+    // password: process.env.REDIS_PASS,
+    url: process.env.REDIS_URL,
 });
 
 redis.on('error', (err) => console.log('Redis Client Error', err));
@@ -33,12 +33,13 @@ async function refreshMilestones() {
 
     const normalized = latest
         .map(
-            ({ title, open_issues, closed_issues, html_url }) =>
+            ({ title, open_issues, closed_issues, html_url, number }) =>
                 new models.Milestone({
                     title,
                     open_issues,
                     closed_issues,
                     url: html_url,
+                    number,
                 })
         )
         .sort((a, b) => b.title.localeCompare(a.title));
@@ -300,6 +301,30 @@ function getSpotlight(repos) {
     return repos[Math.floor(Math.random() * items.length)];
 }
 
+async function refreshNodeEvents() {
+    const EVENT_TYPES = [
+        'PullRequestEvent',
+        'IssueCommentEvent',
+        'ForkEvent',
+        'CommitCommentEvent',
+        'PushEvent',
+        'ReleaseEvent',
+        'PullRequestReviewEvent',
+        'PullRequestReviewCommentEvent',
+    ];
+    let events = (
+        await octo.request(`GET /repos/nanocurrency/nano-node/events`, {
+            per_page: 80,
+        })
+    ).data;
+    return events
+        .filter((eve) => EVENT_TYPES.includes(eve.type))
+        .map(
+            (eve) =>
+                `${eve.actor.login} ${eve.payload.action} in ${eve.repo.name}`
+        );
+}
+
 const job = new Cron('10 * * * *', async () => {
     await refreshMilestones();
     const repos = await refreshRepos();
@@ -309,8 +334,8 @@ const job = new Cron('10 * * * *', async () => {
 
 module.exports = {
     refreshCommitsAndContributors,
-    refreshDevList,
     refreshMilestones,
     refreshRepos,
     rate,
+    refreshNodeEvents,
 };

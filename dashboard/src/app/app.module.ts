@@ -8,9 +8,17 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { TimeagoModule } from 'ngx-timeago';
 import { CountUpModule } from 'ngx-countup';
 import { FormsModule } from '@angular/forms';
+import { AboutComponent } from './components/about/about.component';
+import { RouterModule } from '@angular/router';
+import { HomeComponent } from './components/home/home.component';
 
 @NgModule({
-  declarations: [AppComponent, PaginationComponent],
+  declarations: [
+    AppComponent,
+    PaginationComponent,
+    AboutComponent,
+    HomeComponent,
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -21,6 +29,10 @@ import { FormsModule } from '@angular/forms';
     TimeagoModule.forRoot(),
     CountUpModule,
     FormsModule,
+    RouterModule.forRoot([
+      { path: 'about', component: AboutComponent },
+      { path: '', component: HomeComponent },
+    ]),
   ],
   providers: [],
   bootstrap: [AppComponent],

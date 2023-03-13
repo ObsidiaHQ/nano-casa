@@ -35,6 +35,7 @@ export interface Milestone {
   open_issues: number;
   closed_issues: number;
   created_at: string;
+  number: number;
 }
 export interface Profile {
   _id: string;

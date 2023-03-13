@@ -35,6 +35,7 @@ const Milestone = mongoose.model(
             open_issues: Number,
             closed_issues: Number,
             url: String,
+            number: Number,
         },
         { timestamps: { createdAt: 'created_at', updatedAt: false } }
     )
