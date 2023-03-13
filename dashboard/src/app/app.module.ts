@@ -5,7 +5,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { PaginationComponent } from './paginate.component';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { TimeagoModule } from 'ngx-timeago';
+import {
+  TimeagoModule,
+  TimeagoIntl,
+  TimeagoFormatter,
+  TimeagoCustomFormatter,
+} from 'ngx-timeago';
+import { strings as englishShortStrings } from 'ngx-timeago/language-strings/en-short';
 import { CountUpModule } from 'ngx-countup';
 import { FormsModule } from '@angular/forms';
 import { AboutComponent } from './components/about/about.component';
@@ -26,15 +32,26 @@ import { HomeComponent } from './components/home/home.component';
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),
-    TimeagoModule.forRoot(),
+    TimeagoModule.forRoot({
+      intl: TimeagoIntl,
+      formatter: {
+        provide: TimeagoFormatter,
+        useClass: TimeagoCustomFormatter,
+      },
+    }),
     CountUpModule,
     FormsModule,
     RouterModule.forRoot([
       { path: 'about', component: AboutComponent },
-      { path: '', component: HomeComponent },
+      { path: '**', component: HomeComponent },
     ]),
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private intl: TimeagoIntl) {
+    this.intl.strings = englishShortStrings;
+    this.intl.changes.next();
+  }
+}
