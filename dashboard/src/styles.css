@@ -43,10 +43,6 @@ a:hover {
   padding: 5px;
 }
 
-.badge:hover .icon-tabler-star {
-  fill: orange;
-  cursor: pointer;
-}
 .icon.small {
   width: 1rem;
   height: 1rem;
@@ -83,4 +79,11 @@ a:hover {
 }
 .ptr:hover {
   cursor: pointer;
+}
+
+.sticky {
+  position: sticky;
+  top: 0px;
+  background: #1d273b;
+  z-index: 2;
 }

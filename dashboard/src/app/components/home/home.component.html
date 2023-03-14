@@ -24,12 +24,7 @@
                     <div class="me-auto">
                       <span class="text-pink d-inline-flex align-items-center lh-1">
                         {{shared.data.value.repos[shared.data.value.repos.length-1]?.name}}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1 small" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                          <polyline points="12 8 12 12 14 14"></polyline>
-                          <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
-                        </svg>
+                        <app-icon icon="spark" class="ms-1" size="16"></app-icon>
                       </span>
                     </div>
                   </div>
@@ -62,15 +57,7 @@
           <div *ngIf="shared.data.value.milestones.length" class="card-body">
             <div class="card-stamp">
               <div class="card-stamp-icon bg-purple-lt">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                  <path d="M12 7a5 5 0 1 0 5 5"></path>
-                  <path d="M13 3.055a9 9 0 1 0 7.941 7.945"></path>
-                  <path d="M15 6v3h3l3 -3h-3v-3z"></path>
-                  <path d="M15 9l-3 3"></path>
-                </svg>
+                <app-icon icon="target" classList="icon icon-taber"></app-icon>
               </div>
             </div>
             <div class="d-flex align-items-center">
@@ -125,11 +112,7 @@
           </ng-container>
           <a href="#" *ngIf="shared.data.value.repos.length">
             <div class="ribbon ribbon-top bg-yellow">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
-              </svg>
+              <app-icon icon="star"></app-icon>
             </div>
             <div class="card-body">
               <div class="d-flex align-items-center">
@@ -177,25 +160,10 @@
                     <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                     <div class="mt-2">
                       <span class="text-muted mb-1" style="font-size: 0.8rem;" title="Commits">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                          <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-                          <path d="M12 3l0 6"></path>
-                          <path d="M12 15l0 6"></path>
-                        </svg>
+                        <app-icon icon="commit"></app-icon>
                         {{busyLastWeek ? busy.commits_7d : busy.commits_30d || 0}}</span>
                       <span class="mx-2 text-muted mb-1" style="font-size: 0.8rem;" title="Pull requests">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                          <path d="M6 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                          <path d="M6 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                          <path d="M18 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                          <path d="M6 8l0 8"></path>
-                          <path d="M11 6h5a2 2 0 0 1 2 2v8"></path>
-                          <path d="M14 9l-3 -3l3 -3"></path>
-                        </svg>
+                        <app-icon icon="pr"></app-icon>
                         {{busy.prs_30d}}</span>
                     </div>
                   </div>
@@ -229,16 +197,12 @@
             <div class="card-table table-responsive" style=" scrollbar-width: thin;">
               <table class="table table-vcenter">
                 <thead>
-                  <tr>
+                  <tr class="sticky">
                     <th>Repo</th>
                     <th>Commit</th>
-                    <th class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <circle cx="12" cy="12" r="9"></circle>
-                        <path d="M12 12l-3 2"></path>
-                        <path d="M12 7v5"></path>
-                      </svg></th>
+                    <th class="text-center">
+                      <app-icon icon="clock"></app-icon>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -290,13 +254,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th class="text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M12 12l-3 2"></path>
-                    <path d="M12 7v5"></path>
-                  </svg>
+                  <app-icon icon="clock"></app-icon>
                 </th>
               </tr>
             </thead>
@@ -309,11 +267,7 @@
                         <a href="https://github.com/{{repo.full_name}}" target="_blank">
                           <span>{{repo.name}}</span>
                           <span class="badge bg-yellow-lt ms-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                              stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                              <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path>
-                            </svg>
+                            <app-icon icon="star" size="16"></app-icon>
                             {{repo.stargazers_count}}
                           </span>
                         </a>
@@ -350,28 +304,10 @@
               <tr>
                 <th width="30px">#</th>
                 <th>Name</th>
-                <th (click)="sortContributors('total')">Total commits <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler ptr" width="24"
-                    height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <ng-container *ngIf="CONTRIB_SORT === 'total'; else singleDown">
-                      <path d="M7 7l5 5l5 -5"></path>
-                      <path d="M7 13l5 5l5 -5"></path>
-                    </ng-container>
-                    <ng-template #singleDown>
-                      <path d="M6 9l6 6l6 -6"></path>
-                    </ng-template>
-                  </svg></th>
-                <th (click)="sortContributors('month')">Past 30 days <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler ptr" width="24" height="24"
-                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <ng-container *ngIf="CONTRIB_SORT === 'month'; else singleDown">
-                      <path d="M7 7l5 5l5 -5"></path>
-                      <path d="M7 13l5 5l5 -5"></path>
-                    </ng-container>
-                    <ng-template #singleDown>
-                      <path d="M6 9l6 6l6 -6"></path>
-                    </ng-template>
-                  </svg></th>
+                <th (click)="sortContributors('total')">Total commits <app-icon [icon]="CONTRIB_SORT === 'total' ? 'double-down' : 'down'"
+                    class="ptr"></app-icon></th>
+                <th (click)="sortContributors('month')">Past 30 days <app-icon [icon]="CONTRIB_SORT === 'month' ? 'double-down' : 'down'"
+                    class="ptr"></app-icon></th>
                 <th class="w-1">Sponsor</th>
               </tr>
             </thead>
@@ -387,31 +323,13 @@
                           <span>{{user.login}}</span>
                         </a>
                         <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo" *ngIf="contributedToNode(user.repos)">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" fill="#17a2b8" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <circle cx="12" cy="9" r="6"></circle>
-                            <path d="M12.002 15.003l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889"></path>
-                            <path d="M6.802 12.003l-3.4 5.89l3.598 -.233l1.598 3.232l3.4 -5.889"></path>
-                          </svg>
+                          <app-icon icon="veteran" fill="#17a2b8" size="16" strokeWidth="2"></app-icon>
                         </span>
                         <span class="badge bg-purple-lt ms-2 cursor-help" title="Contributed to 10 repos or more" *ngIf="user.repos.length >= 10">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M21 3l-5 9h5l-6.891 7.086a6.5 6.5 0 1 1 -8.855 -9.506l7.746 -6.58l-1 5l9 -5z"></path>
-                            <circle cx="9.5" cy="14.5" r="2.5"></circle>
-                          </svg>
+                          <app-icon icon="rockstar" size="16" strokeWidth="2"></app-icon>
                         </span>
                         <span class="badge bg-orange-lt ms-2 cursor-help" title="Contributed to a popular repo" *ngIf="hasPopularRepo(user.repos)">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M3 12h18"></path>
-                            <path d="M12 21v-18"></path>
-                            <path d="M7.5 7.5l9 9"></path>
-                            <path d="M7.5 16.5l9 -9"></path>
-                          </svg>
+                          <app-icon icon="mvp" size="16" strokeWidth="2"></app-icon>
                         </span>
                       </div>
                     </div>
@@ -421,15 +339,7 @@
                   <span class="opacity-75" style="vertical-align: middle;">{{user.contributions | number}}</span>
                   <span class="badge bg-indigo-lt ms-2 cursor-help" title="Contributed to {{user.repos_count}} repos">
                     {{user.repos_count}}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                      stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                      <path d="M12 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                      <path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                      <path d="M17 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                      <path d="M7 8v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2v-2"></path>
-                      <path d="M12 12l0 4"></path>
-                    </svg>
+                    <app-icon icon="repo" size="16" strokeWidth="2"></app-icon>
                   </span>
                 </td>
                 <td class="py-2" data-label="Past 30 days">
@@ -439,40 +349,19 @@
                   <div class="btn-list flex-nowrap">
                     <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile.nano_address}}"
                       class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="6.4241271" y1="20.224079" x2="16.844126" y2="4.2240787" />
-                        <line x1="6.9741268" y1="11.874079" x2="16.664125" y2="11.874079" />
-                        <line x1="6.9741268" y1="14.584079" x2="16.664125" y2="14.584079" />
-                        <line x1="17.294127" y1="20.224079" x2="6.8741269" y2="4.2240787" />
-                      </svg>
+                      <app-icon icon="nano"></app-icon>
                     </a>
                     <a *ngIf="user.profile?.patreon_url" target="_blank" href="https://patreon.com/{{user.profile.patreon_url}}"
                       class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M3 3h3v18h-3z"></path>
-                        <path d="M15 9.5m-6.5 0a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0"></path>
-                      </svg>
+                      <app-icon icon="patreon"></app-icon>
                     </a>
                     <a *ngIf="user.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt w-100 btn-icon"
                       title="Sponsor on GitHub">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
-                      </svg>
+                      <app-icon icon="heart"></app-icon>
                     </a>
                     <a href="#" class="btn bg-blue-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
                       (click)="shared.selectUser(user)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <circle cx="12" cy="12" r="9"></circle>
-                        <circle cx="12" cy="10" r="3"></circle>
-                        <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
-                      </svg>
+                      <app-icon icon="profile"></app-icon>
                     </a>
                   </div>
                 </td>
@@ -497,68 +386,29 @@
           <div class="row">
             <div class="col-12 col-md-4 my-1">
               <a *ngIf="selectedUser.profile?.website" href="https://{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M19.5 7a9 9 0 0 0 -7.5 -4a8.991 8.991 0 0 0 -7.484 4"></path>
-                  <path d="M11.5 3a16.989 16.989 0 0 0 -1.826 4"></path>
-                  <path d="M12.5 3a16.989 16.989 0 0 1 1.828 4"></path>
-                  <path d="M19.5 17a9 9 0 0 1 -7.5 4a8.991 8.991 0 0 1 -7.484 -4"></path>
-                  <path d="M11.5 21a16.989 16.989 0 0 1 -1.826 -4"></path>
-                  <path d="M12.5 21a16.989 16.989 0 0 0 1.828 -4"></path>
-                  <path d="M2 10l1 4l1.5 -4l1.5 4l1 -4"></path>
-                  <path d="M17 10l1 4l1.5 -4l1.5 4l1 -4"></path>
-                  <path d="M9.5 10l1 4l1.5 -4l1.5 4l1 -4"></path>
-                </svg>
+                <app-icon icon="web"></app-icon>
               </a>
               <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path
-                    d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5">
-                  </path>
-                </svg>
+                <app-icon icon="github"></app-icon>
               </a>
               <a *ngIf="selectedUser.profile?.twitter_username" href="https://twitter.com/{{selectedUser.profile.twitter_username}}" target="_blank"
                 class="h4 px-2" title="Follow on Twitter">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path
-                    d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z">
-                  </path>
-                </svg>
+                <app-icon icon="twitter"></app-icon>
               </a>
             </div>
             <div class="col-12 col-md-4"></div>
             <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
               <a *ngIf="selectedUser.profile?.nano_address" href="https://nano.to/{{selectedUser.profile.nano_address}}" target="_blank"
                 class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="6.4241271" y1="20.224079" x2="16.844126" y2="4.2240787" />
-                  <line x1="6.9741268" y1="11.874079" x2="16.664125" y2="11.874079" />
-                  <line x1="6.9741268" y1="14.584079" x2="16.664125" y2="14.584079" />
-                  <line x1="17.294127" y1="20.224079" x2="6.8741269" y2="4.2240787" />
-                </svg>
+                <app-icon icon="nano"></app-icon>
               </a>
               <a *ngIf="selectedUser.profile?.patreon_url" target="_blank" [href]="selectedUser.profile.patreon_url" class="btn bg-white-lt w-100 btn-icon"
                 title="Become a patron">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M3 3h3v18h-3z"></path>
-                  <path d="M15 9.5m-6.5 0a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0"></path>
-                </svg>
+                <app-icon icon="patreon"></app-icon>
               </a>
               <a *ngIf="selectedUser.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{selectedUser.login}}"
                 class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428m0 0a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
-                </svg>
+                <app-icon icon="heart"></app-icon>
               </a>
             </div>
           </div>

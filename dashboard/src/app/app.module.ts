@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { AboutComponent } from './components/about/about.component';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
+import { IconComponent } from './components/icon/icon.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { HomeComponent } from './components/home/home.component';
     PaginationComponent,
     AboutComponent,
     HomeComponent,
+    IconComponent,
   ],
   imports: [
     BrowserModule,
