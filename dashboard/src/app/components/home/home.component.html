@@ -308,6 +308,7 @@
                     class="ptr"></app-icon></th>
                 <th (click)="sortContributors('month')">Past 30 days <app-icon [icon]="CONTRIB_SORT === 'month' ? 'double-down' : 'down'"
                     class="ptr"></app-icon></th>
+                <th style="width: 130px;">Goal</th>
                 <th class="w-1">Sponsor</th>
               </tr>
             </thead>
@@ -345,13 +346,16 @@
                 <td class="py-2" data-label="Past 30 days">
                   <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
                 </td>
+                <td>
+                  <app-goal *ngIf="i < 3" class="onlyBar" [id]="user.login + 'goal' + i"></app-goal>
+                </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap">
-                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile.nano_address}}"
+                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile?.nano_address}}"
                       class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
                       <app-icon icon="nano"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="https://patreon.com/{{user.profile.patreon_url}}"
+                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="https://patreon.com/{{user.profile?.patreon_url}}"
                       class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>

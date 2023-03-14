@@ -18,6 +18,7 @@ import { AboutComponent } from './components/about/about.component';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { IconComponent } from './components/icon/icon.component';
+import { GoalComponent } from './components/goal/goal.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { IconComponent } from './components/icon/icon.component';
     AboutComponent,
     HomeComponent,
     IconComponent,
+    GoalComponent,
   ],
   imports: [
     BrowserModule,

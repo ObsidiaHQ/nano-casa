@@ -87,3 +87,20 @@ a:hover {
   background: #1d273b;
   z-index: 2;
 }
+
+#funding-wrap {
+  border: none !important;
+  padding: 0 !important;
+}
+
+#glass {
+  height: 10px !important;
+  background: #20334c !important;
+}
+#contribution {
+  background-color: #4299e1 !important;
+}
+
+.onlyBar #funding-wrap .flex-item {
+  display: none !important;
+}
