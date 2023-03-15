@@ -263,12 +263,13 @@
               <tr *ngFor="let repo of reposPage; trackBy: trackByName">
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
+                    <img class="avatar avatar-sm me-2" [src]="repo.avatar_url" loading="lazy">
                     <div class="flex-fill">
                       <div class="font-weight-medium">
                         <a href="https://github.com/{{repo.full_name}}" target="_blank">
                           <span>{{repo.name}}</span>
                           <span class="badge bg-yellow-lt ms-2">
-                            <app-icon icon="star" size="16"></app-icon>
+                            <app-icon fill="#f59f00" icon="star" size="14"></app-icon>
                             {{repo.stargazers_count}}
                           </span>
                         </a>

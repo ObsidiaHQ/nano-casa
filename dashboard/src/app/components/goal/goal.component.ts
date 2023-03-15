@@ -11,7 +11,7 @@ export class GoalComponent implements AfterViewInit {
     'nano_1faucet7b6xjyha7m13objpn5ubkquzd6ska8kwopzf1ecbfmn35d1zey3ys';
   @Input() amount: number = 15;
   @Input() title: string = 'Bird Sanctuary';
-  @Input() color: string;
+  @Input() color: string = '#4299e1';
   @Input() website: string;
 
   constructor() {}
