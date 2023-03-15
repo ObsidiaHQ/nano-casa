@@ -79,7 +79,7 @@ import paginate from 'jw-paginate';
 })
 export class PaginationComponent implements OnInit, OnChanges {
   @Input() items: Array<any>;
-  @Output() changePage = new EventEmitter<any>(true);
+  @Output() itemsChange = new EventEmitter<any>(true);
   initialPage = 1;
   @Input() pageSize = 10;
   @Input() maxPages = 10;
@@ -111,6 +111,6 @@ export class PaginationComponent implements OnInit, OnChanges {
       this.pager.endIndex + 1
     );
 
-    this.changePage.emit({ items: pageOfItems, page });
+    this.itemsChange.emit({ items: pageOfItems, page });
   }
 }

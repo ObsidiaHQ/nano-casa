@@ -8,7 +8,6 @@ import { Contributor, Profile, ServerResponse } from './interfaces';
 })
 export class AppComponent implements OnInit {
   loggedUser: Profile;
-  data: ServerResponse;
   selectedUser: Contributor;
 
   constructor(public shared: SharedService) {}
@@ -17,7 +16,6 @@ export class AppComponent implements OnInit {
     this.shared.loggedUser.subscribe(
       (user: Profile) => (this.loggedUser = user)
     );
-    this.shared.data.subscribe((data: ServerResponse) => (this.data = data));
     this.shared.selectedUser.subscribe(
       (user: Contributor) => (this.selectedUser = user)
     );

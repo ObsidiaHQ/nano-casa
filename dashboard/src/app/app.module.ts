@@ -19,6 +19,9 @@ import { RouterModule } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { IconComponent } from './components/icon/icon.component';
 import { GoalComponent } from './components/goal/goal.component';
+import { FilterPipe } from './pipes/filter.pipe';
+import { SortPipe } from './pipes/sort.pipe';
+import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
 
 @NgModule({
   declarations: [
@@ -28,6 +31,10 @@ import { GoalComponent } from './components/goal/goal.component';
     HomeComponent,
     IconComponent,
     GoalComponent,
+    FilterPipe,
+    SortPipe,
+    AsRepoPipe,
+    AsUserPipe,
   ],
   imports: [
     BrowserModule,

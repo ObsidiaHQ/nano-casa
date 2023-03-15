@@ -2,25 +2,50 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, take } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Contributor, Profile, ServerResponse } from './interfaces';
+import {
+  ChartCommit,
+  Commit,
+  Contributor,
+  Milestone,
+  Profile,
+  Repo,
+  ServerResponse,
+} from './interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SharedService {
+  usersSort = new BehaviorSubject<'month' | 'total'>('month');
+  reposSort = new BehaviorSubject<'date' | 'stars'>('date');
   loggedUser = new BehaviorSubject<Profile>(null);
   selectedUser = new BehaviorSubject<Contributor>(null);
-  data = new BehaviorSubject<ServerResponse>({
-    repos: [],
-    commits: [],
-    contributors: [],
-    milestones: [],
-    events: [],
-  });
+
+  repos = new BehaviorSubject<Repo[]>([]);
+  commits = new BehaviorSubject<ChartCommit[]>([]);
+  contributors = new BehaviorSubject<Contributor[]>([]);
+  milestones = new BehaviorSubject<Milestone[]>([]);
+  events = new BehaviorSubject<Commit[]>([]);
 
   constructor(private http: HttpClient) {
     this.fetchUser();
     this.getData();
+    const perfUS =
+      (localStorage.getItem('usersSort') as 'month' | 'total') || 'month';
+    const perfRS =
+      (localStorage.getItem('reposSort') as 'date' | 'stars') || 'date';
+    this.usersSort.next(perfUS);
+    this.reposSort.next(perfRS);
+  }
+
+  sortUsersBy(by: 'month' | 'total') {
+    this.usersSort.next(by);
+    localStorage.setItem('usersSort', by);
+  }
+
+  sortReposBy(by: 'date' | 'stars') {
+    this.reposSort.next(by);
+    localStorage.setItem('reposSort', by);
   }
 
   fetchUser() {
@@ -34,7 +59,7 @@ export class SharedService {
 
   selectUser(user: Contributor, editMode = false) {
     if (editMode) {
-      const loggedContrib = this.data.value.contributors.find(
+      const loggedContrib = this.contributors.value.find(
         (c) => c.login === this.loggedUser.value._id
       );
       this.selectedUser.next(loggedContrib);
@@ -44,7 +69,7 @@ export class SharedService {
   }
 
   getData(): void {
-    if (!this.data.value.repos.length) {
+    if (!this.repos.value.length) {
       this.http
         .get(`${environment.api}/data`)
         .pipe(take(1))
@@ -58,7 +83,11 @@ export class SharedService {
             }
             return usr;
           });
-          this.data.next(data);
+          this.repos.next(data.repos);
+          this.contributors.next(data.contributors);
+          this.commits.next(data.commits);
+          this.events.next(data.events);
+          this.milestones.next(data.milestones);
         });
     }
   }

@@ -6,24 +6,24 @@
       <div class="col-12 col-md-4">
         <div class="card">
           <div class="card-body pb-0">
-            <ng-container *ngIf="!shared.data.value.repos.length">
+            <ng-container *ngIf="!shared.repos.value.length">
               <div class="d-flex justify-content-center">
                 <div class="spinner-grow text-secondary align-self-center" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </div>
             </ng-container>
-            <ng-container *ngIf="shared.data.value.repos.length">
+            <ng-container *ngIf="shared.repos.value.length">
               <div class="row">
                 <div class="col-12 col-md-7">
                   <div class="d-flex align-items-center">
                     <div class="subheader">Projects</div>
                   </div>
                   <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="shared.data.value.repos.length"></div>
+                    <div class="h2 mb-2 me-2" [countUp]="shared.repos.value.length"></div>
                     <div class="me-auto">
                       <span class="text-pink d-inline-flex align-items-center lh-1">
-                        {{shared.data.value.repos[shared.data.value.repos.length-1]?.name}}
+                        {{shared.repos.value[shared.repos.value.length-1]?.name}}
                         <app-icon icon="spark" class="ms-1" size="16"></app-icon>
                       </span>
                     </div>
@@ -34,7 +34,7 @@
                     <div class="subheader">Contributors</div>
                   </div>
                   <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="shared.data.value.contributors.length"></div>
+                    <div class="h2 mb-2 me-2" [countUp]="shared.contributors.value.length"></div>
                   </div>
                 </div>
               </div>
@@ -47,14 +47,14 @@
 
       <div class="col-12 col-md-4">
         <div class="card">
-          <ng-container *ngIf="!shared.data.value.milestones.length">
+          <ng-container *ngIf="!shared.milestones.value.length">
             <div class="card-body d-flex justify-content-center">
               <div class="spinner-grow text-secondary align-self-center" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
           </ng-container>
-          <div *ngIf="shared.data.value.milestones.length" class="card-body">
+          <div *ngIf="shared.milestones.value.length" class="card-body">
             <div class="card-stamp">
               <div class="card-stamp-icon bg-purple-lt">
                 <app-icon icon="target" classList="icon icon-taber"></app-icon>
@@ -65,11 +65,11 @@
             </div>
             <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
               <div class="carousel-indicators carousel-indicators-dot">
-                <button *ngFor="let milestone of shared.data.value.milestones; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
+                <button *ngFor="let milestone of shared.milestones.value; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
                   [ngClass]="{'active': i === 0}" [attr.data-bs-slide-to]="i"></button>
               </div>
               <div class="carousel-inner">
-                <div class="carousel-item" *ngFor="let milestone of shared.data.value.milestones; let i = index" [ngClass]="{'active': i === 0}">
+                <div class="carousel-item" *ngFor="let milestone of shared.milestones.value; let i = index" [ngClass]="{'active': i === 0}">
                   <div class="row align-items-center">
                     <div class="col">
                       <div class="row g-2 align-items-center">
@@ -103,14 +103,14 @@
 
       <div class="col-12 col-md-4">
         <div class="card spotlight">
-          <ng-container *ngIf="!shared.data.value.repos.length">
+          <ng-container *ngIf="!shared.repos.value.length">
             <div class="card-body d-flex justify-content-center">
               <div class="spinner-grow text-secondary align-self-center" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
           </ng-container>
-          <a href="#" *ngIf="shared.data.value.repos.length">
+          <a href="#" *ngIf="shared.repos.value.length">
             <div class="ribbon ribbon-top bg-yellow">
               <app-icon icon="star"></app-icon>
             </div>
@@ -119,9 +119,9 @@
                 <div class="subheader">Spotlight</div>
               </div>
               <div class="d-flex align-items-baseline">
-                <div class="h2 mb-2 me-2">{{shared.data.value.repos[31].name}}</div>
+                <div class="h2 mb-2 me-2">{{shared.repos.value[31].name}}</div>
               </div>
-              <p class="text-muted">{{shared.data.value.repos[31].description}}</p>
+              <p class="text-muted">{{shared.repos.value[31].description}}</p>
             </div>
           </a>
         </div>
@@ -132,39 +132,41 @@
     <div class="row">
       <div class="col-12 mt-3">
         <div class="card">
-          <ng-container *ngIf="!shared.data.value.repos.length">
+          <ng-container *ngIf="!shared.repos.value.length">
             <div class="spinner-grow text-secondary align-self-center" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </ng-container>
-          <ng-container *ngIf="shared.data.value.repos.length">
+          <ng-container *ngIf="shared.repos.value.length">
             <div class="card-header">
               <h3 class="card-title">Keeping busy</h3>
               <div class="ms-3 lh-1">
                 <div class="dropdown">
-                  <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{busyLastWeek ?
+                  <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{busyWindow ===
+                    'busyWeek' ?
                     'Last week' : 'Last month'}}</a>
                   <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" [ngClass]="{active: busyLastWeek}" (click)="filterBusyRepos(true)">Last week</a>
-                    <a class="dropdown-item" [ngClass]="{active: !busyLastWeek}" (click)="filterBusyRepos(false)">Last month</a>
+                    <a class="dropdown-item" [ngClass]="{active: busyWindow === 'busyWeek'}" (click)="busyWindow = 'busyWeek'">Last week</a>
+                    <a class="dropdown-item" [ngClass]="{active: busyWindow === 'busyMonth'}" (click)="busyWindow = 'busyMonth'">Last month</a>
                   </div>
                 </div>
               </div>
             </div>
             <div class="card-body">
-              <ng-container *ngIf="busyRepos.length">
+              <ng-container *ngIf="shared.repos.value.length">
                 <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
-                  <div *ngFor="let busy of busyRepos | slice:0:20; trackBy: trackByName; let last = last;" [ngClass]="last ? '' : 'me-4'"
-                    class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                  <div
+                    *ngFor="let busy of shared.repos.value | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; trackBy: trackByName; let last = last;"
+                    [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
                     <img [src]="busy.avatar_url" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
                     <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                     <div class="mt-2">
                       <span class="text-muted mb-1" style="font-size: 0.8rem;" title="Commits">
                         <app-icon icon="commit"></app-icon>
-                        {{busyLastWeek ? busy.commits_7d : busy.commits_30d || 0}}</span>
+                        {{busyWindow === 'busyWeek' ? busy.commits_7d : busy.commits_30d || 0}}</span>
                       <span class="mx-2 text-muted mb-1" style="font-size: 0.8rem;" title="Pull requests">
                         <app-icon icon="pr"></app-icon>
-                        {{busy.prs_30d}}</span>
+                        {{busyWindow === 'busyMonth' ? busy.prs_7d : busy.prs_30d}}</span>
                     </div>
                   </div>
                 </div>
@@ -188,12 +190,12 @@
       </div>
       <div class="col-12 col-md-4 mt-3">
         <div class="card" style="height: 484px;">
-          <ng-container *ngIf="!shared.data.value.events.length">
+          <ng-container *ngIf="!shared.events.value.length">
             <div class="spinner-grow text-secondary align-self-center" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </ng-container>
-          <ng-container *ngIf="shared.data.value.events.length">
+          <ng-container *ngIf="shared.events.value.length">
             <div class="card-table table-responsive" style=" scrollbar-width: thin;">
               <table class="table table-vcenter">
                 <thead>
@@ -206,7 +208,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let event of shared.data.value.events">
+                  <tr *ngFor="let event of shared.events.value">
                     <td class="w-1 py-1">
                       <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
                           [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
@@ -233,18 +235,17 @@
           <h3 class="card-title">Projects</h3>
           <div class="ms-3 lh-1">
             <div class="dropdown">
-              <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{REPO_SORT === 'date'
+              <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{reposSort === 'date'
                 ?
                 'Most recent' : 'Most popular'}}</a>
               <div class="dropdown-menu dropdown-menu-end">
-                <a class="dropdown-item" [ngClass]="{active: REPO_SORT === 'stars'}" (click)="sortRepos('stars')">Most popular</a>
-                <a class="dropdown-item" [ngClass]="{active: REPO_SORT === 'date'}" (click)="sortRepos('date')">Most recent</a>
+                <a class="dropdown-item" [ngClass]="{active: reposSort === 'stars'}" (click)="reposSort = 'stars'">Most popular</a>
+                <a class="dropdown-item" [ngClass]="{active: reposSort === 'date'}" (click)="reposSort = 'date'">Most recent</a>
               </div>
             </div>
           </div>
           <div class="ms-auto d-inline-block">
-            <input type="text" class="form-control form-control-sm" aria-label="Search repos" placeholder="Search by name/description" [(ngModel)]="reposQuery"
-              (ngModelChange)="filterRepos($event)">
+            <input type="text" class="form-control form-control-sm" aria-label="Search repos" placeholder="Search by name/description" [(ngModel)]="reposQuery">
           </div>
         </div>
         <div class="table-responsive">
@@ -285,7 +286,8 @@
             </tbody>
           </table>
         </div>
-        <app-pagination [pageSize]="15" [items]="sortedRepos" (changePage)="reposPage = $event.items"></app-pagination>
+        <app-pagination [pageSize]="15" [items]="shared.repos.value | filter:'repo':reposQuery | sort:'repo':reposSort"
+          (itemsChange)="reposPage = $event.items"></app-pagination>
       </div>
     </div>
 
@@ -295,7 +297,7 @@
           <h3 class="card-title">Contributors</h3>
           <div class="ms-auto d-inline-block">
             <input type="text" class="form-control form-control-sm" aria-label="Search users" placeholder="Search by username/repos"
-              [(ngModel)]="contributorsQuery" (ngModelChange)="filterContributors($event)">
+              [(ngModel)]="contributorsQuery">
           </div>
         </div>
         <div class="table-responsive">
@@ -304,10 +306,12 @@
               <tr>
                 <th width="30px">#</th>
                 <th>Name</th>
-                <th (click)="sortContributors('total')">Total commits <app-icon [icon]="CONTRIB_SORT === 'total' ? 'double-down' : 'down'"
-                    class="ptr"></app-icon></th>
-                <th (click)="sortContributors('month')">Past 30 days <app-icon [icon]="CONTRIB_SORT === 'month' ? 'double-down' : 'down'"
-                    class="ptr"></app-icon></th>
+                <th (click)="contributorsSort = 'total'">Total commits <app-icon [icon]="contributorsSort === 'total' ? 'double-down' : 'down'"
+                    class="ptr"></app-icon>
+                </th>
+                <th (click)="contributorsSort = 'month'">Past 30 days <app-icon [icon]="contributorsSort === 'month' ? 'double-down' : 'down'"
+                    class="ptr"></app-icon>
+                </th>
                 <th style="width: 130px;">Goal</th>
                 <th class="w-1">Sponsor</th>
               </tr>
@@ -347,20 +351,17 @@
                   <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
                 </td>
                 <td>
-                  <app-goal *ngIf="i < 3" class="onlyBar" [id]="user.login + 'goal' + i"></app-goal>
+                  <app-goal *ngIf="i < 3" class="onlyBar" [amount]="15 / (i+1)" [id]="'goal' + i"></app-goal>
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap">
-                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile?.nano_address}}"
-                      class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+                    <a target="_blank" href="https://nano.to/{{user.profile?.nano_address}}" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
                       <app-icon icon="nano"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="https://patreon.com/{{user.profile?.patreon_url}}"
-                      class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+                    <a target="_blank" href="https://patreon.com/{{user.profile?.patreon_url}}" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt w-100 btn-icon"
-                      title="Sponsor on GitHub">
+                    <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
                       <app-icon icon="heart"></app-icon>
                     </a>
                     <a href="#" class="btn bg-blue-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
@@ -373,8 +374,8 @@
             </tbody>
           </table>
         </div>
-        <app-pagination [pageSize]="40" [items]="sortedContributors"
-          (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
+        <app-pagination [pageSize]="40" [items]="shared.contributors.value | filter:'user':contributorsQuery | sort:'user':contributorsSort"
+          (itemsChange)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
       </div>
     </div>
 
