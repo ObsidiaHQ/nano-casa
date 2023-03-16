@@ -7,6 +7,7 @@ import {
   Commit,
   Contributor,
   Milestone,
+  NodeEvent,
   Profile,
   Repo,
   ServerResponse,
@@ -26,6 +27,7 @@ export class SharedService {
   contributors = new BehaviorSubject<Contributor[]>([]);
   milestones = new BehaviorSubject<Milestone[]>([]);
   events = new BehaviorSubject<Commit[]>([]);
+  nodeEvents = new BehaviorSubject<NodeEvent[]>([]);
 
   constructor(private http: HttpClient) {
     this.fetchUser();
@@ -83,6 +85,7 @@ export class SharedService {
             }
             return usr;
           });
+          this.nodeEvents.next(data.nodeEvents);
           this.repos.next(data.repos);
           this.contributors.next(data.contributors);
           this.commits.next(data.commits);

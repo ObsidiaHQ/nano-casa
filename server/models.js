@@ -69,4 +69,15 @@ const Contributor = mongoose.model(
     })
 );
 
-module.exports = { Repo, Commit, Contributor, Milestone, Profile };
+const NodeEvent = mongoose.model(
+    'NodeEvent',
+    new mongoose.Schema({
+        event: Object,
+        type: String,
+        author: String,
+        avatar_url: String,
+        created_at: String,
+    })
+);
+
+module.exports = { Repo, Commit, Contributor, Milestone, Profile, NodeEvent };

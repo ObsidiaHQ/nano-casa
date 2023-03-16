@@ -1,7 +1,7 @@
 const Cron = require('croner');
 const { Octokit } = require('octokit');
-const models = require('./models');
 require('dotenv').config();
+const models = require('./models');
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const REPOS = require('./repos.json');
 const { queryDB } = require('./server');
@@ -302,27 +302,121 @@ function getSpotlight(repos) {
 }
 
 async function refreshNodeEvents() {
+    // Copyright (c) 2021 nano.community contributors
+    const formatEvent = (item) => {
+        switch (item.type) {
+            case 'CommitCommentEvent':
+                return {
+                    action: 'commented commit', // created
+                    ref: item.payload.comment.commit_id,
+                    event_url: item.payload.comment.html_url,
+                    body: item.payload.comment.body,
+                };
+
+            case 'IssueCommentEvent':
+                return {
+                    action: 'commented issue', // created, edited, deleted
+                    ref: item.payload.issue.number,
+                    event_url: item.payload.comment.html_url,
+                    title: item.payload.issue.title,
+                    body: item.payload.comment.body,
+                };
+
+            case 'IssuesEvent':
+                return {
+                    action: `${item.payload.action} issue`, // opened, closed, reopened, assigned, unassigned, labeled, unlabled
+                    ref: item.payload.issue.number,
+                    event_url: item.payload.issue.html_url,
+                    title: item.payload.issue.title,
+                };
+
+            case 'PullRequestEvent':
+                return {
+                    action: `${item.payload.action.replace('_', ' ')} pr`, // opened, closed, reopened, assigned, unassigned, review_requested, review_request_removed, labeled, unlabeled, and synchronize
+                    ref: item.payload.pull_request.number,
+                    title: item.payload.pull_request.title,
+                    event_url: item.payload.pull_request.html_url,
+                    body: item.payload.pull_request.body,
+                };
+
+            case 'PullRequestReviewEvent':
+                return {
+                    action: `${item.payload.review.state.replace('_', ' ')} pr`, // created
+                    ref: item.payload.pull_request.number,
+                    title: `#${item.payload.pull_request.number}`,
+                    body: item.payload.review.body,
+                    event_url: item.payload.review.html_url,
+                };
+
+            case 'PullRequestReviewCommentEvent':
+                return {
+                    action: 'commented pr review',
+                    ref: item.payload.pull_request.number,
+                    event_url: item.payload.comment.html_url,
+                    title: item.payload.pull_request.title,
+                    body: item.payload.comment.body,
+                };
+
+            case 'PushEvent':
+                return {
+                    action: `pushed ${item.payload.commits.length} commit${
+                        item.payload.commits.length > 1 ? 's' : ''
+                    } to ${item.payload.ref.slice(
+                        item.payload.ref.lastIndexOf('/') + 1
+                    )}`,
+                    event_url: item.payload.commits[0].url
+                        .replace('api.', '')
+                        .replace('/repos', ''),
+                    title: item.payload.commits[0].message,
+                };
+
+            case 'ReleaseEvent':
+                return {
+                    action: 'published release',
+                    ref: item.payload.release.tag_name,
+                    title: item.payload.release.name,
+                    body: item.payload.release.body,
+                    event_url: item.payload.release.html_url,
+                };
+
+            default:
+                return {};
+        }
+    };
+
     const EVENT_TYPES = [
         'PullRequestEvent',
         'IssueCommentEvent',
-        'ForkEvent',
+        'IssuesEvent',
         'CommitCommentEvent',
         'PushEvent',
         'ReleaseEvent',
         'PullRequestReviewEvent',
         'PullRequestReviewCommentEvent',
     ];
+    console.time('refreshed_node_events');
+
     let events = (
         await octo.request(`GET /repos/nanocurrency/nano-node/events`, {
-            per_page: 80,
+            per_page: 70,
         })
-    ).data;
-    return events
+    ).data
         .filter((eve) => EVENT_TYPES.includes(eve.type))
         .map(
             (eve) =>
-                `${eve.actor.login} ${eve.payload.action} in ${eve.repo.name}`
+                new models.NodeEvent({
+                    event: formatEvent(eve),
+                    type: eve.type,
+                    author: eve.actor.login,
+                    avatar_url: eve.actor.avatar_url,
+                    created_at: eve.created_at,
+                })
         );
+
+    await models.NodeEvent.collection.drop();
+    const res = await models.NodeEvent.collection.insertMany(events);
+    console.timeEnd('refreshed_node_events');
+    return res.acknowledged ? events : [];
 }
 
 const job = new Cron('10 * * * *', async () => {
@@ -330,6 +424,10 @@ const job = new Cron('10 * * * *', async () => {
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
     await redis.json.set('data', '.', await queryDB());
+});
+
+const job2 = new Cron('*/20 * * * *', async () => {
+    await redis.json.set('data', '$.nodeEvents', await refreshNodeEvents());
 });
 
 module.exports = {

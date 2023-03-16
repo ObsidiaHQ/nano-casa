@@ -8,7 +8,6 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const session = require('express-session');
 require('dotenv').config();
 const models = require('./models');
-//const { rate, refreshNodeEvents } = require('./cron');
 const app = express();
 
 // Redis
@@ -161,8 +160,7 @@ app.post('/set-profile', async (req, res) => {
 });
 
 app.get('/ping', async (req, res) => {
-    rate();
-    res.status(200).send(await refreshNodeEvents());
+    res.status(200).send();
 });
 
 app.get('/', (req, res) => {
@@ -188,6 +186,9 @@ async function updateProfilesCache(updatedProfile) {
 
 async function queryDB() {
     const data = {
+        nodeEvents: await models.NodeEvent.find({}, { _id: 0 })
+            .sort({ created_at: 'asc' })
+            .lean(),
         repos: await models.Repo.find({}, { _id: 0 })
             .sort({ created_at: 'asc' })
             .lean(),

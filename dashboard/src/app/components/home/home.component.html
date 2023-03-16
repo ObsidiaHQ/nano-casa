@@ -196,33 +196,64 @@
             </div>
           </ng-container>
           <ng-container *ngIf="shared.events.value.length">
-            <div class="card-table table-responsive" style=" scrollbar-width: thin;">
-              <table class="table table-vcenter">
-                <thead>
-                  <tr class="sticky">
-                    <th>Repo</th>
-                    <th>Commit</th>
-                    <th class="text-center">
-                      <app-icon icon="clock"></app-icon>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let event of shared.events.value">
-                    <td class="w-1 py-1">
-                      <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
-                          [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
-                      </a>
-                    </td>
-                    <td class="td-truncate py-1">
-                      <div class="text-truncate opacity-80" title="By {{event.author}}">
-                        {{event.message}}
-                      </div>
-                    </td>
-                    <td class="text-nowrap text-muted py-1">{{event.date | timeago}}</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="card-header">
+              <ul class="nav nav-tabs card-header-tabs nav-fill" data-bs-toggle="tabs" role="tablist">
+                <li class="nav-item " role="presentation">
+                  <a href="#node-tab" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">
+                    <app-icon icon="nano" class="me-1"></app-icon>
+                    Node Development
+                  </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <a href="#ecosystem-tab" class="nav-link" data-bs-toggle="tab" aria-selected="true" role="tab" tabindex="-1">
+                    <app-icon icon="oss" class="me-1"></app-icon>
+                    Ecosystem
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div class="table-responsive" style="scrollbar-width: thin;">
+              <div class="tab-content">
+                <div class="tab-pane active show" id="node-tab" role="tabpanel">
+                  <table class="table table-vcenter">
+                    <tbody>
+                      <tr *ngFor="let event of shared.nodeEvents.value">
+                        <td class="w-1 py-1">
+                          <a target="_blank" [href]="event.event.event_url">
+                            <img class="avatar avatar-sm" src="{{event.avatar_url}}" [alt]="event.author" [title]="event.author" loading="lazy">
+                          </a>
+                        </td>
+                        <td class="td-truncate py-1">
+                          <div class="text-truncate opacity-80 font-size-13">
+                            <span class="text-muted me-1">{{event.event.action}}</span>
+                            <a class="text-white" [href]="event.event.event_url" [title]="event.event.title">{{event.event.title}}</a>
+                          </div>
+                        </td>
+                        <td class="text-nowrap text-muted py-1 font-size-13" [title]="event.created_at | date:'short'">{{event.created_at | timeago}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane" id="ecosystem-tab" role="tabpanel">
+                  <table class="table table-vcenter">
+                    <tbody>
+                      <tr *ngFor="let event of shared.events.value">
+                        <td class="w-1 py-1">
+                          <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
+                              [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
+                          </a>
+                        </td>
+                        <td class="td-truncate py-1">
+                          <div class="text-truncate opacity-80" title="By {{event.author}}">
+                            {{event.message}}
+                          </div>
+                        </td>
+                        <td class="text-nowrap text-muted py-1" [title]="event.date | date:'short'">{{event.date | timeago}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </ng-container>
         </div>
@@ -267,7 +298,7 @@
                     <div class="flex-fill">
                       <div class="font-weight-medium">
                         <a href="https://github.com/{{repo.full_name}}" target="_blank">
-                          <span>{{repo.name}}</span>
+                          <span style="vertical-align: middle;">{{repo.name}}</span>
                           <span class="badge bg-yellow-lt ms-2">
                             <app-icon fill="#f59f00" icon="star" size="14"></app-icon>
                             {{repo.stargazers_count}}

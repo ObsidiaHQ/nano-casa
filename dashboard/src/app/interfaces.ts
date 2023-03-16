@@ -53,4 +53,18 @@ export interface ServerResponse {
   contributors: Contributor[];
   milestones: Milestone[];
   events: Commit[];
+  nodeEvents: NodeEvent[];
+}
+export interface NodeEvent {
+  event: {
+    title?: string;
+    event_url: string;
+    action: string;
+    body?: string;
+    ref?: string;
+  };
+  type: string;
+  author: string;
+  avatar_url: string;
+  created_at: string;
 }
