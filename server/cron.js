@@ -275,30 +275,11 @@ function isEmpty(obj) {
 }
 
 // returns a random index weighted inversely
-function getSpotlight(repos) {
-    const weights = repos.map(({ stargazers_count, commits_30d, prs_30d }) => {
-        const activity = commits_30d + prs_30d || 0;
-        return activity / repos.length + 1 / (stargazers_count + 1);
-    });
-
-    let total = 0;
-    for (let weight of weights) {
-        total += weight;
-    }
-
-    let max = weights[0];
-    const random = Math.random() * total;
-    console.log(random, total);
-
-    for (let index = 0; index < weights.length; index++) {
-        if (random < max) {
-            return repos[index];
-        } else if (index === weights.length - 1) {
-            return repos[weights.length - 1];
-        }
-        max += weights[index + 1];
-    }
-    return repos[Math.floor(Math.random() * items.length)];
+async function getSpotlight() {
+    const repos = (await redis.json.get('data', { path: '$.repos' }))[0]
+        .slice(15)
+        .filter((r) => r.description);
+    return repos[Math.floor(Math.random() * repos.length)];
 }
 
 async function refreshNodeEvents() {
@@ -426,8 +407,12 @@ const job = new Cron('10 * * * *', async () => {
     await redis.json.set('data', '.', await queryDB());
 });
 
-const job2 = new Cron('*/20 * * * *', async () => {
+const eventsJob = new Cron('*/20 * * * *', async () => {
     await redis.json.set('data', '$.nodeEvents', await refreshNodeEvents());
+});
+
+const spotlightJob = new Cron('0 0 * * *', async () => {
+    await redis.json.set('data', '$.spotlight', await getSpotlight());
 });
 
 module.exports = {
@@ -436,4 +421,5 @@ module.exports = {
     refreshRepos,
     rate,
     refreshNodeEvents,
+    getSpotlight,
 };

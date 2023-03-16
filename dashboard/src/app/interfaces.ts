@@ -54,6 +54,7 @@ export interface ServerResponse {
   milestones: Milestone[];
   events: Commit[];
   nodeEvents: NodeEvent[];
+  spotlight: Repo;
 }
 export interface NodeEvent {
   event: {

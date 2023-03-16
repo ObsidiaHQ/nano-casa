@@ -110,7 +110,7 @@
               </div>
             </div>
           </ng-container>
-          <a href="#" *ngIf="shared.repos.value.length">
+          <a href="https://github.com/{{shared.spotlight.value.full_name}}" target="_blank" *ngIf="shared.spotlight.value">
             <div class="ribbon ribbon-top bg-yellow">
               <app-icon icon="star"></app-icon>
             </div>
@@ -119,9 +119,9 @@
                 <div class="subheader">Spotlight</div>
               </div>
               <div class="d-flex align-items-baseline">
-                <div class="h2 mb-2 me-2">{{shared.repos.value[31].name}}</div>
+                <div class="h2 mb-2 me-2">{{shared.spotlight.value.name}}</div>
               </div>
-              <p class="text-muted">{{shared.repos.value[31].description}}</p>
+              <p class="text-muted">{{shared.spotlight.value.description}}</p>
             </div>
           </a>
         </div>
@@ -223,7 +223,7 @@
                             <img class="avatar avatar-sm" src="{{event.avatar_url}}" [alt]="event.author" [title]="event.author" loading="lazy">
                           </a>
                         </td>
-                        <td class="td-truncate py-1">
+                        <td class="td-truncate p-1">
                           <div class="text-truncate opacity-80 font-size-13">
                             <span class="text-muted me-1">{{event.event.action}}</span>
                             <a class="text-white" [href]="event.event.event_url" [title]="event.event.title">{{event.event.title}}</a>
@@ -243,7 +243,7 @@
                               [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
                           </a>
                         </td>
-                        <td class="td-truncate py-1">
+                        <td class="td-truncate p-1">
                           <div class="text-truncate opacity-80" title="By {{event.author}}">
                             {{event.message}}
                           </div>
