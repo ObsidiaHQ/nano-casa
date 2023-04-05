@@ -107,5 +107,7 @@
       }
     }
   },
-  "defaultProject": "nano-casa"
+  "cli": {
+    "analytics": false
+  }
 }
