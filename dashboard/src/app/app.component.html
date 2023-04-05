@@ -89,6 +89,8 @@
         <div class="row text-center align-items-center flex-row-reverse">
           <div class="col-lg-auto ms-lg-auto">
             <ul class="list-inline list-inline-dots mb-0">
+              <li *ngIf="shared.milestones.value.length" class="list-inline-item text-secondary">Updated {{shared.milestones.value[0].created_at |
+                timeago:false}} ago</li>
               <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
               <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
               </li>

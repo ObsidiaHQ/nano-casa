@@ -200,6 +200,22 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  addGoal() {
+    const usr = this.shared.loggedUser.value;
+    usr.goals.push({
+      title: 'New goal',
+      amount: 5,
+      nano_address: usr.nano_address,
+      description:
+        'Ea exercitation reprehenderit proident sit in labore enim incididunt nulla consequat commodo mollit commodo.',
+    });
+    this.shared.loggedUser.next(usr);
+  }
+
+  deleteGoal(goal) {
+    console.log(goal);
+  }
+
   trackByName(index, item) {
     return item.full_name;
   }

@@ -338,11 +338,11 @@
               <tr>
                 <th width="30px">#</th>
                 <th>Name</th>
-                <th (click)="contributorsSort = 'total'">Total commits <app-icon [icon]="contributorsSort === 'total' ? 'double-down' : 'down'"
-                    class="ptr"></app-icon>
+                <th (click)="contributorsSort = 'total'" class="ptr">Total commits <app-icon
+                    [icon]="contributorsSort === 'total' ? 'double-down' : 'down'"></app-icon>
                 </th>
-                <th (click)="contributorsSort = 'month'">Past 30 days <app-icon [icon]="contributorsSort === 'month' ? 'double-down' : 'down'"
-                    class="ptr"></app-icon>
+                <th (click)="contributorsSort = 'month'" class="ptr">Past 30 days <app-icon
+                    [icon]="contributorsSort === 'month' ? 'double-down' : 'down'"></app-icon>
                 </th>
                 <th style="width: 130px;">Goal</th>
                 <th class="w-1">Sponsor</th>
@@ -383,7 +383,7 @@
                   <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
                 </td>
                 <td>
-                  <app-goal *ngIf="i < 3" class="onlyBar" [amount]="15 / (i+1)" [id]="'goal' + i"></app-goal>
+                  <app-goal *ngIf="i < 3" [amount]="15 / (i+1)" [address]="'@faucet'" [sid]="'goal' + i"></app-goal>
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap">
@@ -458,7 +458,7 @@
           <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
           <div>
             <a *ngFor="let repo of selectedUser.repos" href="https://github.com/{{repo}}"><span
-                class="badge badge-outline text-azure me-2 mb-2 p-2">{{repo}}</span></a>
+                class="badge badge-outline badge-pill text-azure me-2 mb-2 p-2">{{repo}}</span></a>
           </div>
         </ng-container>
         <ng-template #editTemplate>
@@ -480,7 +480,7 @@
           <div class="row">
             <div class="col-12 col-md-7 mb-3">
               <label class="form-label">Nano address</label>
-              <input type="text" class="form-control" placeholder="xno_123abc.. or nano.to username" [(ngModel)]="loggedUser.nano_address">
+              <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.nano_address">
             </div>
 
             <div class="col-auto pt-md-4 mb-3">
@@ -491,16 +491,46 @@
             </div>
           </div>
 
-          <div>
-            <label class="form-label">About</label>
-            <textarea class="form-control" rows="3" [(ngModel)]="loggedUser.bio"></textarea>
+          <div class="row mb-4">
+            <div class="col-12">
+              <label class="form-label">About</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="loggedUser.bio" placeholder="you can also add links: [label](example.com)"></textarea>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <label class="form-label d-inline-block me-3 mb-3">Funding goals</label>
+              <a type="button" class="text-azure" (click)="addGoal()"><app-icon icon="plus"></app-icon> New</a>
+              <div class="card mb-2" style="min-height: unset;">
+                <div class="list-group list-group-flush">
+                  <div *ngFor="let goal of loggedUser.goals; let i = index" class="list-group-item list-group-item-action">
+                    <div class="row align-items-center">
+                      <div class="col text-truncate">
+                        <div class="text-body d-block">
+                          <span class="inline-goal">
+                            <app-goal [sid]="goal.id + i" [title]="goal.title" [amount]="goal.amount" [address]="goal.nano_address" [barOnly]="false"
+                              [description]="goal.description">
+                            </app-goal>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <a (click)="deleteGoal(goal)" class="list-group-item-actions" title="Delete goal">
+                          <app-icon icon="trash" strokeColor="#B13539"></app-icon>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </ng-template>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        <button *ngIf="loggedUser && selectedUser.login === loggedUser._id && !editMode" type="button" class="btn btn-success"
-          (click)="editMode = true">Edit</button>
+        <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
         <button *ngIf="loggedUser && editMode" type="button" class="btn btn-primary" (click)="updateProfile()">Save</button>
       </div>
     </div>

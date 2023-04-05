@@ -46,6 +46,7 @@ export interface Profile {
   nano_address: string;
   gh_sponsors: boolean;
   patreon_url: string;
+  goals: any[];
 }
 export interface ServerResponse {
   repos: Repo[];

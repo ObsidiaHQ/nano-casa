@@ -56,7 +56,30 @@ export class SharedService {
       this.http
         .get(`${environment.api}/auth/user`)
         .pipe(take(1))
-        .subscribe((user: Profile) => this.loggedUser.next(user));
+        .subscribe(
+          (user: Profile) => {
+            this.loggedUser.next(user);
+          },
+          () =>
+            this.loggedUser.next({
+              goals: [
+                {
+                  title: 'Goal title 1',
+                  amount: 6,
+                  nano_address: '@faucet',
+                  description:
+                    'Ea exercitation reprehenderit proident sit in labore enim incididunt nulla consequat commodo mollit commodo.',
+                },
+                {
+                  title: 'Goal title 2',
+                  amount: 4,
+                  nano_address: '@faucet',
+                  description:
+                    'Ea exercitation reprehenderit proident sit in labore enim incididunt nulla consequat commodo mollit commodo.',
+                },
+              ],
+            } as Profile)
+        );
     }
   }
 
@@ -81,7 +104,7 @@ export class SharedService {
             if (usr.profile) {
               usr.profile.bio = usr.profile.bio?.replace(
                 /\[(.*?)\]\((.*?)\)/gim,
-                "<a href='$2'>$1</a>"
+                "<a href='$2' target='_blank'>$1</a>"
               );
             }
             return usr;

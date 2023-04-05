@@ -89,7 +89,7 @@ app.use(express.urlencoded({ extended: true }));
 // Router
 app.get('/data', async (req, res) => {
     let cached = await redis.json.get('data', '$');
-    if (cached) {
+    if (false) {
         res.json(cached);
     } else {
         await redis.json.set('data', '$', await queryDB());
@@ -159,6 +159,27 @@ app.post('/set-profile', async (req, res) => {
         .catch(() => res.status(500).send());
 });
 
+app.post('/add-goal', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).send();
+    }
+    models.Profile.findByIdAndUpdate(
+        req.user._id,
+        {
+            $push: {
+                goals: req.body,
+            },
+        },
+        { new: true, useFindAndModify: false }
+    )
+        .then(async (usr) => {
+            console.log(usr);
+            //updateProfilesCache(usr);
+            res.status(201).send(usr);
+        })
+        .catch(() => res.status(500).send());
+});
+
 app.get('/ping', async (req, res) => {
     res.status(200).send();
 });
@@ -184,10 +205,42 @@ async function updateProfilesCache(updatedProfile) {
     }
 }
 
+async function countActiveDevs(windowInDays) {
+    const now = new Date();
+    // Calculate the date that was windowInDays days ago
+    const windowStart = new Date(
+        now.getTime() - windowInDays * 24 * 60 * 60 * 1000
+    );
+    return (
+        await models.Commit.aggregate([
+            {
+                $project: {
+                    date: {
+                        $dateFromString: {
+                            dateString: '$date',
+                            format: '%Y-%m-%dT%H:%M:%SZ',
+                        },
+                    },
+                    author: 1,
+                },
+            },
+            {
+                $match: { date: { $gte: windowStart } },
+            },
+            {
+                $group: { _id: '$author' },
+            },
+            {
+                $count: 'total',
+            },
+        ])
+    )[0].total;
+}
+
 async function queryDB() {
     const data = {
         nodeEvents: await models.NodeEvent.find({}, { _id: 0 })
-            .sort({ created_at: 'asc' })
+            .sort({ created_at: 'desc' })
             .lean(),
         repos: await models.Repo.find({}, { _id: 0 })
             .sort({ created_at: 'asc' })
@@ -262,7 +315,10 @@ async function queryDB() {
             },
         ]),
         milestones: await models.Milestone.find({}, { _id: 0 }).lean(),
-        events: await models.Commit.find({}, { _id: 0 })
+        events: await models.Commit.find(
+            { repo_full_name: { $ne: 'nanocurrency/nano-node' } },
+            { _id: 0 }
+        )
             .sort({ date: 'desc' })
             .limit(40)
             .lean(),
