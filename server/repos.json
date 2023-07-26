@@ -27,7 +27,9 @@
         "mitche50/NanoTipBot",
         "danhitchcock/nano_tipper_z",
         "AuliaYF/easyraikit-python",
-        "vitorcremonez/nano-vanity"
+        "vitorcremonez/nano-vanity",
+        "MyEcoria/tornano",
+        "PlasmaPower/orv-privacy"
     ],
     "ignored": [
         "ITMFLtd/ITCONode",
@@ -39,7 +41,8 @@
         "dsvakola/Coin_sorter_counter_system",
         "panapina/pina",
         "Dogenano-xdg/dogenano-node",
-        "SlowestTimelord/slowesttimelord.github.io"
+        "SlowestTimelord/slowesttimelord.github.io",
+        "gr0vity-dev/nanotps-front"
     ],
     "queries": [
         "topic:nanocurrency",

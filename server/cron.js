@@ -4,7 +4,6 @@ require('dotenv').config();
 const models = require('./models');
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const REPOS = require('./repos.json');
-const { queryDB } = require('./server');
 const createClient = require('redis').createClient;
 const redis = createClient({
     // host: 'localhost',
@@ -404,7 +403,7 @@ const job = new Cron('10 * * * *', async () => {
     await refreshMilestones();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
-    await redis.json.set('data', '.', await queryDB());
+    await redis.json.set('data', '.', await models.queryDB());
 });
 
 const eventsJob = new Cron('*/20 * * * *', async () => {

@@ -92,7 +92,7 @@ app.get('/data', async (req, res) => {
     if (false) {
         res.json(cached);
     } else {
-        await redis.json.set('data', '$', await queryDB());
+        await redis.json.set('data', '$', await models.queryDB());
         res.json(await redis.json.get('data', '$'));
     }
 });
@@ -236,94 +236,3 @@ async function countActiveDevs(windowInDays) {
         ])
     )[0].total;
 }
-
-async function queryDB() {
-    const data = {
-        nodeEvents: await models.NodeEvent.find({}, { _id: 0 })
-            .sort({ created_at: 'desc' })
-            .lean(),
-        repos: await models.Repo.find({}, { _id: 0 })
-            .sort({ created_at: 'asc' })
-            .lean(),
-        contributors: await models.Contributor.aggregate([
-            {
-                $project: {
-                    contributions: 1,
-                    last_month: 1,
-                    repos_count: { $size: '$repos' },
-                    repos: 1,
-                    login: 1,
-                    avatar_url: 1,
-                    _id: 0,
-                },
-            },
-            {
-                $lookup: {
-                    from: 'profiles',
-                    localField: 'login',
-                    foreignField: '_id',
-                    as: 'profile',
-                },
-            },
-            {
-                // return first profile
-                $set: {
-                    profile: { $arrayElemAt: ['$profile', 0] },
-                },
-            },
-            { $sort: { contributions: -1, repos_count: -1 } },
-        ]),
-        commits: await models.Commit.aggregate([
-            {
-                $group: {
-                    _id: {
-                        year: {
-                            $year: {
-                                $dateFromString: {
-                                    dateString: '$date',
-                                    format: '%Y-%m-%dT%H:%M:%SZ',
-                                },
-                            },
-                        },
-                        week: {
-                            $week: {
-                                $dateFromString: {
-                                    dateString: '$date',
-                                    format: '%Y-%m-%dT%H:%M:%SZ',
-                                },
-                            },
-                        },
-                    },
-                    count: { $sum: 1 },
-                },
-            },
-            {
-                $sort: { '_id.year': 1, '_id.week': 1 },
-            },
-            {
-                $project: {
-                    date: {
-                        $concat: [
-                            { $toString: '$_id.year' },
-                            '|',
-                            { $toString: '$_id.week' },
-                        ],
-                    },
-                    count: 1,
-                    _id: 0,
-                },
-            },
-        ]),
-        milestones: await models.Milestone.find({}, { _id: 0 }).lean(),
-        events: await models.Commit.find(
-            { repo_full_name: { $ne: 'nanocurrency/nano-node' } },
-            { _id: 0 }
-        )
-            .sort({ date: 'desc' })
-            .limit(40)
-            .lean(),
-    };
-    return data;
-}
-
-module.exports = { queryDB };
