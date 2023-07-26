@@ -43,7 +43,7 @@ async function refreshMilestones() {
         )
         .sort((a, b) => b.title.localeCompare(a.title));
     await models.Milestone.collection.drop();
-    await models.Milestone.insertMany(normalized);
+    await models.Milestone.insertMany(normalized, { lean: true });
 
     console.timeEnd('refreshed_milestones');
 }
@@ -145,7 +145,7 @@ async function refreshRepos() {
             })
     );
     await models.Repo.collection.drop();
-    await models.Repo.collection.insertMany(normalized);
+    await models.Repo.collection.insertMany(normalized, { lean: true });
 
     console.timeEnd('refreshed_repos');
 
@@ -248,7 +248,9 @@ async function refreshCommitsAndContributors(repos = []) {
             })
     );
     await models.Contributor.collection.drop();
-    await models.Contributor.collection.insertMany(normalizedContribs);
+    await models.Contributor.collection.insertMany(normalizedContribs, {
+        lean: true,
+    });
 
     const normalizedCommits = allCommits.map(
         (commit) =>
@@ -261,7 +263,9 @@ async function refreshCommitsAndContributors(repos = []) {
             })
     );
     await models.Commit.collection.drop();
-    await models.Commit.collection.insertMany(normalizedCommits);
+    await models.Commit.collection.insertMany(normalizedCommits, {
+        lean: true,
+    });
 
     console.timeEnd('refreshed_commits');
 }
@@ -394,7 +398,9 @@ async function refreshNodeEvents() {
         );
 
     await models.NodeEvent.collection.drop();
-    const res = await models.NodeEvent.collection.insertMany(events);
+    const res = await models.NodeEvent.collection.insertMany(events, {
+        lean: true,
+    });
     console.timeEnd('refreshed_node_events');
     return res.acknowledged ? events : [];
 }
@@ -406,7 +412,7 @@ const job = new Cron('10 * * * *', async () => {
     await redis.json.set('data', '.', await models.queryDB());
 });
 
-const eventsJob = new Cron('*/20 * * * *', async () => {
+const eventsJob = new Cron('13 * * * *', async () => {
     await redis.json.set('data', '$.nodeEvents', await refreshNodeEvents());
 });
 

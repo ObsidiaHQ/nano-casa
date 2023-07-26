@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const compression = require('compression');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
@@ -70,17 +69,17 @@ app.use(passport.initialize());
 // Rate limiter
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 500, // Limit each IP to 500 requests per `window` (here, per 10 minutes)
+    max: 300, // Limit each IP to 500 requests per `window`
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use(limiter);
 
 // Misc
-const build_path = './nano-casa';
-const explorer_path = './html';
-app.use(express.static(path.join(__dirname, build_path)));
-app.use(express.static(path.join(__dirname, explorer_path)));
+const BUILD_PATH = './nano-casa';
+const EXPLORER_PATH = './html';
+app.use(express.static(path.join(__dirname, BUILD_PATH)));
+app.use(express.static(path.join(__dirname, EXPLORER_PATH)));
 app.use(compression());
 //app.use(cors());
 app.use(express.json());
@@ -185,11 +184,11 @@ app.get('/ping', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, build_path, 'index.html'));
+    res.sendFile(path.resolve(__dirname, BUILD_PATH, 'index.html'));
 });
 
 app.get('/explorer', async (req, res) => {
-    res.sendFile(path.resolve(__dirname, explorer_path, 'index.html'));
+    res.sendFile(path.resolve(__dirname, EXPLORER_PATH, 'index.html'));
 });
 
 app.listen(8080, () => {

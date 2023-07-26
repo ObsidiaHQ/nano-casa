@@ -12,8 +12,8 @@ const Repo = mongoose.model(
         avatar_url: String,
         prs_30d: Number,
         prs_7d: Number,
-        commits_30d: Number,
-        commits_7d: Number,
+        commits_30d: { type: Number, default: 0 },
+        commits_7d: { type: Number, default: 0 },
         description: String,
     })
 );
