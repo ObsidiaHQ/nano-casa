@@ -7,8 +7,8 @@ declare var nano;
     <ng-container *ngIf="barOnly; else fullLayout">
       <div
         [id]="sid"
-        [title]="title"
-        [attr.data-title]="title"
+        [title]="title || 'Funding goal'"
+        [attr.data-title]="title || 'Funding goal'"
         [attr.data-color]="color"
         [attr.data-type]="'bar'"
         [attr.data-address]="address"
@@ -42,15 +42,15 @@ declare var nano;
           </div>
         </div>
       </div>
-      <span class="text-muted text-truncate mt-1">{{ description }}</span>
+      <span class="text-muted mt-1">{{ description }}</span>
     </ng-template>
   `,
 })
 export class GoalComponent implements AfterViewInit {
-  @Input() sid!: string;
-  @Input() address!: string;
-  @Input() title!: string;
-  @Input() amount!: number;
+  @Input() sid: string;
+  @Input() address: string;
+  @Input() title: string;
+  @Input() amount: number;
   @Input() color: string = '#4299e1';
   @Input() website: string;
   @Input() description: string;

@@ -166,7 +166,7 @@
                         {{busyWindow === 'busyWeek' ? busy.commits_7d : busy.commits_30d || 0}}</span>
                       <span class="mx-2 text-muted mb-1" style="font-size: 0.8rem;" title="Pull requests">
                         <app-icon icon="pr"></app-icon>
-                        {{busyWindow === 'busyMonth' ? busy.prs_7d : busy.prs_30d}}</span>
+                        {{busyWindow === 'busyWeek' ? busy.prs_7d : busy.prs_30d}}</span>
                     </div>
                   </div>
                 </div>
@@ -383,7 +383,8 @@
                   <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
                 </td>
                 <td>
-                  <app-goal *ngIf="i < 3" [amount]="15 / (i+1)" [address]="'@faucet'" [sid]="'goal' + i"></app-goal>
+                  <app-goal *ngIf="user.profile?.goal?.amount" [amount]="user.profile?.goal?.amount" [address]="user.profile?.goal?.nano_address"
+                    [sid]="'id'+user.profile?.goal?._id"></app-goal>
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap">
@@ -460,7 +461,19 @@
             <a *ngFor="let repo of selectedUser.repos" href="https://github.com/{{repo}}"><span
                 class="badge badge-outline badge-pill text-azure me-2 mb-2 p-2">{{repo}}</span></a>
           </div>
+          <div class="subheader mt-3 mb-2">Funding goal</div>
+          <div *ngIf="selectedUser.profile?.goal?.amount; else noGoal" class="text-body d-block">
+            <span class="inline-goal">
+              <app-goal [sid]="'id_'+selectedUser.profile?.goal?._id" [title]="selectedUser.profile?.goal?.title" [amount]="selectedUser.profile?.goal?.amount"
+                [address]="selectedUser.profile?.goal?.nano_address" [barOnly]="false" [description]="selectedUser.profile?.goal?.description">
+              </app-goal>
+            </span>
+          </div>
+          <ng-template #noGoal>
+            <div class="text-muted italic text-center">No funding goal set.</div>
+          </ng-template>
         </ng-container>
+
         <ng-template #editTemplate>
           <div class="row">
             <div class="col-12 col-md-4 mb-3">
@@ -500,38 +513,51 @@
 
           <div class="row">
             <div class="col-12">
-              <label class="form-label d-inline-block me-3 mb-3">Funding goals</label>
-              <a type="button" class="text-azure" (click)="addGoal()"><app-icon icon="plus"></app-icon> New</a>
-              <div class="card mb-2" style="min-height: unset;">
+              <label class="form-label d-inline-block me-3 mb-3">Funding goal</label>
+              <a *ngIf="!loggedUser.goal" type="button" class="text-azure" (click)="setGoal()"><app-icon icon="plus"></app-icon> New</a>
+              <a *ngIf="loggedUser.goal" type="button" class="list-group-item-actions" (click)="deleteGoal(loggedUser.goal)" title="Delete goal">
+                <app-icon icon="trash" strokeColor="#B13539"></app-icon>
+              </a>
+              <div *ngIf="loggedUser?.goal; else noGoal" class="card mb-2" style="min-height: unset;">
                 <div class="list-group list-group-flush">
-                  <div *ngFor="let goal of loggedUser.goals; let i = index" class="list-group-item list-group-item-action">
-                    <div class="row align-items-center">
-                      <div class="col text-truncate">
-                        <div class="text-body d-block">
-                          <span class="inline-goal">
-                            <app-goal [sid]="goal.id + i" [title]="goal.title" [amount]="goal.amount" [address]="goal.nano_address" [barOnly]="false"
-                              [description]="goal.description">
-                            </app-goal>
-                          </span>
-                        </div>
+                  <div class="list-group-item list-group-item-action">
+                    <div class="row">
+                      <div class="col-9 col-md-7 mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" placeholder="server cost, etc.." [(ngModel)]="loggedUser.goal.title">
                       </div>
-                      <div class="col-auto">
-                        <a (click)="deleteGoal(goal)" class="list-group-item-actions" title="Delete goal">
-                          <app-icon icon="trash" strokeColor="#B13539"></app-icon>
-                        </a>
+                      <div class="col-3 col-md-5 mb-3">
+                        <label class="form-label">Goal</label>
+                        <input type="number" class="form-control" min="1" [(ngModel)]="loggedUser.goal.amount">
+                      </div>
+                      <div class="col-12 col-md-7 mb-3">
+                        <label class="form-label">Nano address</label>
+                        <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.goal.nano_address">
+                      </div>
+                      <div class="col-12 col-md-5 mb-3">
+                        <label class="form-label">Website</label>
+                        <input type="text" class="form-control" placeholder="optional" [(ngModel)]="loggedUser.goal.website">
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="2" [(ngModel)]="loggedUser.goal.description" placeholder="optional"></textarea>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <ng-template #noGoal>
+                <div class="text-muted italic text-center">No funding goal set.</div>
+              </ng-template>
             </div>
           </div>
         </ng-template>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
-        <button *ngIf="loggedUser && editMode" type="button" class="btn btn-primary" (click)="updateProfile()">Save</button>
+        <button *ngIf="loggedUser?._id === selectedUser.profile?._id" type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
+        <button *ngIf="loggedUser && editMode" type="button" class="btn btn-primary" [disabled]="!loggedUser.goal.nano_address || !loggedUser.goal.amount"
+          (click)="updateProfile()">Save</button>
       </div>
     </div>
   </div>

@@ -55,16 +55,16 @@ const Profile = mongoose.model(
             nano_address: String,
             gh_sponsors: Boolean,
             patreon_url: String,
-            goals: [
-                {
+            goal: {
+                type: {
                     title: String,
                     amount: Number,
                     nano_address: String,
                     website: String,
                     description: String,
-                    created_at: { type: Date, default: Date.now },
                 },
-            ],
+                default: {},
+            },
         },
         { timestamps: { createdAt: 'created_at', updatedAt: false } }
     )

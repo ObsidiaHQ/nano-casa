@@ -138,6 +138,7 @@ app.post('/set-profile', async (req, res) => {
         nano_address,
         gh_sponsors,
         patreon_url,
+        goal = {},
     } = req.body;
     models.Profile.findByIdAndUpdate(
         req.user._id,
@@ -148,32 +149,12 @@ app.post('/set-profile', async (req, res) => {
             nano_address,
             gh_sponsors,
             patreon_url,
+            goal,
         },
         { new: true }
     )
         .then(async (usr) => {
             updateProfilesCache(usr);
-            res.status(201).send(usr);
-        })
-        .catch(() => res.status(500).send());
-});
-
-app.post('/add-goal', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).send();
-    }
-    models.Profile.findByIdAndUpdate(
-        req.user._id,
-        {
-            $push: {
-                goals: req.body,
-            },
-        },
-        { new: true, useFindAndModify: false }
-    )
-        .then(async (usr) => {
-            console.log(usr);
-            //updateProfilesCache(usr);
             res.status(201).send(usr);
         })
         .catch(() => res.status(500).send());

@@ -46,7 +46,7 @@ export interface Profile {
   nano_address: string;
   gh_sponsors: boolean;
   patreon_url: string;
-  goals: any[];
+  goal: FundingGoal;
 }
 export interface ServerResponse {
   repos: Repo[];
@@ -69,4 +69,12 @@ export interface NodeEvent {
   author: string;
   avatar_url: string;
   created_at: string;
+}
+export interface FundingGoal {
+  _id: string;
+  title?: string;
+  amount: number;
+  nano_address: string;
+  website?: string;
+  description?: string;
 }

@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { graphic, EChartsOption } from 'echarts';
-import { ChartCommit, Contributor, Profile, Repo } from '../../interfaces';
+import {
+  ChartCommit,
+  Contributor,
+  FundingGoal,
+  Profile,
+  Repo,
+} from '../../interfaces';
 import { SharedService } from 'src/app/shared.service';
 
 @Component({
@@ -200,20 +206,21 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  addGoal() {
+  setGoal() {
     const usr = this.shared.loggedUser.value;
-    usr.goals.push({
+    usr.goal = {
       title: 'New goal',
       amount: 5,
       nano_address: usr.nano_address,
-      description:
-        'Ea exercitation reprehenderit proident sit in labore enim incididunt nulla consequat commodo mollit commodo.',
-    });
+      description: '',
+    } as FundingGoal;
     this.shared.loggedUser.next(usr);
   }
 
   deleteGoal(goal) {
-    console.log(goal);
+    const usr = this.shared.loggedUser.value;
+    delete usr.goal;
+    this.shared.loggedUser.next(usr);
   }
 
   trackByName(index, item) {
