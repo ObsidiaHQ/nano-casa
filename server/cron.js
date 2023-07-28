@@ -7,10 +7,10 @@ const REPOS = require('./repos.json');
 const axios = require('axios');
 const createClient = require('redis').createClient;
 const redis = createClient({
-    // host: 'localhost',
-    // port: process.env.REDIS_PORT || 6379,
-    // password: process.env.REDIS_PASS,
-    url: process.env.REDIS_URL,
+    host: 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASS,
+    //url: process.env.REDIS_URL,
 });
 
 redis.on('error', (err) => console.log('Redis Client Error', err));
@@ -283,7 +283,18 @@ async function getSpotlight() {
     const repos = (await redis.json.get('data', { path: '$.repos' }))[0]
         .slice(15)
         .filter((r) => r.description);
-    return repos[Math.floor(Math.random() * repos.length)];
+    const sl = repos[Math.floor(Math.random() * repos.length)];
+    await models.Misc.findOneAndUpdate(
+        {},
+        { $set: { spotlight: sl } },
+        { new: true, upsert: true },
+        function (err, doc) {
+            if (err) {
+                console.log('Something went wrong while updating the data!');
+            }
+        }
+    );
+    return sl;
 }
 
 async function refreshNodeEvents() {
@@ -453,7 +464,7 @@ async function checkPublicNodes() {
     return;
 }
 
-const job = new Cron('10 * * * *', async () => {
+const job = new Cron('45 * * * *', async () => {
     await refreshMilestones();
     await checkPublicNodes();
     const repos = await refreshRepos();
@@ -461,7 +472,7 @@ const job = new Cron('10 * * * *', async () => {
     await redis.json.set('data', '.', await models.queryDB());
 });
 
-const eventsJob = new Cron('13 * * * *', async () => {
+const eventsJob = new Cron('*/20 * * * *', async () => {
     await redis.json.set('data', '$.nodeEvents', await refreshNodeEvents());
 });
 

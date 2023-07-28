@@ -12,10 +12,10 @@ const app = express();
 // Redis
 const createClient = require('redis').createClient;
 const redis = createClient({
-    // host: 'localhost',
-    // port: process.env.REDIS_PORT || 6379,
-    // password: process.env.REDIS_PASS,
-    url: process.env.REDIS_URL,
+    host: 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASS,
+    //url: process.env.REDIS_URL,
 });
 redis.on('error', (err) => console.log('Redis Client Error', err));
 redis.connect();
@@ -26,7 +26,7 @@ passport.use(
         {
             clientID: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            callbackURL: 'http://localhost:8080/auth/github/callback',
+            callbackURL: 'https://nano.casa/auth/github/callback',
         },
         function (accessToken, refreshToken, profile, done) {
             const { login, avatar_url, bio, twitter_username, blog } =
@@ -88,7 +88,7 @@ app.use(express.urlencoded({ extended: true }));
 // Router
 app.get('/data', async (req, res) => {
     let cached = await redis.json.get('data', '$');
-    if (false) {
+    if (cached) {
         res.json(cached);
     } else {
         await redis.json.set('data', '$', await models.queryDB());

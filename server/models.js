@@ -102,6 +102,13 @@ const PublicNode = mongoose.model(
     })
 );
 
+const Misc = mongoose.model(
+    'Misc',
+    new mongoose.Schema({
+        spotlight: Object,
+    })
+);
+
 async function queryDB() {
     const data = {
         publicNodes: await PublicNode.find({}, { _id: 0 })
@@ -182,6 +189,7 @@ async function queryDB() {
                 },
             },
         ]),
+        misc: await Misc.findOne({}, { _id: 0 }).lean(),
         milestones: await Milestone.find({}, { _id: 0 }).lean(),
         events: await Commit.find(
             { repo_full_name: { $ne: 'nanocurrency/nano-node' } },
@@ -202,5 +210,6 @@ module.exports = {
     Profile,
     NodeEvent,
     PublicNode,
+    Misc,
     queryDB,
 };

@@ -96,15 +96,16 @@ export class SharedService {
           this.commits.next(data.commits);
           this.events.next(data.events);
           this.milestones.next(data.milestones);
-          this.spotlight.next(data.spotlight || data.repos[31]);
+          this.spotlight.next(
+            data.misc.spotlight ||
+              data.repos[Math.floor(Math.random() * data.repos.length)]
+          );
           this.publicNodes.next(data.publicNodes);
         });
     }
   }
 
   updateProfile() {
-    //TODO loggedUser is not reactive !!
-    // behSub with ngModel
     return this.http
       .post(`${environment.api}/set-profile`, this.loggedUser.value)
       .pipe(take(1));
