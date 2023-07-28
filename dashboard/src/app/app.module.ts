@@ -22,6 +22,7 @@ import { GoalComponent } from './components/goal/goal.component';
 import { FilterPipe } from './pipes/filter.pipe';
 import { SortPipe } from './pipes/sort.pipe';
 import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
+import { PublicNodesComponent } from './components/public-nodes/public-nodes.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
     SortPipe,
     AsRepoPipe,
     AsUserPipe,
+    PublicNodesComponent,
   ],
   imports: [
     BrowserModule,
@@ -54,6 +56,7 @@ import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
     FormsModule,
     RouterModule.forRoot([
       { path: 'about', component: AboutComponent },
+      { path: 'public-nodes', component: PublicNodesComponent },
       { path: '**', component: HomeComponent },
     ]),
   ],

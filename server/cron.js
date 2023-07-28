@@ -4,6 +4,7 @@ require('dotenv').config();
 const models = require('./models');
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const REPOS = require('./repos.json');
+const axios = require('axios');
 const createClient = require('redis').createClient;
 const redis = createClient({
     // host: 'localhost',
@@ -405,8 +406,56 @@ async function refreshNodeEvents() {
     return res.acknowledged ? events : [];
 }
 
+async function checkPublicNodes() {
+    console.time('refreshed_public_nodes');
+    const endpointStatuses = [];
+    for (let endpoint of REPOS.public_nodes) {
+        let start = Date.now();
+        try {
+            const res = await axios.post(
+                endpoint,
+                { action: 'version' },
+                { timeout: 2000 }
+            );
+            let resp_time = Date.now() - start;
+
+            endpointStatuses.push(
+                new models.PublicNode({
+                    endpoint,
+                    resp_time,
+                    version: res.data.node_vendor,
+                    error: null,
+                })
+            );
+        } catch (error) {
+            let resp_time = Date.now() - start;
+            console.log(error.response?.data);
+            let errorMsg =
+                error.code === 'ECONNABORTED'
+                    ? 'Down'
+                    : error.response?.data?.error ||
+                      error.response?.data ||
+                      `Failed with status code ${error.response?.status}`;
+            endpointStatuses.push(
+                new models.PublicNode({
+                    endpoint,
+                    resp_time,
+                    error: { error: errorMsg },
+                })
+            );
+        }
+    }
+    await models.PublicNode.collection.drop();
+    await models.PublicNode.collection.insertMany(endpointStatuses, {
+        lean: true,
+    });
+    console.timeEnd('refreshed_public_nodes');
+    return;
+}
+
 const job = new Cron('10 * * * *', async () => {
     await refreshMilestones();
+    await checkPublicNodes();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
     await redis.json.set('data', '.', await models.queryDB());
@@ -427,4 +476,5 @@ module.exports = {
     rate,
     refreshNodeEvents,
     getSpotlight,
+    checkPublicNodes,
 };

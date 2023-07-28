@@ -9,6 +9,7 @@ import {
   Milestone,
   NodeEvent,
   Profile,
+  PublicNode,
   Repo,
   ServerResponse,
 } from './interfaces';
@@ -29,6 +30,7 @@ export class SharedService {
   events = new BehaviorSubject<Commit[]>([]);
   nodeEvents = new BehaviorSubject<NodeEvent[]>([]);
   spotlight = new BehaviorSubject<Repo>({} as Repo);
+  publicNodes = new BehaviorSubject<PublicNode[]>([]);
 
   constructor(private http: HttpClient) {
     this.fetchUser();
@@ -95,6 +97,7 @@ export class SharedService {
           this.events.next(data.events);
           this.milestones.next(data.milestones);
           this.spotlight.next(data.spotlight || data.repos[31]);
+          this.publicNodes.next(data.publicNodes);
         });
     }
   }

@@ -92,8 +92,21 @@ const NodeEvent = mongoose.model(
     })
 );
 
+const PublicNode = mongoose.model(
+    'PublicNode',
+    new mongoose.Schema({
+        endpoint: String,
+        resp_time: Number,
+        version: String,
+        error: Object,
+    })
+);
+
 async function queryDB() {
     const data = {
+        publicNodes: await PublicNode.find({}, { _id: 0 })
+            .sort({ endpoint: 'asc' })
+            .lean(),
         nodeEvents: await NodeEvent.find({}, { _id: 0 })
             .sort({ created_at: 'desc' })
             .lean(),
@@ -188,5 +201,6 @@ module.exports = {
     Milestone,
     Profile,
     NodeEvent,
+    PublicNode,
     queryDB,
 };

@@ -29,7 +29,9 @@
         "AuliaYF/easyraikit-python",
         "vitorcremonez/nano-vanity",
         "MyEcoria/tornano",
-        "PlasmaPower/orv-privacy"
+        "PlasmaPower/orv-privacy",
+        "PlasmaPower/distributed-vanity",
+        "PlasmaPower/distributed-vanity-server"
     ],
     "ignored": [
         "ITMFLtd/ITCONode",
@@ -53,5 +55,23 @@
         "nanocurrency+in:description",
         "nano+currency+in:description",
         "topic:raiblocks"
+    ],
+    "public_nodes": [
+        "https://api.nano.to",
+        "https://rpc.nano.to",
+        "https://solarnanofaucet.space/api",
+        "https://mynano.ninja/api/node",
+        "https://api.nano.kga.earth/node/proxy",
+        "https://nault.nanos.cc/proxy",
+        "https://rainstorm.city/api",
+        "https://node.somenano.com/proxy",
+        "https://proxy.nanos.cc/proxy",
+        "https://www.nanolooker.com/api/rpc",
+        "https://rpc.wenano.net/api/node-api",
+        "https://app.natrium.io/api",
+        "https://nano.nownodes.io",
+        "https://us-1.nano.to",
+        "https://us-2.nano.to",
+        "https://solar.nano.to"
     ]
 }

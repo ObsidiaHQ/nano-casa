@@ -56,6 +56,7 @@ export interface ServerResponse {
   events: Commit[];
   nodeEvents: NodeEvent[];
   spotlight: Repo;
+  publicNodes: PublicNode[];
 }
 export interface NodeEvent {
   event: {
@@ -77,4 +78,10 @@ export interface FundingGoal {
   nano_address: string;
   website?: string;
   description?: string;
+}
+export interface PublicNode {
+  endpoint: string;
+  error: any;
+  version: string;
+  resp_time: number;
 }
