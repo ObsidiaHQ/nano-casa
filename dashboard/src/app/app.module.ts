@@ -1,27 +1,71 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AppComponent } from './app.component';
 import { PaginationComponent } from './paginate.component';
-import { TimeagoModule } from 'ngx-timeago';
+import { NgxEchartsModule } from 'ngx-echarts';
+import {
+  TimeagoModule,
+  TimeagoIntl,
+  TimeagoFormatter,
+  TimeagoCustomFormatter,
+} from 'ngx-timeago';
+import { strings as englishShortStrings } from 'ngx-timeago/language-strings/en-short';
+import { CountUpModule } from 'ngx-countup';
+import { FormsModule } from '@angular/forms';
+import { AboutComponent } from './components/about/about.component';
+import { RouterModule } from '@angular/router';
+import { HomeComponent } from './components/home/home.component';
+import { IconComponent } from './components/icon/icon.component';
+import { GoalComponent } from './components/goal/goal.component';
+import { FilterPipe } from './pipes/filter.pipe';
+import { SortPipe } from './pipes/sort.pipe';
+import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
+import { PublicNodesComponent } from './components/public-nodes/public-nodes.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PaginationComponent
+    PaginationComponent,
+    AboutComponent,
+    HomeComponent,
+    IconComponent,
+    GoalComponent,
+    FilterPipe,
+    SortPipe,
+    AsRepoPipe,
+    AsUserPipe,
+    PublicNodesComponent,
   ],
   imports: [
     BrowserModule,
-    NgxChartsModule,
-    BrowserAnimationsModule,
-    FontAwesomeModule,
     HttpClientModule,
-    TimeagoModule.forRoot()
+    BrowserAnimationsModule,
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts'),
+    }),
+    TimeagoModule.forRoot({
+      intl: TimeagoIntl,
+      formatter: {
+        provide: TimeagoFormatter,
+        useClass: TimeagoCustomFormatter,
+      },
+    }),
+    CountUpModule,
+    FormsModule,
+    RouterModule.forRoot([
+      { path: 'about', component: AboutComponent },
+      { path: 'public-nodes', component: PublicNodesComponent },
+      { path: '**', component: HomeComponent },
+    ]),
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private intl: TimeagoIntl) {
+    this.intl.strings = englishShortStrings;
+    this.intl.changes.next();
+  }
+}

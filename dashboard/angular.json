@@ -27,9 +27,14 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/@tabler/core/dist/css/tabler.min.css",
+              "node_modules/@tabler/core/dist/css/demo.min.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/@tabler/core/dist/js/tabler.min.js",
+              "node_modules/@tabler/core/dist/js/demo.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -37,7 +42,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -102,5 +107,7 @@
       }
     }
   },
-  "defaultProject": "nano-casa"
+  "cli": {
+    "analytics": false
+  }
 }

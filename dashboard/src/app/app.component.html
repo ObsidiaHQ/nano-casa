@@ -1,373 +1,120 @@
-<nav class="container">
-  <div class="row align-items-center justify-content-end">
-      <div class="col-12 col-md-4 text-center">
-          <img src="assets/logo.png" alt="nano casa" height="80" width="202">
-      </div>
-      <div class="col-12 col-md-4 justify-content-end d-flex">
-          <a class="mx-2" style="width: fit-content; line-height: 30px;" href="/explorer" aria-label="repo explorer">Explorer</a>
-          <a class="mx-2" style="font-size: 1.5rem; width: 30px;" href="https://github.com/obsidiaHQ/nano-casa" aria-label="nano casa on GitHub"><fa-icon [icon]="faGithub"></fa-icon></a>
-          <a class="mx-2" style="font-size: 1.5rem; width: 30px;" href="https://twitter.com/GeorgeMamar" aria-label="nano casa Twitter updates"><fa-icon [icon]="faTwitter"></fa-icon></a>
-      </div>
-  </div>
-</nav>
-
-<div class="container">
-
-  <div class="row mb-3">
-    <section class="col-12">
-      <h3>About</h3>
-      <p>
-        nano.casa monitors the open source development of the <a href="https://nano.org" target="_blank" aria-label="Nano">nano</a> ecosystem, enabling developers and enthusiasts to easily track the progress of their favorite projects,
-        discover new ones and allowing them easier access to the information about who's currently working on what.
-      </p>
-      <p>
-        Goal: Drive more engagement by making it easier for people to find and follow developers within the community, as well as show their support via GitHub Sponsorships or nano donations.
-      </p>
-    </section>
-    <section class="col-12">
-      <h3>Methodology</h3>
-      <p>
-        we track GitHub repositories that have any one of the following topics: 
-        <span class="badge rounded-pill bg-primary mx-1">nanocurrency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano-currency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano + cryptocurrency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano-cryptocurrency</span>
-        <span class="badge rounded-pill bg-primary mx-1">nano + crypto</span>, 
-        as well as a list of known repos that haven't been tagged yet. <a href="https://github.com/obsidiaHQ/nano-casa/issues/1" target="_blank" aria-label="Suggest known repos">Suggestions are welcome</a>!
-      </p>
-    </section>
-  </div>
-
-  <div class="row">
-    <div class="col-6 col-md-2">
-      <div class="card mb-4 mt-1 card-sm">
-        <ng-container *ngIf="!repos.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
+<div class="page">
+  <!-- Navbar -->
+  <div class="mb-3">
+    <header class="navbar navbar-expand-md navbar-dark d-print-none">
+      <div class="container-xl">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+          <a href="/">
+            <img src="assets/logo.png" width="110" height="32" alt="nano casa" class="navbar-brand-image">
+          </a>
+        </h1>
+        <div class="navbar-nav flex-row order-md-last">
+          <div class="d-none d-md-flex me-2">
+            <a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="nav-link" title="Source code">
+              <app-icon icon="github"></app-icon>
+            </a>
+            <a href="https://twitter.com/geommr" target="_blank" class="nav-link" title="Twitter">
+              <app-icon icon="twitter"></app-icon>
+            </a>
           </div>
-        </ng-container>
-        <ng-container *ngIf="repos.length">
-          <div class="card-body">
-            <h5 class="pt-1">repos</h5>
-            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faRepo"></fa-icon></span>{{repos.length}}</h5>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-      <div class="card mb-4 mt-1 card-sm">
-        <ng-container *ngIf="!repos.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="repos.length">
-          <div class="card-body">
-            <h5 class="pt-1">latest repo</h5>
-            <h5 class="mb-0">
-              <span class="me-3"><fa-icon [icon]="faHistory"></fa-icon></span>
-              <a [href]="'https://github.com/' + repos[repos.length-1].full_name" [attr.aria-label]="repos[repos.length-1].name">{{repos[repos.length-1].name}}</a>
-            </h5>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-      <div class="card mb-4 mt-1 card-sm">
-        <ng-container *ngIf="!contributors.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="contributors.length">
-          <div class="card-body">
-            <h5 class="pt-1">contributors</h5>
-            <h5 class="mb-0"><span class="me-3"><fa-icon [icon]="faUser" class="mr-2"></fa-icon></span>{{contributors.length}}</h5>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-4">
-      <div class="card mb-4 mt-1 card-sm">
-        <ng-container *ngIf="!contributors.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="contributors.length">
-          <div class="card-body">
-            <h5 class="pt-1">{{milestones[0].title}}</h5>
-            <div class="progress position-relative">
-              <div class="progress-bar bg-warning" role="progressbar" aria-label="progress on latest nano protocol milestone"
-                [ngStyle]="{width: milestones[0].closed_issues*100/(milestones[0].open_issues + milestones[0].closed_issues)+'%' }"
-                [attr.aria-valuenow]="milestones[0].closed_issues" 
-                [attr.aria-valuemin]="0" 
-                [attr.aria-valuemax]="milestones[0].open_issues + milestones[0].closed_issues">
+          <div class="nav-item dropdown" *ngIf="loggedUser">
+            <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu" aria-expanded="true">
+              <span class="avatar avatar-sm" style="background-image: url({{loggedUser.avatar_url}})"></span>
+              <div class="d-none d-xl-block ps-2">
+                <div>{{loggedUser._id}}</div>
               </div>
-              <span class="position-absolute text-white" style="right: 0; left: 0; margin: 0 auto;">
-                {{milestones[0].closed_issues}}/{{milestones[0].open_issues + milestones[0].closed_issues}} 
-                ({{milestones[0].closed_issues/(milestones[0].open_issues + milestones[0].closed_issues) | percent}})
-              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" data-bs-popper="static">
+              <a (click)="shared.selectUser(null, true)" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-profile">Profile</a>
+              <a (click)="shared.logOut()" class="dropdown-item">Log out</a>
             </div>
           </div>
-        </ng-container>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4 mt-1">
-        <ng-container *ngIf="!repos.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="repos.length">
-          <div class="card-body">
-            <div class="card-title">
-              <h5>keeping busy <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Activity in the past 7 or 30 days"></fa-icon>
-                <a role="button" class="ms-3 opacity-50" [ngStyle]="{'text-decoration': busyLastWeek ? 'underline' : ''}" title="Last week" (click)="filterBusyRepos(true)">7d</a>
-                <a role="button" class="ms-3 opacity-50" [ngStyle]="{'text-decoration': !busyLastWeek ? 'underline' : ''}" title="Last month" (click)="filterBusyRepos(false)">30d</a>
-              </h5>
-            </div>
-            <ng-container *ngIf="busyRepos.length">
-              <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
-                <div *ngFor="let busy of busyRepos | slice:0:20; trackBy: trackByName; let last = last;" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
-                  <img [src]="busy.avatar_url" [alt]="busy.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
-                  <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
-                  <div class="mt-2">
-                    <span class="d-block text-muted mb-1" style="font-size: 0.8rem;"><fa-icon [icon]="faCommit"></fa-icon> {{busyLastWeek ? busy.commits_7d : busy.commits_30d || 0}} commits</span>
-                    <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faPR"></fa-icon> {{busy.prs_30d}} PRs</span>
-                  </div>
-                </div>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="!busyRepos.length">
-              <div class="text-center" style="opacity: 0.8;">
-                <fa-icon style="font-size: 3rem;" class="ghost d-block mb-2" [icon]="faGhost"></fa-icon>
-                <span class="mt-1">things are quite right now</span>
-              </div>
-            </ng-container>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12 col-md-8">
-      <div class="col-12 mb-4">
-        <div class="card mb-4 mt-1">
-          <ng-container *ngIf="!reposData.length">
-            <div class="spinner-grow text-secondary align-self-center" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="reposData.length">
-            <div class="card-body">
-              <div class="card-title">
-                <h5>repos created / year</h5>
-              </div>
-              <div style="flex:auto; min-width: 0;">
-                <div class="chart" style="width: 100%; height: 417px">
-                  <ngx-charts-bar-vertical [xAxis]="true" [yAxis]="true" [results]="reposData" scheme="solar" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
-                  </ngx-charts-bar-vertical>
-                </div>
-              </div>
-            </div>
-          </ng-container>
         </div>
-      </div>
-
-      <div class="col-12 mb-3">
-        <div class="card mb-4 mt-1" style="min-height: 220px;">
-          <ng-container *ngIf="!recentRepos.length">
-            <div class="spinner-grow text-secondary align-self-center" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="recentRepos.length">
-            <div class="card-body">
-              <div class="card-title">
-                <h5>recently created</h5>
-              </div>
-              <div class="d-flex pb-3" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px;">
-                <div *ngFor="let repo of recentRepos | slice:0:25; trackBy: trackByName; let last = last; let first = first" [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
-                  <img [src]="repo.avatar_url" [alt]="repo.full_name" width="34" height="34" style="border-radius: 8px;" class="d-block me-3 mb-2">
-                  <a [href]="'https://github.com/' + repo.full_name" [attr.aria-label]="repo.full_name.split('/')[1]">{{repo.full_name.split('/')[1]}}</a>
-                  <div class="mt-2">
-                    <span title="{{repo.created_at | date:'mediumDate'}}" class="d-block text-muted mb-1" style="font-size: 0.8rem;">
-                      <fa-icon [icon]="faHistory"></fa-icon> {{first ? (repo.created_at | timeago) : (repo.created_at | date:'MMM d')}}
-                    </span>
-                    <span class="d-block text-muted" style="font-size: 0.8rem;"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 col-md-4">
-      <div class="col-12 mb-4">
-        <div class="card mt-1" style="height: 100%;">
-          <ng-container *ngIf="!popularRepos.length">
-            <div class="spinner-grow text-secondary align-self-center" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="popularRepos.length">
-            <div class="card-body pb-1">
-              <div class="card-title">
-                <h5>most popular repos</h5>
-              </div>
-              <ul class="list-group">
-                <li *ngFor="let repo of popularReposPage; trackBy: trackByName" class="list-group-item">
-                  <a [href]="'https://github.com/' + repo.full_name" target="_blank" [attr.aria-label]="repo.full_name">
-                    {{repo.name}}
+        <div class="collapse navbar-collapse" id="navbar-menu">
+          <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                  <span class="nav-link-title">
+                    Home
+                  </span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/about" routerLinkActive="active">
+                  <span class="nav-link-title">
+                    About
+                  </span>
+                </a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#navbar-third" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
+                  aria-expanded="false">
+                  <span class="nav-link-title">
+                    Resources
+                  </span>
+                </a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" routerLink="/public-nodes">
+                    Public Nodes
                   </a>
-                  <span class="badge rounded-pill bg-warning text-dark mx-2"><fa-icon [icon]="faStar"></fa-icon> {{repo.stargazers_count}}</span>
-                </li>
-              </ul>
-              <app-pagination [pageSize]="16" [items]="popularRepos" (changePage)="popularReposPage = $event.items"></app-pagination>
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4 mt-1">
-        <ng-container *ngIf="!commits[0].series.length">
-          <div class="spinner-grow text-secondary align-self-center" role="status">
-            <span class="visually-hidden">Loading...</span>
+                  <a class="dropdown-item" href="https://nano.casa/explorer">
+                    Node CodEx
+                  </a>
+                  <a class="dropdown-item" href="https://github.com/obsidiaHQ/nano-casa/issues/1" target="_blank">
+                    Add a Project
+                  </a>
+                </div>
+              </li>
+              <li class="nav-item" *ngIf="!loggedUser">
+                <a class="nav-link" (click)="logIn()">
+                  <span class="nav-link-title">
+                    Login
+                  </span>
+                </a>
+              </li>
+            </ul>
           </div>
-        </ng-container>
-        <ng-container *ngIf="commits[0].series.length">
-          <div class="card-body">
-            <div class="card-title">
-              <h5>weekly activity</h5>
-            </div>
-            <div style="flex:auto; min-width: 0;">
-              <div class="chart" style="width: 100%; height: 417px">
-                <ngx-charts-area-chart [xAxis]="true" [yAxis]="true" [results]="commits" scheme="natural" [schemeType]="ScaleType.Ordinal" style="fill: rgb(214, 214, 214);">
-                </ngx-charts-area-chart>
-              </div>
-            </div>
+        </div>
+      </div>
+    </header>
+  </div>
+  <div class="page-wrapper">
+    <!-- Page body -->
+    <router-outlet></router-outlet>
+
+    <footer class="footer footer-transparent d-print-none">
+      <div class="container-xl">
+        <div class="row text-center align-items-center flex-row-reverse">
+          <div class="col-lg-auto ms-lg-auto">
+            <ul class="list-inline list-inline-dots mb-0">
+              <li *ngIf="shared.milestones.value.length" class="list-inline-item text-secondary">Updated {{shared.milestones.value[0].created_at |
+                timeago:false}} ago</li>
+              <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
+              <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
+              </li>
+              <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="link-secondary" rel="noopener">Source
+                  code</a></li>
+              <li class="list-inline-item">
+                <a href="https://twitter.com/geommr" target="_blank" class="link-secondary" rel="noopener">
+                  Twitter
+                </a>
+              </li>
+            </ul>
           </div>
-        </ng-container>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4 mt-1">
-      <ng-container *ngIf="!contributors.length">
-        <div class="spinner-grow text-secondary align-self-center" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="contributors.length">
-        <div class="card-body">
-          <div class="card-title">
-            <h5>contributions by user <fa-icon class="mx-1" style="cursor: help; opacity: 0.7;" [icon]="faInfo" title="Commits to main/master branches"></fa-icon></h5>
+          <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+            <ul class="list-inline list-inline-dots mb-0">
+              <li class="list-inline-item">
+                Obsidia
+              </li>
+            </ul>
           </div>
-          <div class="table-responsive">
-          <table class="table table-hover" style="overflow: hidden;">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">contributor</th>
-                <th scope="col">total commits <span role="button" aria-label="Sort contributors by total commits" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'total' ? 'lightsalmon' : ''}" (click)="sortContributors('total')"><fa-icon [icon]="faDown"></fa-icon></span></th>
-                <th scope="col">last month <span role="button" aria-label="Sort contributors by last month's commits" style="cursor: pointer;" [ngStyle]="{color: filterBy == 'month' ? 'lightsalmon' : ''}" (click)="sortContributors('month')"><fa-icon [icon]="faDown"></fa-icon></span></th>
-                <th scope="col" class="d-none d-md-table-cell"># of repos</th>
-              </tr>
-            </thead>
-            <tbody>
-              <ng-container *ngFor="let contrib of contributorsPage; trackBy: trackByLogin; let i = index;">
-                <tr>
-                  <td scope="row" class="pt-3">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
-                  <td style="min-width: 270px;">
-                    <img [src]="contrib.avatar_url" [alt]="contrib.login" width="36" height="36" class="mx-3" style="border-radius: 6px;">
-                    <a [href]="'https://github.com/' + contrib.login" class="me-3" [attr.aria-label]="contrib.login">{{contrib.login}}</a>
-                    <fa-icon title="Contributed to the nano-node repo" *ngIf="contributedToNode(contrib.repos)" class="mx-2" [icon]="faMedal" style="color: skyblue; cursor: help; vertical-align: text-top;"></fa-icon>
-                    <fa-icon title="Contributed to 10 repos or more" *ngIf="contrib.repos.length >= 10" class="mx-2" [icon]="faMeteor" style="color: plum; cursor: help; vertical-align: text-top;"></fa-icon>
-                    <fa-icon title="Contributed to a popular repo" *ngIf="hasPopularRepo(contrib.repos)" class="mx-2" [icon]="faStarOL" style="color: lightsalmon; cursor: help; vertical-align: text-top;"></fa-icon>
-                  </td>
-                  <td style="min-width: 120px;" class="pt-3">{{contrib.contributions | number}}</td>
-                  <td style="min-width: 100px;" class="pt-3"><span [ngStyle]="{opacity: contrib.last_month ? 1 : 0.25}">{{contrib.last_month | number}}</span></td>
-                  <td class="pt-3 d-none d-md-table-cell" >
-                    <div class="popover_wrapper" style="cursor: pointer;">
-                      {{contrib.repos_count}}
-                      <span class="p-2 mx-1 popover_title"><fa-icon [icon]="faRepo"></fa-icon></span>
-                      <div class="popover_content">
-                        <a *ngFor="let repo of contrib.repos | slice:0:3; let last = last" class="d-block" [ngClass]="last ? '' : 'mb-2'" [href]="'https://github.com/' + repo" [attr.aria-label]="repo.split('/')[1]">{{repo.split('/')[1]}}</a>
-                        <span class="d-block mt-2" *ngIf="contrib.repos.length > 3">+{{contrib.repos.length-3}} more</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="text-center">
-                    <a class="d-block mt-2 px-2" *ngIf="contrib.profile" data-bs-toggle="collapse" [href]="'#collapse' + contrib.login" role="button" aria-expanded="false" [attr.aria-controls]="'collapse' + contrib.login" aria-label="Show contributor details">
-                      <fa-icon [icon]="faMore"></fa-icon>
-                    </a>
-                  </td>
-                </tr>
-
-                <tr *ngIf="contrib.profile" class="collapse" [id]="'collapse' + contrib.login">
-                  <td colspan="5">
-                    <div class="p-4">
-                      <h5>
-                        <span class="me-3">{{contrib.profile.name}}</span>
-                        <a title="View on NanoDevList" aria-label="View on NanoDevList" [href]="'https://NanoDevList.com/'" target="_blank" class="mx-2"><fa-icon [icon]="faExt"></fa-icon></a>
-                        <a *ngIf="contrib.profile.github" title="GitHub profile" aria-label="GitHub profile" [href]="'https://github.com/' + contrib.profile.github" target="_blank" class="mx-2"><fa-icon [icon]="faGithub"></fa-icon></a>
-                        <a *ngIf="contrib.profile.twitter" title="Twitter profile" aria-label="Twitter profile" [href]="'https://twitter.com/' + contrib.profile.twitter" target="_blank" class="mx-2"><fa-icon [icon]="faTwitter"></fa-icon></a>
-                      </h5>
-                      <p class="my-3" [innerHTML]="contrib.profile.description"></p>
-                      <a class="mx-2" *ngIf="contrib.profile.sponsor_link" target="_blank" aria-label="Sponor on GitHub" [href]="contrib.profile.sponsor_link" style="color: deeppink;"><fa-icon [icon]="faHeart"></fa-icon> sponsor</a>
-                      <a class="mx-2" *ngIf="contrib.profile.nano_account" target="_blank" aria-label="Tip Nano" [href]="'https://nano.to/' + contrib.profile.nano_account" style="color: cornflowerblue"><span style="font-size: 1.25rem; font-weight:lighter;">Ӿ</span> tip nano</a>
-                    </div>
-                  </td>
-                </tr>
-              </ng-container>
-            </tbody>
-          </table>
-          <app-pagination [pageSize]="40" [items]="contributors" (changePage)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
-        </div>
-        </div>
-      </ng-container>
-    </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-12">
-      <p><small class="mb-2 d-block">last updated <span *ngIf="milestones.length">{{milestones[0].created_at | timeago:false}}</span></small></p>
-    </div>
-    <div class="col-12">
-      <div class="card mt-1 card-sm">
-        <div class="card-body d-flex justify-content-center align-items-center">
-          <a href="/explorer" aria-label="repo explorer" class="mx-3">repo explorer</a>
-          <a href="https://twitter.com/GeorgeMamar" aria-label="nano casa Twitter updates" target="_blank" class="mx-3">twitter updates</a>
-          <a href="https://github.com/obsidiaHQ/nano-casa" aria-label="nano casa on GitHub" target="_blank" class="mx-3">source</a>
         </div>
       </div>
-    </div>
-  </div>
-
-</div>
-
-<div class="container">
-  <div class="row py-5">
-      <div class="col-12 text-center">
-          <img src="assets/obs.png" alt="obsidia logo"  width="80">
-      </div>
+    </footer>
   </div>
 </div>

@@ -1,0 +1,12 @@
+.chart {
+  height: 410px;
+  width: 100%;
+}
+.card.spotlight {
+  border-color: #ffaf1c;
+  box-shadow: 1px 1px 6px #ffaf1c;
+  transition: box-shadow 0.5s ease-in-out;
+}
+.card.spotlight a {
+  text-decoration: none;
+}

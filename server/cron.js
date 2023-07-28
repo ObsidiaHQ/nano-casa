@@ -1,59 +1,27 @@
 const Cron = require('croner');
 const { Octokit } = require('octokit');
-const mongoose = require('mongoose');
-const models = require('./models');
-const fetch = require('node-fetch');
 require('dotenv').config();
+const models = require('./models');
 const octo = new Octokit({ auth: process.env.GITHUB_TOKEN });
-mongoose.connect(process.env.DB_URL);
+const REPOS = require('./repos.json');
+const axios = require('axios');
+const createClient = require('redis').createClient;
+const redis = createClient({
+    // host: 'localhost',
+    // port: process.env.REDIS_PORT || 6379,
+    // password: process.env.REDIS_PASS,
+    url: process.env.REDIS_URL,
+});
 
-const IGNORED_REPOS = [
-    'ITMFLtd/ITCONode',
-    'onitsoft/nexchange-open-client-react',
-    'imerkle/binbase_wallet_old',
-    'BizblocksChains/nexchange-open-client-react',
-    'Coinemy/Banano-Wallet-Fast-Robust-Secure-Wallet',
-    'kingspeller/-SSD-Chemical-Solution-27613119008-Activation-Powder-IN-Winchester-Wolverhampton-Worcester-Wo',
-    'dsvakola/Coin_sorter_counter_system',
-    'panapina/pina',
-    'Dogenano-xdg/dogenano-node',
-];
-const KNOWN_REPOS = {
-    names: [
-        'appditto/natrium_wallet_flutter',
-        'appditto/pippin_nano_wallet',
-        'appditto/nanodart',
-        'appditto/natrium-wallet-server',
-        'appditto/natricon',
-        'appditto/nanopaperwallet',
-        'appditto/flutter_nano_ffi',
-        'wezrule/UE4NanoPlugin',
-        'wezrule/UnityNanoPlugin',
-        'nanocurrency/nano-work-server',
-        'nanocurrency/protocol',
-        'bbedward/graham_discord_bot',
-        'simpago/rsnano-node',
-        'tjl-dev/npass',
-        'guilhermelawless/nano-dpow',
-        'icarusglider/PyRai',
-        'cronoh/nanovault-ws',
-        'cronoh/nanovault-server',
-        'npy0/nanopy',
-        'unyieldinggrace/nanofusion',
-        'anarkrypto/confirmy-block',
-        'accept-nano/accept-nano',
-        'accept-nano/accept-nano-client',
-        'cryptocode/nanocap',
-        'mitche50/NanoTipBot',
-        'danhitchcock/nano_tipper_z',
-        'AuliaYF/easyraikit-python',
-        'vitorcremonez/nano-vanity',
-    ],
-    repos: [],
-};
+redis.on('error', (err) => console.log('Redis Client Error', err));
+redis.connect();
+
+async function rate() {
+    console.log((await octo.request('GET /rate_limit')).data.resources.core);
+}
 
 async function refreshMilestones() {
-    const startTime = new Date();
+    console.time('refreshed_milestones');
     const milestones = (
         await octo.request('GET /repos/nanocurrency/nano-node/milestones')
     ).data;
@@ -63,94 +31,65 @@ async function refreshMilestones() {
         )
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    const normalized = latest.map(
-        ({ title, open_issues, closed_issues }) =>
-            new models.Milestone({ title, open_issues, closed_issues })
-    );
+    const normalized = latest
+        .map(
+            ({ title, open_issues, closed_issues, html_url, number }) =>
+                new models.Milestone({
+                    title,
+                    open_issues,
+                    closed_issues,
+                    url: html_url,
+                    number,
+                })
+        )
+        .sort((a, b) => b.title.localeCompare(a.title));
     await models.Milestone.collection.drop();
-    await models.Milestone.insertMany(normalized);
+    await models.Milestone.insertMany(normalized, { lean: true });
 
-    const endTime = new Date();
-    const timeDiff = Math.round((endTime - startTime) / 1000);
-    console.log('refreshed milestones in', timeDiff, 'seconds');
+    console.timeEnd('refreshed_milestones');
 }
 
 async function refreshRepos() {
-    const startTime = new Date();
+    console.time('fetched_repos');
     const lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
     const lastWeek = new Date(new Date().setDate(new Date().getDate() - 7));
+    let allRepos = [];
 
-    const queries = [
-        {
-            topic: 'topic:nanocurrency',
-            repos: [],
-        },
-        {
-            topic: 'topic:cryptocurrency+topic:nano',
-            repos: [],
-        },
-        {
-            topic: 'topic:nano-currency',
-            repos: [],
-        },
-        {
-            topic: 'topic:nano-cryptocurrency',
-            repos: [],
-        },
-        {
-            topic: 'topic:crypto+topic:nano',
-            repos: [],
-        },
-        {
-            topic: 'nanocurrency+in:description',
-            repos: [],
-        },
-        {
-            topic: 'nano+currency+in:description',
-            repos: [],
-        },
-        {
-            topic: 'topic:raiblocks',
-            repos: [],
-        },
-    ];
-
-    for (let i = 0; i < queries.length; i++) {
+    for (let i = 0; i < REPOS.queries.length; i++) {
         let foundAll = false,
             page = 1;
         while (!foundAll) {
             const res = (
                 await octo.request('GET /search/repositories', {
-                    q: queries[i].topic,
+                    q: REPOS.queries[i],
                     per_page: 100,
                     page: page,
                 })
             ).data.items;
-            queries[i].repos = [...queries[i].repos, ...res];
+            allRepos = [...allRepos, ...res];
 
             foundAll = res.length < 100;
             if (!foundAll) page++;
         }
     }
 
-    for (let i = 0; i < KNOWN_REPOS.names.length; i++) {
-        const res = (await octo.request(`GET /repos/${KNOWN_REPOS.names[i]}`))
-            .data;
-        KNOWN_REPOS.repos = [...KNOWN_REPOS.repos, res];
-    }
+    const repoRequests = REPOS.known.map((name) =>
+        octo.request(`GET /repos/${name}`).then((res) => res.data)
+    );
+    const knownResults = await Promise.all(repoRequests);
 
-    const allRepos = [
-        ...queries.map((q) => q.repos).flat(),
-        ...KNOWN_REPOS.repos,
-    ];
+    allRepos = [...allRepos, ...knownResults];
 
     const uniqueRepos = allRepos.filter(function ({ full_name }) {
         return (
             !this.has(full_name) &&
             this.add(full_name) &&
-            !IGNORED_REPOS.includes(full_name)
+            !REPOS.ignored.includes(full_name)
         );
     }, new Set());
+
+    console.timeEnd('fetched_repos');
+    console.time('fetched_pulls');
 
     for (let i = 0; i < uniqueRepos.length; i++) {
         let foundAll = false,
@@ -174,6 +113,9 @@ async function refreshRepos() {
             if (!foundAll) page++;
         }
     }
+    console.timeEnd('fetched_pulls');
+
+    console.time('refreshed_repos');
 
     const normalized = uniqueRepos.map(
         ({
@@ -187,6 +129,7 @@ async function refreshRepos() {
             owner,
             prs_30d,
             prs_7d,
+            description,
         }) =>
             new models.Repo({
                 id,
@@ -199,21 +142,20 @@ async function refreshRepos() {
                 avatar_url: owner.avatar_url,
                 prs_30d,
                 prs_7d,
+                description,
             })
     );
     await models.Repo.collection.drop();
-    await models.Repo.collection.insertMany(normalized);
+    await models.Repo.collection.insertMany(normalized, { lean: true });
 
-    const endTime = new Date();
-    const timeDiff = Math.round((endTime - startTime) / 1000);
-    console.log('refreshed repos in', timeDiff, 'seconds');
+    console.timeEnd('refreshed_repos');
 
     return normalized;
 }
 
 async function refreshCommitsAndContributors(repos = []) {
     let allCommits = [];
-    const startTime = new Date();
+    console.time('fetched_commits');
     const lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
     const lastWeek = new Date(new Date().setDate(new Date().getDate() - 7));
 
@@ -232,6 +174,7 @@ async function refreshCommitsAndContributors(repos = []) {
             activity = activity.map((act) => ({
                 ...act,
                 repo_full_name: repos[i].full_name,
+                avatar_url: repos[i].avatar_url,
             }));
             allCommits = [...allCommits, ...activity];
 
@@ -239,6 +182,7 @@ async function refreshCommitsAndContributors(repos = []) {
             if (!foundAll) page++;
         }
     }
+    console.timeEnd('fetched_commits');
 
     const contributors = {};
     const reposToUpdate = {};
@@ -248,7 +192,7 @@ async function refreshCommitsAndContributors(repos = []) {
     allCommits = allCommits.filter((commit) => {
         const duplicateSHA = seen.has(commit.sha);
         seen.add(commit.sha);
-        return !!commit.author && !duplicateSHA;
+        return !isEmpty(commit.author) && !duplicateSHA;
     });
 
     for (let i = 0; i < allCommits.length; i++) {
@@ -289,11 +233,10 @@ async function refreshCommitsAndContributors(repos = []) {
             },
         ]);
     });
-    bulk.execute();
 
-    const endTime1 = new Date();
-    const timeDiff1 = Math.round((endTime1 - startTime) / 1000);
-    console.log('fetched commits in', timeDiff1, 'seconds');
+    if (bulk.length) bulk.execute();
+
+    console.time('refreshed_commits');
 
     const normalizedContribs = Object.values(contributors).map(
         ({ avatar_url, login, contributions, repos, last_month }) =>
@@ -306,11 +249,9 @@ async function refreshCommitsAndContributors(repos = []) {
             })
     );
     await models.Contributor.collection.drop();
-    await models.Contributor.collection.insertMany(normalizedContribs);
-
-    const endTime2 = new Date();
-    const timeDiff2 = Math.round((endTime2 - endTime1) / 1000);
-    console.log('refreshed users in', timeDiff2, 'seconds');
+    await models.Contributor.collection.insertMany(normalizedContribs, {
+        lean: true,
+    });
 
     const normalizedCommits = allCommits.map(
         (commit) =>
@@ -318,56 +259,222 @@ async function refreshCommitsAndContributors(repos = []) {
                 repo_full_name: commit.repo_full_name,
                 author: commit.author.login,
                 date: commit.commit.author?.date,
+                avatar_url: commit.avatar_url,
+                message: commit.commit.message,
             })
     );
     await models.Commit.collection.drop();
-    await models.Commit.collection.insertMany(normalizedCommits);
+    await models.Commit.collection.insertMany(normalizedCommits, {
+        lean: true,
+    });
 
-    const endTime3 = new Date();
-    const timeDiff3 = Math.round((endTime3 - endTime2) / 1000);
-    console.log('refreshed commits in', timeDiff3, 'seconds');
+    console.timeEnd('refreshed_commits');
 }
 
-async function refreshDevList() {
-    const url = '/repos/Joohansson/nanodevlist/contents/donatees';
-    const devs = [];
-    let devsRes = (await octo.request(`GET ${url}`)).data;
-    for (let i = 0; i < devsRes.length; i++) {
-        const {
-            name,
-            github,
-            twitter,
-            sponsor_link,
-            nano_account,
-            description,
-            tags,
-        } = await (await fetch(`${devsRes[i].download_url}`)).json();
-        devs.push(
-            new models.Profile({
-                name,
-                github,
-                twitter,
-                sponsor_link,
-                nano_account,
-                description,
-                tags,
-            })
-        );
+function isEmpty(obj) {
+    for (var x in obj) {
+        return false;
     }
-    await models.Profile.collection.drop();
-    await models.Profile.collection.insertMany(devs);
-    return devs;
+    return true;
 }
-const job = new Cron('0 * * * *', async () => {
+
+// returns a random index weighted inversely
+async function getSpotlight() {
+    const repos = (await redis.json.get('data', { path: '$.repos' }))[0]
+        .slice(15)
+        .filter((r) => r.description);
+    return repos[Math.floor(Math.random() * repos.length)];
+}
+
+async function refreshNodeEvents() {
+    // Copyright (c) 2021 nano.community contributors
+    const formatEvent = (item) => {
+        switch (item.type) {
+            case 'CommitCommentEvent':
+                return {
+                    action: 'commented commit', // created
+                    ref: item.payload.comment.commit_id,
+                    event_url: item.payload.comment.html_url,
+                    body: item.payload.comment.body,
+                };
+
+            case 'IssueCommentEvent':
+                return {
+                    action: 'commented issue', // created, edited, deleted
+                    ref: item.payload.issue.number,
+                    event_url: item.payload.comment.html_url,
+                    title: item.payload.issue.title,
+                    body: item.payload.comment.body,
+                };
+
+            case 'IssuesEvent':
+                return {
+                    action: `${item.payload.action} issue`, // opened, closed, reopened, assigned, unassigned, labeled, unlabled
+                    ref: item.payload.issue.number,
+                    event_url: item.payload.issue.html_url,
+                    title: item.payload.issue.title,
+                };
+
+            case 'PullRequestEvent':
+                return {
+                    action: `${item.payload.action.replace('_', ' ')} pr`, // opened, closed, reopened, assigned, unassigned, review_requested, review_request_removed, labeled, unlabeled, and synchronize
+                    ref: item.payload.pull_request.number,
+                    title: item.payload.pull_request.title,
+                    event_url: item.payload.pull_request.html_url,
+                    body: item.payload.pull_request.body,
+                };
+
+            case 'PullRequestReviewEvent':
+                return {
+                    action: `${item.payload.review.state.replace('_', ' ')} pr`, // created
+                    ref: item.payload.pull_request.number,
+                    title: `#${item.payload.pull_request.number}`,
+                    body: item.payload.review.body,
+                    event_url: item.payload.review.html_url,
+                };
+
+            case 'PullRequestReviewCommentEvent':
+                return {
+                    action: 'commented pr review',
+                    ref: item.payload.pull_request.number,
+                    event_url: item.payload.comment.html_url,
+                    title: item.payload.pull_request.title,
+                    body: item.payload.comment.body,
+                };
+
+            case 'PushEvent':
+                return {
+                    action: `pushed ${item.payload.commits.length} commit${
+                        item.payload.commits.length > 1 ? 's' : ''
+                    } to ${item.payload.ref.slice(
+                        item.payload.ref.lastIndexOf('/') + 1
+                    )}`,
+                    event_url: item.payload.commits[0].url
+                        .replace('api.', '')
+                        .replace('/repos', ''),
+                    title: item.payload.commits[0].message,
+                };
+
+            case 'ReleaseEvent':
+                return {
+                    action: 'published release',
+                    ref: item.payload.release.tag_name,
+                    title: item.payload.release.name,
+                    body: item.payload.release.body,
+                    event_url: item.payload.release.html_url,
+                };
+
+            default:
+                return {};
+        }
+    };
+
+    const EVENT_TYPES = [
+        'PullRequestEvent',
+        'IssueCommentEvent',
+        'IssuesEvent',
+        'CommitCommentEvent',
+        'PushEvent',
+        'ReleaseEvent',
+        'PullRequestReviewEvent',
+        'PullRequestReviewCommentEvent',
+    ];
+    console.time('refreshed_node_events');
+
+    let events = (
+        await octo.request(`GET /repos/nanocurrency/nano-node/events`, {
+            per_page: 70,
+        })
+    ).data
+        .filter((eve) => EVENT_TYPES.includes(eve.type))
+        .map(
+            (eve) =>
+                new models.NodeEvent({
+                    event: formatEvent(eve),
+                    type: eve.type,
+                    author: eve.actor.login,
+                    avatar_url: eve.actor.avatar_url,
+                    created_at: eve.created_at,
+                })
+        );
+
+    await models.NodeEvent.collection.drop();
+    const res = await models.NodeEvent.collection.insertMany(events, {
+        lean: true,
+    });
+    console.timeEnd('refreshed_node_events');
+    return res.acknowledged ? events : [];
+}
+
+async function checkPublicNodes() {
+    console.time('refreshed_public_nodes');
+    const endpointStatuses = [];
+    for (let endpoint of REPOS.public_nodes) {
+        let start = Date.now();
+        try {
+            const res = await axios.post(
+                endpoint,
+                { action: 'version' },
+                { timeout: 2000 }
+            );
+            let resp_time = Date.now() - start;
+
+            endpointStatuses.push(
+                new models.PublicNode({
+                    endpoint,
+                    resp_time,
+                    version: res.data.node_vendor,
+                    error: null,
+                })
+            );
+        } catch (error) {
+            let resp_time = Date.now() - start;
+            console.log(error.response?.data);
+            let errorMsg =
+                error.code === 'ECONNABORTED'
+                    ? 'Down'
+                    : error.response?.data?.error ||
+                      error.response?.data ||
+                      `Failed with status code ${error.response?.status}`;
+            endpointStatuses.push(
+                new models.PublicNode({
+                    endpoint,
+                    resp_time,
+                    error: { error: errorMsg },
+                })
+            );
+        }
+    }
+    await models.PublicNode.collection.drop();
+    await models.PublicNode.collection.insertMany(endpointStatuses, {
+        lean: true,
+    });
+    console.timeEnd('refreshed_public_nodes');
+    return;
+}
+
+const job = new Cron('10 * * * *', async () => {
     await refreshMilestones();
+    await checkPublicNodes();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);
-    await refreshDevList();
+    await redis.json.set('data', '.', await models.queryDB());
 });
 
-// module.exports = {
-//     refreshCommitsAndContributors,
-//     refreshDevList,
-//     refreshMilestones,
-//     refreshRepos
-// };
+const eventsJob = new Cron('13 * * * *', async () => {
+    await redis.json.set('data', '$.nodeEvents', await refreshNodeEvents());
+});
+
+const spotlightJob = new Cron('0 0 * * *', async () => {
+    await redis.json.set('data', '$.spotlight', await getSpotlight());
+});
+
+module.exports = {
+    refreshCommitsAndContributors,
+    refreshMilestones,
+    refreshRepos,
+    rate,
+    refreshNodeEvents,
+    getSpotlight,
+    checkPublicNodes,
+};

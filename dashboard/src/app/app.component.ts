@@ -1,154 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { faCodeBranch, faHistory, faInfoCircle, faMedal, faStar, faUsers, faStarOfLife, faMeteor, faArrowDown, faAngleDown, faHeart, faExternalLink, faCodeCommit, faCodePullRequest, faGhost } from '@fortawesome/free-solid-svg-icons';
-import { faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons';
-import { ScaleType } from '@swimlane/ngx-charts';
-
-interface Repo {
-    name:             string,
-    full_name:        string,
-    created_at:       string,
-    stargazers_count: number,
-    prs_30d:          number,
-    prs_7d:           number,
-    commits_30d:      number,
-    commits_7d:       number,
-    avatar_url:       string  
-}
-interface Commit {
-    count:            number, 
-    date:             string
-}
-interface Contributor {
-    login:            string,
-    avatar_url:       string,
-    contributions:    number,
-    last_month:       number,
-    repos:            string[],
-    repos_count:      number,
-    profile:          any
-}
-interface Milestone {
-    title:         string,
-    open_issues:   number,
-    closed_issues: number,
-    created_at:    string
-}
+import { SharedService } from './shared.service';
+import { Contributor, Profile, ServerResponse } from './interfaces';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+  selector: 'app-root',
+  templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
-    ScaleType = ScaleType;
-    faRepo = faCodeBranch;
-    faUser = faUsers;
-    faStar = faStar;
-    faHistory = faHistory;
-    faInfo = faInfoCircle;
-    faTwitter = faTwitter;
-    faGithub = faGithub;
-    faMedal = faMedal;
-    faStarOL = faStarOfLife;
-    faMeteor = faMeteor;
-    faDown = faArrowDown;
-    faMore = faAngleDown;
-    faHeart = faHeart;
-    faExt = faExternalLink;
-    faCommit = faCodeCommit;
-    faPR = faCodePullRequest;
-    faGhost = faGhost;
+  loggedUser: Profile;
+  selectedUser: Contributor;
 
-    reposData = [];
-    popularRepos: Repo[] = [];
-    popularReposNames: string[] = [];
-    popularReposPage: Repo[] = [];
-    contributorsPage: Contributor[] = [];
-    contributorsPageIndex = 0;
+  constructor(public shared: SharedService) {}
 
-    busyRepos: Repo[] = [];
-    recentRepos: Repo[] = [];
-    repos: Repo[] = [];
-    contributors: Contributor[] = [];
-    commits = [{name: 'commits', series: []}];
-    milestones: Milestone[] = [];
-    filterBy: 'month' | 'total' = 'total';
-    busyLastWeek = false;
+  ngOnInit() {
+    this.shared.loggedUser.subscribe(
+      (user: Profile) => (this.loggedUser = user)
+    );
+    this.shared.selectedUser.subscribe(
+      (user: Contributor) => (this.selectedUser = user)
+    );
+  }
 
-    constructor(private http: HttpClient) { }
-
-    ngOnInit() {
-        this.getData();
-    }
-
-    getData(): void {
-        this.http.get('https://nano.casa/data').subscribe((data: any) => {
-            this.contributors = data.contributors;
-            this.contributors = this.contributors.map(usr => {
-                const profile = data.devList.find(dl => dl.github.toLowerCase() === usr.login.toLowerCase());
-                if (profile)
-                    profile.description = profile.description.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
-                return ({...usr, profile });
-            });
-            this.milestones = data.milestones;
-            this.setRepos(data.repos);
-            this.setCommits(data.commits);
-        });
-    }
-
-    setRepos(repos: Repo[]) {
-        this.repos = repos;
-        this.recentRepos = [...repos].reverse();
-        this.popularRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
-        this.busyRepos = [...repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
-        this.popularReposNames = this.popularRepos.map(r => r.full_name);
-
-        // list years since 2014
-        const YEARS = Array.from(Array(new Date().getFullYear() - 2013), (_, i) => (i + 2014).toString());
-        const YEARS_DICT = {};
-        for (const year of YEARS) { YEARS_DICT[year] = { name: year, value: 0 } }
-
-        repos.forEach((repo, i) => {
-            const year = (new Date(repo.created_at)).getFullYear();
-            YEARS_DICT[year].value += 1;
-        });
-
-        this.reposData = Object.values(YEARS_DICT);
-    }
-
-    setCommits(commits: Commit[]) {
-        this.commits[0].series = commits.map((com) => ({ name: com.date, value: com.count }));
-    }
-
-    hasPopularRepo(repos: string[]) {
-        return repos.some(r => this.popularReposNames.indexOf(r) >= 0 && this.popularReposNames.indexOf(r) < 10 && r != 'nanocurrency/nano-node');
-    }
-
-    contributedToNode(repos: string[]) {
-        return repos.includes('nanocurrency/nano-node');
-    }
-
-    sortContributors(by: 'month' | 'total') {
-        if (this.filterBy === by) return;
-        this.filterBy = by;
-        this.contributors = [...this.contributors].sort((a,b) => by === 'total' ? (b.contributions - a.contributions) : (b.last_month - a.last_month));
-    }
-
-    filterBusyRepos(lastWeekOnly: boolean) {
-        this.busyLastWeek = lastWeekOnly;
-        if (lastWeekOnly) {
-            this.busyRepos = [...this.repos].filter(a => (a.commits_7d + a.prs_7d) > 0).sort((a, b) => (b.commits_7d + b.prs_7d) - (a.commits_7d + a.prs_7d));    
-            return;
-        }
-        this.busyRepos = [...this.repos].filter(a => (a.commits_30d + a.prs_30d) > 0).sort((a, b) => (b.commits_30d + b.prs_30d) - (a.commits_30d + a.prs_30d));
-    }
-
-    trackByName(index, item) {
-        return item.full_name;
-    }
-
-    trackByLogin(index, item) {
-        return item.login;
-    }
+  logIn() {
+    window.open('/auth/github', '_self');
+  }
 }
