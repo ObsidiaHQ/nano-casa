@@ -311,7 +311,7 @@
                 <td data-label="Description">
                   <span class="opacity-75">{{repo.description}}</span>
                 </td>
-                <td data-label="Date created" class="text-muted" [title]="repo.created_at | date">
+                <td data-label="Date created" class="text-muted text-center" [title]="repo.created_at | date">
                   {{repo.created_at | timeago}}
                 </td>
               </tr>
@@ -558,7 +558,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        <button *ngIf="loggedUser?._id === selectedUser.profile?._id" type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
+        <button *ngIf="loggedUser && loggedUser?._id === selectedUser.profile?._id" type="button" class="btn btn-outline-success"
+          (click)="editMode = true">Edit</button>
         <button *ngIf="loggedUser && editMode" type="button" class="btn btn-primary" [disabled]="!loggedUser.goal.nano_address || !loggedUser.goal.amount"
           (click)="updateProfile()">Save</button>
       </div>

@@ -445,7 +445,6 @@ async function checkPublicNodes() {
                 error.code === 'ECONNABORTED'
                     ? 'Down'
                     : error.response?.data?.error ||
-                      error.response?.data ||
                       `Failed with status code ${error.response?.status}`;
             endpointStatuses.push(
                 new models.PublicNode({

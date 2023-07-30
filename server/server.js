@@ -164,12 +164,12 @@ app.get('/ping', async (req, res) => {
     res.status(200).send();
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, BUILD_PATH, 'index.html'));
-});
-
 app.get('/explorer', async (req, res) => {
     res.sendFile(path.resolve(__dirname, EXPLORER_PATH, 'index.html'));
+});
+
+app.get('/*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, BUILD_PATH, 'index.html'));
 });
 
 app.listen(8080, () => {
