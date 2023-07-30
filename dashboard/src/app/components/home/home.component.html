@@ -65,7 +65,7 @@
             </div>
             <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
               <div class="carousel-indicators carousel-indicators-dot">
-                <button *ngFor="let milestone of shared.milestones.value; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
+                <button *ngFor="let milestone of shared.milestones.value; let i = index" type="button" data-bs-target="#carousel-indicators-dot" role="none"
                   [ngClass]="{'active': i === 0}" [attr.data-bs-slide-to]="i"></button>
               </div>
               <div class="carousel-inner">
@@ -158,7 +158,7 @@
                   <div
                     *ngFor="let busy of shared.repos.value | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; trackBy: trackByName; let last = last;"
                     [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
-                    <img [src]="busy.avatar_url" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
+                    <img [src]="busy.avatar_url + '&s=100'" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
                     <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                     <div class="mt-2">
                       <span class="text-muted mb-1" style="font-size: 0.8rem;" title="Commits">
@@ -220,7 +220,7 @@
                       <tr *ngFor="let event of shared.nodeEvents.value">
                         <td class="w-1 py-1">
                           <a target="_blank" [href]="event.event.event_url">
-                            <img class="avatar avatar-sm" src="{{event.avatar_url}}" [alt]="event.author" [title]="event.author" loading="lazy">
+                            <img class="avatar avatar-sm" src="{{event.avatar_url + '&s=100'}}" [alt]="event.author" [title]="event.author" loading="lazy">
                           </a>
                         </td>
                         <td class="td-truncate p-1">
@@ -239,8 +239,8 @@
                     <tbody>
                       <tr *ngFor="let event of shared.events.value">
                         <td class="w-1 py-1">
-                          <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url}}"
-                              [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
+                          <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm"
+                              src="{{event.avatar_url + '&s=100'}}" [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
                           </a>
                         </td>
                         <td class="td-truncate p-1">
@@ -294,7 +294,7 @@
               <tr *ngFor="let repo of reposPage; trackBy: trackByName">
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
-                    <img class="avatar avatar-sm me-2" [src]="repo.avatar_url" loading="lazy">
+                    <img class="avatar avatar-sm me-2" [src]="repo.avatar_url + '&s=100'" loading="lazy" [alt]="repo.name">
                     <div class="flex-fill">
                       <div class="font-weight-medium">
                         <a href="https://github.com/{{repo.full_name}}" target="_blank">
@@ -345,7 +345,7 @@
                     [icon]="contributorsSort === 'month' ? 'double-down' : 'down'"></app-icon>
                 </th>
                 <th style="width: 130px;">Goal</th>
-                <th class="w-1">Sponsor</th>
+                <th class="w-1 text-center">Sponsor</th>
               </tr>
             </thead>
             <tbody>
@@ -353,7 +353,7 @@
                 <td class="py-2" scope="row">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
-                    <img class="avatar me-3" [src]="user.avatar_url" loading="lazy">
+                    <img class="avatar me-3" [src]="user.avatar_url + '&s=100'" loading="lazy" [alt]="user.login">
                     <div class="flex-fill">
                       <div class="font-weight-medium">
                         <a class="me-2" href="https://github.com/{{user.login}}" target="_blank">
@@ -387,7 +387,7 @@
                     [sid]="'id'+user.profile?.goal?._id"></app-goal>
                 </td>
                 <td class="py-2">
-                  <div class="btn-list flex-nowrap">
+                  <div class="btn-list flex-nowrap justify-content-end">
                     <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile?.nano_address}}"
                       class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
                       <app-icon icon="nano"></app-icon>
@@ -422,11 +422,11 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content" *ngIf="selectedUser">
       <div class="modal-body pt-5">
-        <img [src]="selectedUser.avatar_url" class="profile avatar" [alt]="selectedUser.login">
+        <img [src]="selectedUser.avatar_url + '&s=100'" class="profile avatar" [alt]="selectedUser.login">
         <ng-container *ngIf="!editMode; else editTemplate">
           <div class="row">
             <div class="col-12 col-md-4 my-1">
-              <a *ngIf="selectedUser.profile?.website" href="https://{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
+              <a *ngIf="selectedUser.profile?.website" href="{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
                 <app-icon icon="web"></app-icon>
               </a>
               <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">

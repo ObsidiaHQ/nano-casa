@@ -19,6 +19,7 @@
     "express": "^4.17.3",
     "express-rate-limit": "^6.3.0",
     "express-session": "^1.17.3",
+    "helmet": "^7.0.0",
     "mongoose": "^6.2.10",
     "octokit": "^1.7.1",
     "passport": "^0.6.0",
