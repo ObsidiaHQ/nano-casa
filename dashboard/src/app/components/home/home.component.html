@@ -388,19 +388,19 @@
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap justify-content-end">
-                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile?.nano_address}}"
-                      class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile?.nano_address}}" class="btn bg-azure-lt btn-icon"
+                      title="Donate nano">
                       <app-icon icon="nano"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="https://patreon.com/{{user.profile?.patreon_url}}"
-                      class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="{{user.profile?.patreon_url}}" class="btn bg-white-lt btn-icon"
+                      title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt w-100 btn-icon"
+                    <a *ngIf="user.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon"
                       title="Sponsor on GitHub">
                       <app-icon icon="heart"></app-icon>
                     </a>
-                    <a href="#" class="btn bg-blue-lt w-100 btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
+                    <a href="#" class="btn bg-blue-lt btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
                       (click)="shared.selectUser(user)">
                       <app-icon icon="profile"></app-icon>
                     </a>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { graphic, EChartsOption } from 'echarts';
 import {
   ChartCommit,
@@ -14,7 +14,7 @@ import { SharedService } from 'src/app/shared.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   reposPage: Repo[] = [];
   reposNames: string[] = [];
   reposSort: 'date' | 'stars' = 'date';
@@ -47,6 +47,14 @@ export class HomeComponent implements OnInit {
     this.shared.selectedUser.subscribe(
       (user: Contributor) => (this.selectedUser = user)
     );
+  }
+
+  ngAfterViewInit(): void {
+    document
+      .getElementById('modal-profile')
+      .addEventListener('hidden.bs.modal', (e) => {
+        this.shared.selectedUser.next({} as Contributor);
+      });
   }
 
   initCharts(commits: ChartCommit[], repos: Repo[]) {
