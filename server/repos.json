@@ -31,7 +31,9 @@
         "MyEcoria/tornano",
         "PlasmaPower/orv-privacy",
         "PlasmaPower/distributed-vanity",
-        "PlasmaPower/distributed-vanity-server"
+        "PlasmaPower/distributed-vanity-server",
+        "cypherstack/stack_wallet",
+        "cake-tech/cake_wallet"
     ],
     "ignored": [
         "ITMFLtd/ITCONode",
