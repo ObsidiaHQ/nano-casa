@@ -5,6 +5,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { PaginationComponent } from './paginate.component';
 import { NgxEchartsModule } from 'ngx-echarts';
+import * as echarts from 'echarts/core';
+import { BarChart, LineChart } from 'echarts/charts';
+import { CanvasRenderer } from 'echarts/renderers';
+import {
+  DataZoomComponent,
+  GridComponent,
+  TooltipComponent,
+} from 'echarts/components';
 import {
   TimeagoModule,
   TimeagoIntl,
@@ -23,6 +31,14 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { SortPipe } from './pipes/sort.pipe';
 import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
 import { PublicNodesComponent } from './components/public-nodes/public-nodes.component';
+echarts.use([
+  LineChart,
+  BarChart,
+  CanvasRenderer,
+  DataZoomComponent,
+  GridComponent,
+  TooltipComponent,
+]);
 
 @NgModule({
   declarations: [
@@ -42,9 +58,7 @@ import { PublicNodesComponent } from './components/public-nodes/public-nodes.com
     BrowserModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    NgxEchartsModule.forRoot({
-      echarts: () => import('echarts'),
-    }),
+    NgxEchartsModule.forRoot({ echarts }),
     TimeagoModule.forRoot({
       intl: TimeagoIntl,
       formatter: {

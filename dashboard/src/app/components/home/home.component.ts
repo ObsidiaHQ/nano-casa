@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { graphic, EChartsOption } from 'echarts';
+import { EChartsOption } from 'echarts';
+import { graphic } from 'echarts/core';
 import {
   ChartCommit,
   Contributor,

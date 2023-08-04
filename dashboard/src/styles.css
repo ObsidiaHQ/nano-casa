@@ -1,10 +1,9 @@
 @font-face {
   font-family: "Noto Sans";
-  src: url("assets/NotoSans-Regular.ttf") format("truetype"),
-    url("assets/NotoSans-Medium.ttf") format("truetype"),
-    url("assets/NotoSans-Thin.ttf") format("truetype");
+  src: url("assets/NotoSans-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 body {
   font-family: "Noto Sans", sans-serif;
