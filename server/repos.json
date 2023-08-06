@@ -31,10 +31,12 @@
         "MyEcoria/tornano",
         "PlasmaPower/orv-privacy",
         "PlasmaPower/distributed-vanity",
-        "PlasmaPower/distributed-vanity-server",
-        "cypherstack/stack_wallet",
-        "cake-tech/cake_wallet"
+        "PlasmaPower/distributed-vanity-server"
     ],
+    "partial": {
+        "repos": ["cypherstack/stack_wallet", "cake-tech/cake_wallet"],
+        "query": "nano+OR+xno"
+    },
     "ignored": [
         "ITMFLtd/ITCONode",
         "onitsoft/nexchange-open-client-react",
@@ -46,7 +48,8 @@
         "panapina/pina",
         "Dogenano-xdg/dogenano-node",
         "SlowestTimelord/slowesttimelord.github.io",
-        "gr0vity-dev/nanotps-front"
+        "gr0vity-dev/nanotps-front",
+        "CarlosFGordian/MasterMinds"
     ],
     "queries": [
         "topic:nanocurrency",

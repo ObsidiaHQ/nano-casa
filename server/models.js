@@ -109,6 +109,38 @@ const Misc = mongoose.model(
     })
 );
 
+async function countActiveDevs(windowInDays) {
+    const now = new Date();
+    // Calculate the date that was windowInDays days ago
+    const windowStart = new Date(
+        now.getTime() - windowInDays * 24 * 60 * 60 * 1000
+    );
+    return (
+        await Commit.aggregate([
+            {
+                $project: {
+                    date: {
+                        $dateFromString: {
+                            dateString: '$date',
+                            format: '%Y-%m-%dT%H:%M:%SZ',
+                        },
+                    },
+                    author: 1,
+                },
+            },
+            {
+                $match: { date: { $gte: windowStart } },
+            },
+            {
+                $group: { _id: '$author' },
+            },
+            {
+                $count: 'total',
+            },
+        ])
+    )[0].total;
+}
+
 async function queryDB() {
     const data = {
         publicNodes: await PublicNode.find({}, { _id: 0 })

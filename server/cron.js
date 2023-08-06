@@ -426,7 +426,7 @@ async function checkPublicNodes() {
             const res = await axios.post(
                 endpoint,
                 { action: 'version' },
-                { timeout: 2000 }
+                { timeout: 2500 }
             );
             let resp_time = Date.now() - start;
 
@@ -443,7 +443,7 @@ async function checkPublicNodes() {
             console.log(error.response?.data);
             let errorMsg =
                 error.code === 'ECONNABORTED'
-                    ? 'Down'
+                    ? 'Timeout'
                     : error.response?.data?.error ||
                       `Failed with status code ${error.response?.status}`;
             endpointStatuses.push(
