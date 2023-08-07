@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { graphic } from 'echarts/core';
 import {
@@ -9,11 +15,15 @@ import {
   Repo,
 } from '../../interfaces';
 import { SharedService } from 'src/app/shared.service';
+import { SortPipe } from 'src/app/pipes/sort.pipe';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  providers: [SortPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   reposPage: Repo[] = [];
@@ -33,21 +43,28 @@ export class HomeComponent implements OnInit, AfterViewInit {
   loggedUser: Profile;
   editMode = false;
 
-  constructor(public shared: SharedService) {}
+  constructor(
+    public shared: SharedService,
+    private sort: SortPipe,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.shared.repos.subscribe((repos: Repo[]) => {
-      this.reposNames = repos.map((r) => r.full_name);
+    combineLatest({
+      repos: this.shared.repos,
+      loggedUser: this.shared.loggedUser,
+      selectedUser: this.shared.selectedUser,
+    }).subscribe(({ repos, loggedUser, selectedUser }) => {
+      this.reposNames = this.sort
+        .transform(repos, 'repo', 'stars')
+        .map((r) => r.full_name);
       setTimeout(() => {
         this.initCharts(this.shared.commits.value, this.shared.repos.value);
       }, 400);
+      this.loggedUser = loggedUser;
+      this.selectedUser = selectedUser;
+      this.cdr.markForCheck();
     });
-    this.shared.loggedUser.subscribe(
-      (user: Profile) => (this.loggedUser = user)
-    );
-    this.shared.selectedUser.subscribe(
-      (user: Contributor) => (this.selectedUser = user)
-    );
   }
 
   ngAfterViewInit(): void {
@@ -184,6 +201,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         },
       ],
     };
+    this.cdr.markForCheck();
   }
 
   hasPopularRepo(repos: string[]) {
