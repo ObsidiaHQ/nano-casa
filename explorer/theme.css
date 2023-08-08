@@ -1,76 +1,99 @@
 :root {
-    --bg-accent-1: rgb(242, 149, 89);
-    --bg-accent-2: rgb(242, 212, 146);
-    --bg-darker: hsl(211, 28%, 17%);
-    --bg-dark: hsl(211, 28%, 21%);
-    --border-light: rgb(53, 73, 90);
+  --bg-accent-1: rgb(242, 149, 89);
+  --bg-accent-2: rgb(242, 212, 146);
+  --bg-darker: #1a2234;
+  --bg-dark: #1d273b;
+  --border-light: #243049;
 }
 
 * {
-    text-shadow: none !important;
+  text-shadow: none !important;
 }
 
-body, #nav-tree, div.header {
-    background-color: var(--bg-darker) !important;
-    background-image: none !important;
-    color: whitesmoke;
+body,
+#nav-tree,
+div.header {
+  background-color: var(--bg-darker) !important;
+  background-image: none !important;
+  color: whitesmoke;
 }
 
 div.header {
-    border-bottom: 2px var(--bg-dark) solid;
+  border-bottom: 2px var(--bg-dark) solid;
 }
 
-a, .alphachar a, .memtemplate, h2.groupheader, .memTemplParams {
-    color: var(--bg-accent-2);
-    background-image: none !important;
+a,
+.alphachar a,
+.memtemplate,
+h2.groupheader,
+.memTemplParams {
+  color: var(--bg-accent-2);
+  background-image: none !important;
 }
 
 .contents a:visited {
-    color: rgb(167, 138, 75);
+  color: rgb(167, 138, 75);
 }
 
-.ui-resizable-e, .classindex dl.odd, .directory tr.even, .memItemRight, .memItemLeft, .memTemplItemRight, .memTemplItemLeft, .memTemplParams {
-    background-image: none !important;
-    background: var(--bg-dark) !important;
-    background-color: var(--bg-dark) !important;
-    border: none;
+.ui-resizable-e,
+.classindex dl.odd,
+.directory tr.even,
+.memItemRight,
+.memItemLeft,
+.memTemplItemRight,
+.memTemplItemLeft,
+.memTemplParams {
+  background-image: none !important;
+  background: var(--bg-dark) !important;
+  background-color: var(--bg-dark) !important;
+  border: none;
 }
 
-.sm-dox, .sm-dox ul a:hover {
-    background-image: none !important;
-    background-color: var(--bg-accent-1) !important;
-    border: none;
+.sm-dox,
+.sm-dox ul a:hover {
+  background-image: none !important;
+  background-color: var(--bg-accent-1) !important;
+  border: none;
 }
 
 #nav-path ul {
-    background-image: none !important;
-    background-color: var(--border-light) !important;
-    border: none;
+  background-image: none !important;
+  background-color: var(--border-light) !important;
+  border: none;
 }
 
-.navpath li.navelem a, .navpath li.footer {
-    color: whitesmoke !important;
+.navpath li.navelem a,
+.navpath li.footer {
+  color: whitesmoke !important;
 }
 
 .classindex dd {
-    line-height: 1.3em;
+  line-height: 1.3em;
 }
 
-.memtitle, .memproto, .memdoc {
-    background-image: none !important;
-    background-color: var(--bg-dark) !important;
-    border: var(--border-light);
-    color: whitesmoke;
+.memtitle,
+.memproto,
+.memdoc {
+  background-image: none !important;
+  background-color: var(--bg-dark) !important;
+  border: var(--border-light);
+  color: whitesmoke;
 }
 
 .paramname {
-    color: #ce5f5f !important;
+  color: #ce5f5f !important;
 }
 
+.sm-dox a span.sub-arrow {
+  border-color: var(--bg-dark) transparent transparent transparent;
+}
+.sm-dox a {
+  color: var(--bg-dark);
+}
 .sm-dox ul a:hover span.sub-arrow {
-    border-color: transparent transparent transparent whitesmoke !important;
+  border-color: transparent transparent transparent whitesmoke !important;
 }
 
 .memSeparator {
-    border: var(--border-light);
+  border: var(--border-light);
 }

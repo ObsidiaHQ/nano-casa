@@ -82,7 +82,16 @@ const EXPLORER_PATH = './html';
 app.use(express.static(path.join(__dirname, BUILD_PATH)));
 app.use(express.static(path.join(__dirname, EXPLORER_PATH)));
 app.use(compression());
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                'default-src': ["'self'", 'net.mamar.dev'],
+                'script-src': ["'self'", 'goal.nano.to', 'net.mamar.dev'],
+            },
+        },
+    })
+);
 //app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -167,6 +176,7 @@ app.get('/ping', async (req, res) => {
 });
 
 app.get('/explorer', async (req, res) => {
+    res.removeHeader('Content-Security-Policy');
     res.sendFile(path.resolve(__dirname, EXPLORER_PATH, 'index.html'));
 });
 
