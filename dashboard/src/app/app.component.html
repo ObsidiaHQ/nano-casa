@@ -8,7 +8,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-          <a href="/">
+          <a routerLink="/">
             <img src="assets/logo.png" width="110" height="32" alt="nano casa" class="navbar-brand-image">
           </a>
         </h1>
@@ -52,7 +52,7 @@
                 </a>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#navbar-third" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
+                <a class="nav-link dropdown-toggle" href="#resources" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                   aria-expanded="false">
                   <span class="nav-link-title">
                     Resources
@@ -94,6 +94,7 @@
             <ul class="list-inline list-inline-dots mb-0">
               <li *ngIf="shared.milestones.value.length" class="list-inline-item text-secondary">Updated {{shared.milestones.value[0].created_at |
                 timeago:false}} ago</li>
+              <li class="list-inline-item"><a class="link-secondary" routerLink="/public-nodes">Public Nodes</a></li>
               <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
               <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
               </li>

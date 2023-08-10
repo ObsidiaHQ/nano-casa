@@ -420,11 +420,11 @@ async function refreshNodeEvents() {
 async function checkPublicNodes() {
     console.time('refreshed_public_nodes');
     const endpointStatuses = [];
-    for (let endpoint of REPOS.public_nodes) {
+    for (let node of REPOS.public_nodes) {
         let start = Date.now();
         try {
             const res = await axios.post(
-                endpoint,
+                node.endpoint,
                 { action: 'version' },
                 { timeout: 2500 }
             );
@@ -432,7 +432,9 @@ async function checkPublicNodes() {
 
             endpointStatuses.push(
                 new models.PublicNode({
-                    endpoint,
+                    endpoint: node.endpoint,
+                    website: node.website,
+                    up: true,
                     resp_time,
                     version: res.data.node_vendor,
                     error: null,
@@ -448,7 +450,9 @@ async function checkPublicNodes() {
                       `Failed with status code ${error.response?.status}`;
             endpointStatuses.push(
                 new models.PublicNode({
-                    endpoint,
+                    endpoint: node.endpoint,
+                    website: node.website,
+                    up: (error.response?.status || 0) < 500,
                     resp_time,
                     error: { error: errorMsg },
                 })

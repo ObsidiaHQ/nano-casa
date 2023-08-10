@@ -96,6 +96,8 @@ const PublicNode = mongoose.model(
     'PublicNode',
     new mongoose.Schema({
         endpoint: String,
+        website: String,
+        up: Boolean,
         resp_time: Number,
         version: String,
         error: Object,

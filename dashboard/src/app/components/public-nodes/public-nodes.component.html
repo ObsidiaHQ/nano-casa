@@ -8,7 +8,7 @@
 				<div class="list-group-item" *ngFor="let node of nodes">
 					<div class="row align-items-center">
 						<div class="col-auto">
-							<span class="status-indicator status-indicator-animated" [ngClass]="node.error ? 'status-red' : 'status-green'">
+							<span class="status-indicator status-indicator-animated" [ngClass]="node.up ? 'status-green' : 'status-red'">
 								<span class="status-indicator-circle"></span>
 								<span class="status-indicator-circle"></span>
 								<span class="status-indicator-circle"></span>
@@ -17,13 +17,17 @@
 						<div class="col">
 							<h2 class="page-title">
 								{{node.endpoint}}
-								<a [href]="node.endpoint" target="_blank" class="ms-2"><app-icon icon="external-link" size="16" classList="text-muted"
-										style="vertical-align: super;"></app-icon></a>
+								<a [href]="node.website || node.endpoint" target="_blank" class="ms-2"><app-icon icon="external-link" size="16"
+										classList="text-muted" style="vertical-align: super;"></app-icon></a>
 							</h2>
 							<div class=" text-muted">
 								<ul class="list-inline list-inline-dots mb-0">
 									<li class="list-inline-item">
-										<span [ngClass]="node.error ? 'text-red' : 'text-green'">
+										<span [ngClass]="{
+											'text-red': !node.up && node.error,
+											'text-green': node.up && !node.error,
+											'text-orange': node.up && node.error
+										}">
 											{{node.error ? node.error.error : 'Up'}}
 										</span>
 									</li>

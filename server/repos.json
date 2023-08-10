@@ -62,21 +62,50 @@
         "topic:raiblocks"
     ],
     "public_nodes": [
-        "https://api.nano.to",
-        "https://rpc.nano.to",
-        "https://solarnanofaucet.space/api",
-        "https://api.nano.kga.earth/node/proxy",
-        "https://nault.nanos.cc/proxy",
-        "https://rainstorm.city/api",
-        "https://node.somenano.com/proxy",
-        "https://proxy.nanos.cc/proxy",
-        "https://www.nanolooker.com/api/rpc",
-        "https://rpc.wenano.net/api/node-api",
-        "https://app.natrium.io/api",
-        "https://nano.nownodes.io",
-        "https://us-1.nano.to",
-        "https://us-2.nano.to",
-        "https://solar.nano.to",
-        "https://www.bitrequest.app:8020/"
+        {
+            "endpoint": "https://solarnanofaucet.space/api",
+            "website": "https://solarnanofaucet.space"
+        },
+        {
+            "endpoint": "https://api.nano.kga.earth/node/proxy",
+            "website": "https://api.nano.kga.earth/index.html"
+        },
+        {
+            "endpoint": "https://rainstorm.city/api",
+            "website": "https://rainstorm.city/"
+        },
+        {
+            "endpoint": "https://node.somenano.com/proxy",
+            "website": "https://node.somenano.com/"
+        },
+        {
+            "endpoint": "https://proxy.nanos.cc/proxy",
+            "website": "https://api.nanos.cc/"
+        },
+        {
+            "endpoint": "https://www.nanolooker.com/api/rpc",
+            "website": "https://www.nanolooker.com/"
+        },
+        {
+            "endpoint": "https://rpc.wenano.net/api/node-api",
+            "website": "https://wenano.net/"
+        },
+        {
+            "endpoint": "https://app.natrium.io/api",
+            "website": "https://natrium.io"
+        },
+        {
+            "endpoint": "https://nano.nownodes.io",
+            "website": "https://nownodes.io/nodes/nano-xno"
+        },
+        { "endpoint": "https://us-1.nano.to" },
+        { "endpoint": "https://us-2.nano.to" },
+        { "endpoint": "https://solar.nano.to" },
+        { "endpoint": "https://api.nano.to" },
+        { "endpoint": "https://rpc.nano.to" },
+        {
+            "endpoint": "https://www.bitrequest.app:8020/",
+            "website": "https://bitrequest.io"
+        }
     ]
 }

@@ -81,6 +81,8 @@ export interface FundingGoal {
 }
 export interface PublicNode {
   endpoint: string;
+  website?: string;
+  up: boolean;
   error: any;
   version: string;
   resp_time: number;
