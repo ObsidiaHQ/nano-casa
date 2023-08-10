@@ -161,10 +161,11 @@
                     <img [src]="busy.avatar_url + '&s=40'" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
                     <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
                     <div class="mt-2">
-                      <span class="text-muted mb-1" style="font-size: 0.8rem;" title="Commits">
+                      <span class="text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;" title="Commits">
                         <app-icon icon="commit"></app-icon>
                         {{busyWindow === 'busyWeek' ? busy.commits_7d : busy.commits_30d || 0}}</span>
-                      <span class="mx-2 text-muted mb-1" style="font-size: 0.8rem;" title="Pull requests">
+                      <span class="mx-2 text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;"
+                        title="Pull requests">
                         <app-icon icon="pr"></app-icon>
                         {{busyWindow === 'busyWeek' ? busy.prs_7d : busy.prs_30d}}</span>
                     </div>

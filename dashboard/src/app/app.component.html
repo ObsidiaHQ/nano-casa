@@ -39,21 +39,16 @@
             <ul class="navbar-nav">
               <li class="nav-item">
                 <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                  <app-icon class="me-1 d-flex" icon="home"></app-icon>
                   <span class="nav-link-title">
                     Home
-                  </span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" routerLink="/about" routerLinkActive="active">
-                  <span class="nav-link-title">
-                    About
                   </span>
                 </a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#resources" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                   aria-expanded="false">
+                  <app-icon class="me-1 d-flex" icon="resource"></app-icon>
                   <span class="nav-link-title">
                     Resources
                   </span>
@@ -70,8 +65,17 @@
                   </a>
                 </div>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/about" routerLinkActive="active">
+                  <app-icon icon="info" class="me-1 d-flex"></app-icon>
+                  <span class="nav-link-title">
+                    About
+                  </span>
+                </a>
+              </li>
               <li class="nav-item" *ngIf="!loggedUser">
                 <a class="nav-link" (click)="logIn()">
+                  <app-icon icon="login" class="me-1 d-flex"></app-icon>
                   <span class="nav-link-title">
                     Login
                   </span>
