@@ -72,23 +72,26 @@
         },
         {
             "endpoint": "https://rainstorm.city/api",
-            "website": "https://rainstorm.city/"
+            "website": "https://rainstorm.city",
+            "websocket": "wss://rainstorm.city/websocket"
         },
         {
             "endpoint": "https://node.somenano.com/proxy",
-            "website": "https://node.somenano.com/"
+            "website": "https://node.somenano.com/",
+            "websocket": "wss://node.somenano.com/websocket"
         },
         {
             "endpoint": "https://proxy.nanos.cc/proxy",
-            "website": "https://api.nanos.cc/"
+            "website": "https://api.nanos.cc",
+            "websocket": "wss://socket.nanos.cc"
         },
         {
             "endpoint": "https://www.nanolooker.com/api/rpc",
-            "website": "https://www.nanolooker.com/"
+            "website": "https://www.nanolooker.com"
         },
         {
             "endpoint": "https://rpc.wenano.net/api/node-api",
-            "website": "https://wenano.net/"
+            "website": "https://wenano.net"
         },
         {
             "endpoint": "https://app.natrium.io/api",
@@ -104,8 +107,14 @@
         { "endpoint": "https://api.nano.to" },
         { "endpoint": "https://rpc.nano.to" },
         {
-            "endpoint": "https://www.bitrequest.app:8020/",
-            "website": "https://bitrequest.io"
+            "endpoint": "https://www.bitrequest.app:8020",
+            "website": "https://bitrequest.io",
+            "websocket": "wss://bitrequest.app:8010"
+        },
+        {
+            "endpoint": "https://nanoslo.0x.no/proxy",
+            "website": "https://nanoslo.0x.no",
+            "websocket": "wss://nanoslo.0x.no/websocket"
         }
     ]
 }
