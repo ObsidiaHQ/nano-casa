@@ -82,6 +82,7 @@ export interface FundingGoal {
 export interface PublicNode {
   endpoint: string;
   website?: string;
+  websocket?: string;
   up: boolean;
   error: any;
   version: string;

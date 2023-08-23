@@ -434,6 +434,7 @@ async function checkPublicNodes() {
                 new models.PublicNode({
                     endpoint: node.endpoint,
                     website: node.website,
+                    websocket: node.websocket,
                     up: true,
                     resp_time,
                     version: res.data.node_vendor,
@@ -452,6 +453,7 @@ async function checkPublicNodes() {
                 new models.PublicNode({
                     endpoint: node.endpoint,
                     website: node.website,
+                    websocket: node.websocket,
                     up: (error.response?.status || 0) < 500,
                     resp_time,
                     error: { error: errorMsg },
