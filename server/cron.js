@@ -360,10 +360,10 @@ async function refreshNodeEvents() {
                     } to ${item.payload.ref.slice(
                         item.payload.ref.lastIndexOf('/') + 1
                     )}`,
-                    event_url: item.payload.commits[0].url
+                    event_url: item.payload.commits[0]?.url
                         .replace('api.', '')
                         .replace('/repos', ''),
-                    title: item.payload.commits[0].message,
+                    title: item.payload.commits[0]?.message,
                 };
 
             case 'ReleaseEvent':

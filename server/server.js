@@ -4,6 +4,7 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 const passport = require('passport');
 const helmet = require('helmet');
+const cors = require('cors');
 const GitHubStrategy = require('passport-github2').Strategy;
 const session = require('express-session');
 require('dotenv').config();
@@ -92,7 +93,11 @@ app.use(
         },
     })
 );
-//app.use(cors());
+app.use(
+    cors({
+        origin: ['https://nano.casa', 'https://nano.org'],
+    })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
