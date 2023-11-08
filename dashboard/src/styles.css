@@ -41,9 +41,10 @@ a:hover {
   height: 1rem;
 }
 .carousel-indicators {
-  margin-bottom: -3rem;
+  margin-bottom: -2rem;
 }
-.carousel-indicators [data-bs-target] {
+[data-bs-theme="dark"] .carousel .carousel-indicators [data-bs-target],
+[data-bs-theme="dark"].carousel .carousel-indicators [data-bs-target] {
   background-color: #ae3ec9;
 }
 .profile {
@@ -57,7 +58,7 @@ a:hover {
   right: 0;
 }
 .busy-repo {
-  background-color: #1a2234;
+  background-color: #141f2d;
   border-radius: 4px;
   min-width: 130px;
   min-height: 130px;
