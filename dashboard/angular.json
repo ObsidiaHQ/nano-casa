@@ -74,10 +74,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "nano-casa:build:production"
+              "buildTarget": "nano-casa:build:production"
             },
             "development": {
-              "browserTarget": "nano-casa:build:development"
+              "buildTarget": "nano-casa:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -85,7 +85,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "nano-casa:build"
+            "buildTarget": "nano-casa:build"
           }
         },
         "test": {
