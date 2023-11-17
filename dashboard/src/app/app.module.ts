@@ -69,9 +69,21 @@ echarts.use([
     CountUpModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: 'about', component: AboutComponent },
-      { path: 'public-nodes', component: PublicNodesComponent },
-      { path: '**', component: HomeComponent },
+      {
+        path: 'about',
+        component: AboutComponent,
+        data: { animation: 'AboutPage' },
+      },
+      {
+        path: 'public-nodes',
+        component: PublicNodesComponent,
+        data: { animation: 'NodesPage' },
+      },
+      {
+        path: '**',
+        component: HomeComponent,
+        data: { animation: 'HomePage' },
+      },
     ]),
   ],
   providers: [],

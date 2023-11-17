@@ -1,16 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedService } from './shared.service';
-import { Contributor, Profile, ServerResponse } from './interfaces';
+import { Contributor, Profile } from './interfaces';
+import { ChildrenOutletContexts } from '@angular/router';
+import { fader } from './animation';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
+  animations: [fader],
 })
 export class AppComponent implements OnInit {
   loggedUser: Profile;
   selectedUser: Contributor;
 
-  constructor(public shared: SharedService) {}
+  constructor(
+    public shared: SharedService,
+    private contexts: ChildrenOutletContexts
+  ) {}
 
   ngOnInit() {
     this.shared.loggedUser.subscribe(
@@ -19,6 +25,12 @@ export class AppComponent implements OnInit {
     this.shared.selectedUser.subscribe(
       (user: Contributor) => (this.selectedUser = user)
     );
+  }
+
+  getRouteAnimationData() {
+    return this.contexts.getContext('primary')?.route?.snapshot?.data?.[
+      'animation'
+    ];
   }
 
   logIn() {
