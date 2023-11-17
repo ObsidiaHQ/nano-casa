@@ -18,6 +18,12 @@ a:hover {
   vertical-align: middle;
   line-height: normal;
 }
+.badge-pill {
+  border-color: #3982bf4f;
+}
+.badge-pill:hover {
+  border-color: #3982bf8c;
+}
 .avatar {
   object-fit: cover;
   width: 32px;
