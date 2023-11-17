@@ -42,13 +42,14 @@ import paginate from 'jw-paginate';
           prev
         </a>
       </li>
+      @for (_ of [].constructor(pager.totalPages); track _; let i = $index) {
       <li
-        *ngFor="let page of [].constructor(pager.totalPages); let i = index"
         class="page-item d-none d-md-inline-block"
         [ngClass]="{ active: pager.currentPage === i + 1 }"
       >
         <a class="page-link" (click)="setPage(i + 1)">{{ i + 1 }}</a>
       </li>
+      }
 
       <li
         class="page-item mx-2"

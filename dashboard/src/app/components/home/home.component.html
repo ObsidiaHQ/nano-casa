@@ -6,40 +6,44 @@
       <div class="col-12 col-md-4">
         <div class="card">
           <div class="card-body pb-0">
-            <ng-container *ngIf="!shared.repos.value.length">
-              <div class="d-flex justify-content-center">
-                <div class="spinner-grow text-secondary align-self-center" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="shared.repos.value.length">
-              <div class="row">
-                <div class="col-12 col-md-7">
-                  <div class="d-flex align-items-center">
-                    <div class="subheader">Projects</div>
-                  </div>
-                  <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="shared.repos.value.length"></div>
-                    <div class="me-auto">
-                      <span class="text-pink d-inline-flex align-items-center lh-1">
-                        {{shared.repos.value[shared.repos.value.length-1]?.name}}
-                        <app-icon icon="spark" class="ms-1" size="16"></app-icon>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12 col-md-5">
-                  <div class="d-flex align-items-center">
-                    <div class="subheader">Contributors</div>
-                  </div>
-                  <div class="d-flex align-items-baseline">
-                    <div class="h2 mb-2 me-2" [countUp]="shared.contributors.value.length"></div>
-                  </div>
-                </div>
-              </div>
+            @if (!shared.repos.value.length) {
 
-            </ng-container>
+            <div class="d-flex justify-content-center">
+              <div class="spinner-grow text-secondary align-self-center" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+
+            }
+            @else {
+
+            <div class="row">
+              <div class="col-12 col-md-7">
+                <div class="d-flex align-items-center">
+                  <div class="subheader">Projects</div>
+                </div>
+                <div class="d-flex align-items-baseline">
+                  <div class="h2 mb-2 me-2" [countUp]="shared.repos.value.length"></div>
+                  <div class="me-auto">
+                    <span class="text-pink d-inline-flex align-items-center lh-1">
+                      {{shared.repos.value[shared.repos.value.length-1]?.name}}
+                      <app-icon icon="spark" class="ms-1" size="16"></app-icon>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-5">
+                <div class="d-flex align-items-center">
+                  <div class="subheader">Contributors</div>
+                </div>
+                <div class="d-flex align-items-baseline">
+                  <div class="h2 mb-2 me-2" [countUp]="shared.contributors.value.length"></div>
+                </div>
+              </div>
+            </div>
+
+
+            }
             <div echarts [options]="reposChartOpts" style="height: 70px;"></div>
           </div>
         </div>
@@ -47,14 +51,17 @@
 
       <div class="col-12 col-md-4">
         <div class="card">
-          <ng-container *ngIf="!shared.milestones.value.length">
-            <div class="card-body d-flex justify-content-center">
-              <div class="spinner-grow text-secondary align-self-center" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
+          @if (!shared.milestones.value.length) {
+
+          <div class="card-body d-flex justify-content-center">
+            <div class="spinner-grow text-secondary align-self-center" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
-          </ng-container>
-          <div *ngIf="shared.milestones.value.length" class="card-body">
+          </div>
+
+          }
+          @else {
+          <div class="card-body">
             <div class="card-stamp">
               <div class="card-stamp-icon bg-purple-lt">
                 <app-icon icon="target" classList="icon icon-taber"></app-icon>
@@ -65,11 +72,14 @@
             </div>
             <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
               <div class="carousel-indicators carousel-indicators-dot">
-                <button *ngFor="let milestone of shared.milestones.value; let i = index" type="button" data-bs-target="#carousel-indicators-dot"
-                  aria-label="carousel indicator dot" [ngClass]="{'active': i === 0}" [attr.data-bs-slide-to]="i"></button>
+                @for (milestone of shared.milestones.value; track milestone.number; let i = $index) {
+                <button type="button" data-bs-target="#carousel-indicators-dot" aria-label="carousel indicator dot" [ngClass]="{'active': i === 0}"
+                  [attr.data-bs-slide-to]="i"></button>
+                }
               </div>
               <div class="carousel-inner">
-                <div class="carousel-item" *ngFor="let milestone of shared.milestones.value; let i = index" [ngClass]="{'active': i === 0}">
+                @for (milestone of shared.milestones.value; track milestone.number; let i = $index) {
+                <div class="carousel-item" [ngClass]="{'active': i === 0}">
                   <div class="row align-items-center">
                     <div class="col">
                       <div class="row g-2 align-items-center">
@@ -93,9 +103,11 @@
                     </div>
                   </div>
                 </div>
+                }
               </div>
             </div>
           </div>
+          }
         </div>
       </div>
 
@@ -103,14 +115,17 @@
 
       <div class="col-12 col-md-4">
         <div class="card spotlight">
-          <ng-container *ngIf="!shared.repos.value.length">
-            <div class="card-body d-flex justify-content-center">
-              <div class="spinner-grow text-secondary align-self-center" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
+          @if (!shared.repos.value.length) {
+
+          <div class="card-body d-flex justify-content-center">
+            <div class="spinner-grow text-secondary align-self-center" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
-          </ng-container>
-          <a href="https://github.com/{{shared.spotlight.value.full_name}}" target="_blank" *ngIf="shared.spotlight.value">
+          </div>
+
+          }
+          @if (shared.spotlight.value) {
+          <a href="https://github.com/{{shared.spotlight.value.full_name}}" target="_blank">
             <div class="ribbon ribbon-top bg-yellow">
               <app-icon icon="star"></app-icon>
             </div>
@@ -124,6 +139,7 @@
               <p class="text-muted">{{shared.spotlight.value.description}}</p>
             </div>
           </a>
+          }
         </div>
       </div>
 
@@ -132,48 +148,53 @@
     <div class="row">
       <div class="col-12 mt-3">
         <div class="card">
-          <ng-container *ngIf="!shared.repos.value.length">
-            <div class="spinner-grow text-secondary align-self-center" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="shared.repos.value.length">
-            <div class="card-header">
-              <h3 class="card-title">Keeping busy</h3>
-              <div class="ms-3 lh-1">
-                <div class="dropdown">
-                  <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{busyWindow ===
-                    'busyWeek' ?
-                    'Last week' : 'Last month'}}</a>
-                  <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" [ngClass]="{active: busyWindow === 'busyWeek'}" (click)="busyWindow = 'busyWeek'">Last week</a>
-                    <a class="dropdown-item" [ngClass]="{active: busyWindow === 'busyMonth'}" (click)="busyWindow = 'busyMonth'">Last month</a>
-                  </div>
+          @if (!shared.repos.value.length) {
+
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+
+          }
+          @else {
+
+          <div class="card-header">
+            <h3 class="card-title">Keeping busy</h3>
+            <div class="ms-3 lh-1">
+              <div class="dropdown">
+                <a class="dropdown-toggle text-muted p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{busyWindow ===
+                  'busyWeek' ?
+                  'Last week' : 'Last month'}}</a>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <a class="dropdown-item" [ngClass]="{active: busyWindow === 'busyWeek'}" (click)="busyWindow = 'busyWeek'">Last week</a>
+                  <a class="dropdown-item" [ngClass]="{active: busyWindow === 'busyMonth'}" (click)="busyWindow = 'busyMonth'">Last month</a>
                 </div>
               </div>
             </div>
-            <div class="card-body">
-              <ng-container *ngIf="shared.repos.value.length">
-                <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
-                  <div
-                    *ngFor="let busy of shared.repos.value | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; trackBy: trackByName; let last = last;"
-                    [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
-                    <img [src]="busy.avatar_url + '&s=40'" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
-                    <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
-                    <div class="mt-2">
-                      <span class="text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;" title="Commits">
-                        <app-icon icon="commit"></app-icon>
-                        {{busyWindow === 'busyWeek' ? busy.commits_7d : busy.commits_30d || 0}}</span>
-                      <span class="mx-2 text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;"
-                        title="Pull requests">
-                        <app-icon icon="pr"></app-icon>
-                        {{busyWindow === 'busyWeek' ? busy.prs_7d : busy.prs_30d}}</span>
-                    </div>
-                  </div>
+          </div>
+          <div class="card-body">
+            @if (shared.repos.value.length) {
+
+            <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
+              @for (busy of shared.repos.value | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; track busy.full_name; let last = $last) {
+              <div [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
+                <img [src]="busy.avatar_url + '&s=40'" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
+                <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
+                <div class="mt-2">
+                  <span class="text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;" title="Commits">
+                    <app-icon icon="commit"></app-icon>
+                    {{busyWindow === 'busyWeek' ? busy.commits_7d : busy.commits_30d || 0}}</span>
+                  <span class="mx-2 text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;" title="Pull requests">
+                    <app-icon icon="pr"></app-icon>
+                    {{busyWindow === 'busyWeek' ? busy.prs_7d : busy.prs_30d}}</span>
                 </div>
-              </ng-container>
+              </div>
+              }
             </div>
-          </ng-container>
+
+            }
+          </div>
+
+          }
         </div>
       </div>
     </div>
@@ -191,72 +212,80 @@
       </div>
       <div class="col-12 col-md-4 mt-3">
         <div class="card" style="height: 484px;">
-          <ng-container *ngIf="!shared.events.value.length">
-            <div class="spinner-grow text-secondary align-self-center" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="shared.events.value.length">
-            <div class="card-header">
-              <ul class="nav nav-tabs card-header-tabs nav-fill" data-bs-toggle="tabs" role="tablist">
-                <li class="nav-item " role="presentation">
-                  <a href="#node-tab" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">
-                    <app-icon icon="nano" class="me-1"></app-icon>
-                    Node Development
-                  </a>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <a href="#ecosystem-tab" class="nav-link" data-bs-toggle="tab" aria-selected="true" role="tab" tabindex="-1">
-                    <app-icon icon="oss" class="me-1"></app-icon>
-                    Ecosystem
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div class="table-responsive" style="scrollbar-width: thin;">
-              <div class="tab-content">
-                <div class="tab-pane active show" id="node-tab" role="tabpanel">
-                  <table class="table table-vcenter">
-                    <tbody>
-                      <tr *ngFor="let event of shared.nodeEvents.value">
-                        <td class="w-1 py-1">
-                          <a target="_blank" [href]="event.event.event_url">
-                            <img class="avatar avatar-sm" src="{{event.avatar_url + '&s=40'}}" [alt]="event.author" [title]="event.author" loading="lazy">
-                          </a>
-                        </td>
-                        <td class="td-truncate p-1">
-                          <div class="text-truncate opacity-80 font-size-13">
-                            <span class="text-muted me-1">{{event.event.action}}</span>
-                            <a class="text-white" [href]="event.event.event_url" [title]="event.event.title">{{event.event.title}}</a>
-                          </div>
-                        </td>
-                        <td class="text-nowrap text-muted py-1 font-size-13" [title]="event.created_at | date:'short'">{{event.created_at | timeago}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="tab-pane" id="ecosystem-tab" role="tabpanel">
-                  <table class="table table-vcenter">
-                    <tbody>
-                      <tr *ngFor="let event of shared.events.value">
-                        <td class="w-1 py-1">
-                          <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm"
-                              src="{{event.avatar_url + '&s=40'}}" [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
-                          </a>
-                        </td>
-                        <td class="td-truncate p-1">
-                          <div class="text-truncate opacity-80" title="By {{event.author}}">
-                            {{event.message}}
-                          </div>
-                        </td>
-                        <td class="text-nowrap text-muted py-1" [title]="event.date | date:'short'">{{event.date | timeago}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+          @if (!shared.events.value.length) {
+
+          <div class="spinner-grow text-secondary align-self-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+
+          }
+          @else {
+
+          <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs nav-fill" data-bs-toggle="tabs" role="tablist">
+              <li class="nav-item " role="presentation">
+                <a href="#node-tab" class="nav-link active" data-bs-toggle="tab" aria-selected="true" role="tab">
+                  <app-icon icon="nano" class="me-1"></app-icon>
+                  Node Development
+                </a>
+              </li>
+              <li class="nav-item" role="presentation">
+                <a href="#ecosystem-tab" class="nav-link" data-bs-toggle="tab" aria-selected="true" role="tab" tabindex="-1">
+                  <app-icon icon="oss" class="me-1"></app-icon>
+                  Ecosystem
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="table-responsive" style="scrollbar-width: thin;">
+            <div class="tab-content">
+              <div class="tab-pane active show" id="node-tab" role="tabpanel">
+                <table class="table table-vcenter">
+                  <tbody>
+                    @for (event of shared.nodeEvents.value; track event) {
+                    <tr>
+                      <td class="w-1 py-1">
+                        <a target="_blank" [href]="event.event.event_url">
+                          <img class="avatar avatar-sm" src="{{event.avatar_url + '&s=40'}}" [alt]="event.author" [title]="event.author" loading="lazy">
+                        </a>
+                      </td>
+                      <td class="td-truncate p-1">
+                        <div class="text-truncate opacity-80 font-size-13">
+                          <span class="text-muted me-1">{{event.event.action}}</span>
+                          <a class="text-white" [href]="event.event.event_url" [title]="event.event.title">{{event.event.title}}</a>
+                        </div>
+                      </td>
+                      <td class="text-nowrap text-muted py-1 font-size-13" [title]="event.created_at | date:'short'">{{event.created_at | timeago}}</td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="tab-pane" id="ecosystem-tab" role="tabpanel">
+                <table class="table table-vcenter">
+                  <tbody>
+                    @for (event of shared.events.value; track event) {
+                    <tr>
+                      <td class="w-1 py-1">
+                        <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url + '&s=40'}}"
+                            [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
+                        </a>
+                      </td>
+                      <td class="td-truncate p-1">
+                        <div class="text-truncate opacity-80" title="By {{event.author}}">
+                          {{event.message}}
+                        </div>
+                      </td>
+                      <td class="text-nowrap text-muted py-1" [title]="event.date | date:'short'">{{event.date | timeago}}</td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
               </div>
             </div>
-          </ng-container>
+          </div>
+
+          }
         </div>
       </div>
     </div>
@@ -292,7 +321,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let repo of reposPage; trackBy: trackByName">
+              @for (repo of reposPage; track repo.full_name) {
+              <tr>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
                     <img class="avatar avatar-sm me-2" [src]="repo.avatar_url + '&s=40'" loading="lazy" [alt]="repo.name">
@@ -316,6 +346,7 @@
                   {{repo.created_at | timeago}}
                 </td>
               </tr>
+              }
             </tbody>
           </table>
         </div>
@@ -350,7 +381,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let user of contributorsPage; let i = index; trackBy: trackByLogin;">
+              @for (user of contributorsPage; track user.login; let i = $index) {
+              <tr>
                 <td class="py-2" scope="row">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
@@ -360,15 +392,21 @@
                         <a class="me-2" href="https://github.com/{{user.login}}" target="_blank">
                           <span>{{user.login}}</span>
                         </a>
-                        <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo" *ngIf="contributedToNode(user.repos)">
+                        @if (contributedToNode(user.repos)) {
+                        <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo">
                           <app-icon icon="veteran" fill="#17a2b8" size="16" strokeWidth="2"></app-icon>
                         </span>
-                        <span class="badge bg-purple-lt ms-2 cursor-help" title="Contributed to 10 repos or more" *ngIf="user.repos.length >= 10">
+                        }
+                        @if (user.repos.length >= 10) {
+                        <span class="badge bg-purple-lt ms-2 cursor-help" title="Contributed to 10 repos or more">
                           <app-icon icon="rockstar" size="16" strokeWidth="2"></app-icon>
                         </span>
-                        <span class="badge bg-orange-lt ms-2 cursor-help" title="Contributed to a popular repo" *ngIf="hasPopularRepo(user.repos)">
+                        }
+                        @if (hasPopularRepo(user.repos)) {
+                        <span class="badge bg-orange-lt ms-2 cursor-help" title="Contributed to a popular repo">
                           <app-icon icon="mvp" size="16" strokeWidth="2"></app-icon>
                         </span>
+                        }
                       </div>
                     </div>
                   </div>
@@ -384,23 +422,27 @@
                   <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
                 </td>
                 <td>
-                  <app-goal *ngIf="user.profile?.goal?.amount" [amount]="user.profile?.goal?.amount" [address]="user.profile?.goal?.nano_address"
-                    [sid]="'id'+user.profile?.goal?._id"></app-goal>
+                  @if (user.profile?.goal?.amount) {
+                  <app-goal [amount]="user.profile?.goal?.amount" [address]="user.profile?.goal?.nano_address" [sid]="'id'+user.profile?.goal?._id"></app-goal>
+                  }
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap justify-content-end">
-                    <a *ngIf="user.profile?.nano_address" target="_blank" href="https://nano.to/{{user.profile?.nano_address}}" class="btn bg-azure-lt btn-icon"
-                      title="Donate nano">
+                    @if (user.profile?.nano_address) {
+                    <a target="_blank" href="https://nano.to/{{user.profile?.nano_address}}" class="btn bg-azure-lt btn-icon" title="Donate nano">
                       <app-icon icon="nano"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.patreon_url" target="_blank" href="{{user.profile?.patreon_url}}" class="btn bg-white-lt btn-icon"
-                      title="Become a patron">
+                    }
+                    @if (user.profile?.patreon_url) {
+                    <a target="_blank" href="{{user.profile?.patreon_url}}" class="btn bg-white-lt btn-icon" title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>
-                    <a *ngIf="user.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon"
-                      title="Sponsor on GitHub">
+                    }
+                    @if (user.profile?.gh_sponsors) {
+                    <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon" title="Sponsor on GitHub">
                       <app-icon icon="heart"></app-icon>
                     </a>
+                    }
                     <a href="#" class="btn bg-blue-lt btn-icon" title="More info" data-bs-toggle="modal" data-bs-target="#modal-profile"
                       (click)="shared.selectUser(user)">
                       <app-icon icon="profile"></app-icon>
@@ -408,6 +450,7 @@
                   </div>
                 </td>
               </tr>
+              }
             </tbody>
           </table>
         </div>
@@ -421,149 +464,176 @@
 
 <div class="modal modal-blur fade" id="modal-profile" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content" *ngIf="selectedUser">
+    @if (selectedUser) {
+    <div class="modal-content">
       <div class="modal-body pt-5">
         <img [src]="selectedUser.avatar_url + '&s=100'" class="profile avatar" [alt]="selectedUser.login">
-        <ng-container *ngIf="!editMode; else editTemplate">
-          <div class="row">
-            <div class="col-12 col-md-4 my-1">
-              <a *ngIf="selectedUser.profile?.website" href="{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
-                <app-icon icon="web"></app-icon>
-              </a>
-              <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
-                <app-icon icon="github"></app-icon>
-              </a>
-              <a *ngIf="selectedUser.profile?.twitter_username" href="https://twitter.com/{{selectedUser.profile.twitter_username}}" target="_blank"
-                class="h4 px-2" title="Follow on Twitter">
-                <app-icon icon="twitter"></app-icon>
-              </a>
-            </div>
-            <div class="col-12 col-md-4"></div>
-            <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
-              <a *ngIf="selectedUser.profile?.nano_address" href="https://nano.to/{{selectedUser.profile.nano_address}}" target="_blank"
-                class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
-                <app-icon icon="nano"></app-icon>
-              </a>
-              <a *ngIf="selectedUser.profile?.patreon_url" target="_blank" [href]="selectedUser.profile.patreon_url" class="btn bg-white-lt w-100 btn-icon"
-                title="Become a patron">
-                <app-icon icon="patreon"></app-icon>
-              </a>
-              <a *ngIf="selectedUser.profile?.gh_sponsors" target="_blank" href="https://github.com/sponsors/{{selectedUser.login}}"
-                class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
-                <app-icon icon="heart"></app-icon>
-              </a>
-            </div>
+        @if (!editMode) {
+
+        <div class="row">
+          <div class="col-12 col-md-4 my-1">
+            @if (selectedUser.profile?.website) {
+            <a href="{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
+              <app-icon icon="web"></app-icon>
+            </a>
+            }
+            <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
+              <app-icon icon="github"></app-icon>
+            </a>
+            @if (selectedUser.profile?.twitter_username) {
+            <a href="https://twitter.com/{{selectedUser.profile.twitter_username}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
+              <app-icon icon="twitter"></app-icon>
+            </a>
+            }
+          </div>
+          <div class="col-12 col-md-4"></div>
+          <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
+            @if (selectedUser.profile?.nano_address) {
+            <a href="https://nano.to/{{selectedUser.profile.nano_address}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+              <app-icon icon="nano"></app-icon>
+            </a>
+            }
+            @if (selectedUser.profile?.patreon_url) {
+            <a target="_blank" [href]="selectedUser.profile.patreon_url" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+              <app-icon icon="patreon"></app-icon>
+            </a>
+            }
+            @if (selectedUser.profile?.gh_sponsors) {
+            <a target="_blank" href="https://github.com/sponsors/{{selectedUser.login}}" class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
+              <app-icon icon="heart"></app-icon>
+            </a>
+            }
+          </div>
+        </div>
+
+        @if (selectedUser.profile?.bio) {
+        <div class="subheader mt-3 mb-2">About {{selectedUser.login}}</div>
+        }
+        <div>
+          {{selectedUser.profile?.bio}}
+        </div>
+
+        <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
+        <div>
+          @for (repo of selectedUser.repos; track repo) {
+          <a href="https://github.com/{{repo}}"><span class="badge badge-outline badge-pill text-azure me-2 mb-2 p-2">{{repo}}</span></a>
+          }
+        </div>
+        <div class="subheader mt-3 mb-2">Funding goal</div>
+        @if (selectedUser.profile?.goal?.amount) {
+        <div class="text-body d-block">
+          <span class="inline-goal">
+            <app-goal [sid]="'id_'+selectedUser.profile?.goal?._id" [title]="selectedUser.profile?.goal?.title" [amount]="selectedUser.profile?.goal?.amount"
+              [address]="selectedUser.profile?.goal?.nano_address" [barOnly]="false" [description]="selectedUser.profile?.goal?.description">
+            </app-goal>
+          </span>
+        </div>
+        } @else {
+
+        <div class="text-muted italic text-center">No funding goal set.</div>
+
+        }
+
+        } @else {
+
+        <div class="row">
+          <div class="col-12 col-md-4 mb-3">
+            <label class="form-label">Website</label>
+            <input type="text" class="form-control" placeholder="website, blog, etc" [(ngModel)]="loggedUser.website">
+          </div>
+          <div class="col-12 col-md-4 mb-3">
+            <label class="form-label">Twitter handle</label>
+            <input type="text" class="form-control" placeholder="username" [(ngModel)]="loggedUser.twitter_username">
+          </div>
+          <div class="col-12 col-md-4 mb-3">
+            <label class="form-label">Patreon</label>
+            <input type="text" class="form-control" placeholder="link to your Patreon" [(ngModel)]="loggedUser.patreon_url">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 col-md-7 mb-3">
+            <label class="form-label">Nano address</label>
+            <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.nano_address">
           </div>
 
-          <div *ngIf="selectedUser.profile?.bio" class="subheader mt-3 mb-2">About {{selectedUser.login}}</div>
-          <div>
-            {{selectedUser.profile?.bio}}
+          <div class="col-auto pt-md-4 mb-3">
+            <label class="form-check">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="loggedUser.gh_sponsors" [checked]="loggedUser.gh_sponsors">
+              <span class="form-check-label">GitHub Sponsors?</span>
+            </label>
           </div>
+        </div>
 
-          <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
-          <div>
-            <a *ngFor="let repo of selectedUser.repos" href="https://github.com/{{repo}}"><span
-                class="badge badge-outline badge-pill text-azure me-2 mb-2 p-2">{{repo}}</span></a>
+        <div class="row mb-4">
+          <div class="col-12">
+            <label class="form-label">About</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="loggedUser.bio" placeholder="you can also add links: [label](example.com)"></textarea>
           </div>
-          <div class="subheader mt-3 mb-2">Funding goal</div>
-          <div *ngIf="selectedUser.profile?.goal?.amount; else noGoal" class="text-body d-block">
-            <span class="inline-goal">
-              <app-goal [sid]="'id_'+selectedUser.profile?.goal?._id" [title]="selectedUser.profile?.goal?.title" [amount]="selectedUser.profile?.goal?.amount"
-                [address]="selectedUser.profile?.goal?.nano_address" [barOnly]="false" [description]="selectedUser.profile?.goal?.description">
-              </app-goal>
-            </span>
-          </div>
-          <ng-template #noGoal>
-            <div class="text-muted italic text-center">No funding goal set.</div>
-          </ng-template>
-        </ng-container>
+        </div>
 
-        <ng-template #editTemplate>
-          <div class="row">
-            <div class="col-12 col-md-4 mb-3">
-              <label class="form-label">Website</label>
-              <input type="text" class="form-control" placeholder="website, blog, etc" [(ngModel)]="loggedUser.website">
-            </div>
-            <div class="col-12 col-md-4 mb-3">
-              <label class="form-label">Twitter handle</label>
-              <input type="text" class="form-control" placeholder="username" [(ngModel)]="loggedUser.twitter_username">
-            </div>
-            <div class="col-12 col-md-4 mb-3">
-              <label class="form-label">Patreon</label>
-              <input type="text" class="form-control" placeholder="link to your Patreon" [(ngModel)]="loggedUser.patreon_url">
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-12 col-md-7 mb-3">
-              <label class="form-label">Nano address</label>
-              <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.nano_address">
-            </div>
-
-            <div class="col-auto pt-md-4 mb-3">
-              <label class="form-check">
-                <input class="form-check-input" type="checkbox" [(ngModel)]="loggedUser.gh_sponsors" [checked]="loggedUser.gh_sponsors">
-                <span class="form-check-label">GitHub Sponsors?</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="row mb-4">
-            <div class="col-12">
-              <label class="form-label">About</label>
-              <textarea class="form-control" rows="3" [(ngModel)]="loggedUser.bio" placeholder="you can also add links: [label](example.com)"></textarea>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-12">
-              <label class="form-label d-inline-block me-3 mb-3">Funding goal</label>
-              <a *ngIf="!loggedUser.goal" type="button" class="text-azure" (click)="setGoal()"><app-icon icon="plus"></app-icon> New</a>
-              <a *ngIf="loggedUser.goal" type="button" class="list-group-item-actions" (click)="deleteGoal(loggedUser.goal)" title="Delete goal">
-                <app-icon icon="trash" strokeColor="#B13539"></app-icon>
-              </a>
-              <div *ngIf="loggedUser?.goal; else noGoal" class="card mb-2" style="min-height: unset;">
-                <div class="list-group list-group-flush">
-                  <div class="list-group-item list-group-item-action">
-                    <div class="row">
-                      <div class="col-9 col-md-7 mb-3">
-                        <label class="form-label">Title</label>
-                        <input type="text" class="form-control" placeholder="server cost, etc.." [(ngModel)]="loggedUser.goal.title">
-                      </div>
-                      <div class="col-3 col-md-5 mb-3">
-                        <label class="form-label">Goal</label>
-                        <input type="number" class="form-control" min="1" [(ngModel)]="loggedUser.goal.amount">
-                      </div>
-                      <div class="col-12 col-md-7 mb-3">
-                        <label class="form-label">Nano address</label>
-                        <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.goal.nano_address">
-                      </div>
-                      <div class="col-12 col-md-5 mb-3">
-                        <label class="form-label">Website</label>
-                        <input type="text" class="form-control" placeholder="optional" [(ngModel)]="loggedUser.goal.website">
-                      </div>
-                      <div class="col-12">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="2" [(ngModel)]="loggedUser.goal.description" placeholder="optional"></textarea>
-                      </div>
+        <div class="row">
+          <div class="col-12">
+            <label class="form-label d-inline-block me-3 mb-3">Funding goal</label>
+            @if (!loggedUser.goal) {
+            <a type="button" class="text-azure" (click)="setGoal()"><app-icon icon="plus"></app-icon> New</a>
+            }
+            @if (loggedUser.goal) {
+            <a type="button" class="list-group-item-actions" (click)="deleteGoal(loggedUser.goal)" title="Delete goal">
+              <app-icon icon="trash" strokeColor="#B13539"></app-icon>
+            </a>
+            }
+            @if (loggedUser?.goal) {
+            <div class="card mb-2" style="min-height: unset;">
+              <div class="list-group list-group-flush">
+                <div class="list-group-item list-group-item-action">
+                  <div class="row">
+                    <div class="col-9 col-md-7 mb-3">
+                      <label class="form-label">Title</label>
+                      <input type="text" class="form-control" placeholder="server cost, etc.." [(ngModel)]="loggedUser.goal.title">
+                    </div>
+                    <div class="col-3 col-md-5 mb-3">
+                      <label class="form-label">Goal</label>
+                      <input type="number" class="form-control" min="1" [(ngModel)]="loggedUser.goal.amount">
+                    </div>
+                    <div class="col-12 col-md-7 mb-3">
+                      <label class="form-label">Nano address</label>
+                      <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.goal.nano_address">
+                    </div>
+                    <div class="col-12 col-md-5 mb-3">
+                      <label class="form-label">Website</label>
+                      <input type="text" class="form-control" placeholder="optional" [(ngModel)]="loggedUser.goal.website">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Description</label>
+                      <textarea class="form-control" rows="2" [(ngModel)]="loggedUser.goal.description" placeholder="optional"></textarea>
                     </div>
                   </div>
                 </div>
               </div>
-              <ng-template #noGoal>
-                <div class="text-muted italic text-center">No funding goal set.</div>
-              </ng-template>
             </div>
+            } @else {
+
+            <div class="text-muted italic text-center">No funding goal set.</div>
+
+            }
           </div>
-        </ng-template>
+        </div>
+
+        }
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        <button *ngIf="loggedUser && loggedUser?._id === selectedUser.profile?._id" type="button" class="btn btn-outline-success"
-          (click)="editMode = true">Edit</button>
-        <button *ngIf="loggedUser && editMode" type="button" class="btn btn-primary" [disabled]="!loggedUser.goal.nano_address || !loggedUser.goal.amount"
+        @if (loggedUser && loggedUser?._id === selectedUser.profile?._id) {
+        <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
+        }
+        @if (loggedUser && editMode) {
+        <button type="button" class="btn btn-primary" [disabled]="!loggedUser.goal.nano_address || !loggedUser.goal.amount"
           (click)="updateProfile()">Save</button>
+        }
       </div>
     </div>
+    }
   </div>
 </div>

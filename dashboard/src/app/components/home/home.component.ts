@@ -249,12 +249,4 @@ export class HomeComponent implements OnInit, AfterViewInit {
     delete usr.goal;
     this.shared.loggedUser.next(usr);
   }
-
-  trackByName(index, item) {
-    return item.full_name;
-  }
-
-  trackByLogin(index, item) {
-    return item.login;
-  }
 }
