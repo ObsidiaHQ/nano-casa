@@ -116,6 +116,11 @@
             "endpoint": "https://nanoslo.0x.no/proxy",
             "website": "https://nanoslo.0x.no",
             "websocket": "wss://nanoslo.0x.no/websocket"
+        },
+        {
+            "endpoint": "https://nodes.nanswap.com/XNO",
+            "website": "https://nanswap.com/nodes",
+            "websocket": "wss://nodes.nanswap.com/ws/?ticker=XNO"
         }
     ]
 }
