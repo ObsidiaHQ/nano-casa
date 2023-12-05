@@ -1,6 +1,7 @@
 {
   "name": "Nano.Casa",
   "short_name": "Nano.Casa",
+  "start_url": "https://nano.casa",
   "icons": [
     {
       "src": "/assets/android-chrome-192x192.png",
@@ -11,9 +12,16 @@
       "src": "/assets/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/assets/maskable_icon_x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "theme_color": "#1F375B",
   "background_color": "#1F375B",
-  "display": "standalone"
+  "display": "standalone",
+  "prefer_related_applications": false
 }
