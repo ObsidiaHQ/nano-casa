@@ -1,19 +1,19 @@
 {
-    "name": "",
-    "short_name": "",
-    "icons": [
-        {
-            "src": "/assets/android-chrome-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/assets/android-chrome-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ],
-    "theme_color": "#273545",
-    "background_color": "#273545",
-    "display": "standalone"
+  "name": "Nano.Casa",
+  "short_name": "Nano.Casa",
+  "icons": [
+    {
+      "src": "/assets/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1F375B",
+  "background_color": "#1F375B",
+  "display": "standalone"
 }
