@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "bundle": "ng build --source-map=true; source-map-explorer ./dist/nano-casa/main.*.js"
+    "bundle": "ng build --source-map=true; source-map-explorer ./dist/nano-casa/main.*.js",
+    "postbuild": "node purgecss.js"
   },
   "private": true,
   "dependencies": {
@@ -41,6 +42,7 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "purgecss": "^5.0.0",
     "source-map-explorer": "^2.5.3",
     "typescript": "^5.2.2"
   }
