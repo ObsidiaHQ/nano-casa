@@ -102,6 +102,7 @@ const PublicNode = mongoose.model(
         resp_time: Number,
         version: String,
         error: Object,
+        deprecated: Boolean,
     })
 );
 

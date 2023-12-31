@@ -87,4 +87,5 @@ export interface PublicNode {
   error: any;
   version: string;
   resp_time: number;
+  deprecated?: boolean;
 }

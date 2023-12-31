@@ -84,7 +84,8 @@
         {
             "endpoint": "https://proxy.nanos.cc/proxy",
             "website": "https://api.nanos.cc",
-            "websocket": "wss://socket.nanos.cc"
+            "websocket": "wss://socket.nanos.cc",
+            "deprecated": true
         },
         {
             "endpoint": "https://www.nanolooker.com/api/rpc",

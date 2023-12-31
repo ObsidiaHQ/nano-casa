@@ -26,6 +26,9 @@
                   <app-icon icon="bolt" size="16" classList="text-muted" style="vertical-align: super;"></app-icon>
                 </a>
                 }
+                @if (node.deprecated) {
+                <span class="badge ms-2" style="font-size: 11px;" title="Node is shutting down soon">Deprecated</span>
+                }
               </h2>
               <div class=" text-muted">
                 <ul class="list-inline list-inline-dots mb-0">
