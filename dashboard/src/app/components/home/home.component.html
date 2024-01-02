@@ -202,8 +202,8 @@
     <div class="row">
       <div class="col-12 col-md-8 mt-3">
         <div class="card" style="height: 484px;">
-          <div class="card-body">
-            <div class="card-title">
+          <div class="card-body p-1 p-md-3">
+            <div class="card-title pt-3 px-3 pt-md-0 px-md-0">
               <h3>Weekly activity</h3>
             </div>
             <div echarts [options]="commitsChartOpts" class="chart"></div>
@@ -313,8 +313,8 @@
           <table class="table table-vcenter card-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Description</th>
+                <th style="min-width: 220px;">Name</th>
+                <th style="min-width: 350px;">Description</th>
                 <th class="text-center">
                   <app-icon icon="clock"></app-icon>
                 </th>
@@ -369,7 +369,7 @@
             <thead>
               <tr>
                 <th width="30px">#</th>
-                <th>Name</th>
+                <th style="min-width: 220px">Name</th>
                 <th (click)="contributorsSort = 'total'" class="ptr">Total commits <app-icon
                     [icon]="contributorsSort === 'total' ? 'double-down' : 'down'"></app-icon>
                 </th>
@@ -393,17 +393,17 @@
                           <span>{{user.login}}</span>
                         </a>
                         @if (contributedToNode(user.repos)) {
-                        <span class="badge bg-cyan-lt ms-2 cursor-help" title="Contributed to the nano-node repo">
+                        <span class="badge bg-cyan-lt ms-1 ms-md-2 cursor-help" title="Contributed to the nano-node repo">
                           <app-icon icon="veteran" fill="#17a2b8" size="16" strokeWidth="2"></app-icon>
                         </span>
                         }
                         @if (user.repos.length >= 10) {
-                        <span class="badge bg-purple-lt ms-2 cursor-help" title="Contributed to 10 repos or more">
+                        <span class="badge bg-purple-lt ms-1 ms-md-2 cursor-help" title="Contributed to 10 repos or more">
                           <app-icon icon="rockstar" size="16" strokeWidth="2"></app-icon>
                         </span>
                         }
                         @if (hasPopularRepo(user.repos)) {
-                        <span class="badge bg-orange-lt ms-2 cursor-help" title="Contributed to a popular repo">
+                        <span class="badge bg-orange-lt ms-1 ms-md-2 cursor-help" title="Contributed to a popular repo">
                           <app-icon icon="mvp" size="16" strokeWidth="2"></app-icon>
                         </span>
                         }
@@ -454,7 +454,8 @@
             </tbody>
           </table>
         </div>
-        <app-pagination [pageSize]="40" [items]="shared.contributors.value | filter:'user':contributorsQuery | sort:'user':contributorsSort"
+        <app-pagination [pageSize]="shared.isSmallScreen ? 12 : 40"
+          [items]="shared.contributors.value | filter:'user':contributorsQuery | sort:'user':contributorsSort"
           (itemsChange)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
       </div>
     </div>

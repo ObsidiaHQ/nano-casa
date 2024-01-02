@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, take } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { environment } from 'src/environments/environment';
 import {
   ChartCommit,
@@ -32,7 +33,7 @@ export class SharedService {
   spotlight = new BehaviorSubject<Repo>({} as Repo);
   publicNodes = new BehaviorSubject<PublicNode[]>([]);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private bp: BreakpointObserver) {
     this.fetchUser();
     this.getData();
     const perfUS =
@@ -116,5 +117,9 @@ export class SharedService {
       .get(`${environment.api}/logout`)
       .pipe(take(1))
       .subscribe(() => this.loggedUser.next(null));
+  }
+
+  get isSmallScreen(): boolean {
+    return this.bp.isMatched([Breakpoints.Small, Breakpoints.XSmall]);
   }
 }
