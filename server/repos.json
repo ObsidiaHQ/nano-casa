@@ -106,7 +106,6 @@
         { "endpoint": "https://us-1.nano.to" },
         { "endpoint": "https://us-2.nano.to" },
         { "endpoint": "https://solar.nano.to" },
-        { "endpoint": "https://api.nano.to" },
         { "endpoint": "https://rpc.nano.to" },
         {
             "endpoint": "https://www.bitrequest.app:8020",
