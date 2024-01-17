@@ -34,6 +34,6 @@ export class AppComponent implements OnInit {
   }
 
   logIn() {
-    window.open('/auth/github', '_self');
+    window.open('/api/auth/github', '_self');
   }
 }

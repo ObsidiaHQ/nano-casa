@@ -7,13 +7,7 @@ import {
 } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { graphic } from 'echarts/core';
-import {
-  ChartCommit,
-  Contributor,
-  FundingGoal,
-  Profile,
-  Repo,
-} from '../../interfaces';
+import { Contributor, FundingGoal, Profile, Repo } from '../../interfaces';
 import { SharedService } from 'src/app/shared.service';
 import { SortPipe } from 'src/app/pipes/sort.pipe';
 import { combineLatest } from 'rxjs';
@@ -39,6 +33,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   commitsChartOpts: EChartsOption;
   reposChartOpts: EChartsOption;
+  devFundChartOpts: EChartsOption;
   selectedUser: Contributor = {} as Contributor;
   loggedUser: Profile;
   editMode = false;
@@ -59,7 +54,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         .transform(repos, 'repo', 'stars')
         .map((r) => r.full_name);
       setTimeout(() => {
-        this.initCharts(this.shared.commits.value, this.shared.repos.value);
+        this.initCharts();
       }, 400);
       this.loggedUser = loggedUser;
       this.selectedUser = selectedUser;
@@ -75,7 +70,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       });
   }
 
-  initCharts(commits: ChartCommit[], repos: Repo[]) {
+  initCharts() {
     // list years since 2014
     const YEARS = Array.from(Array(new Date().getFullYear() - 2013), (_, i) =>
       (i + 2014).toString()
@@ -84,7 +79,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     for (const year of YEARS) {
       YEARS_DICT[year] = 0;
     }
-    repos.forEach((repo, i) => {
+    this.shared.repos.value.forEach((repo, i) => {
       const year = new Date(repo.created_at).getFullYear();
       YEARS_DICT[year] += 1;
     });
@@ -92,12 +87,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.reposChartOpts = {
       animation: true,
       animationEasing: 'elasticOut',
-      animationDuration: 1200,
+      animationDuration: 1000,
       tooltip: {
         trigger: 'axis',
-        position: function (pt) {
-          return [pt[0], '10%'];
-        },
       },
       grid: {
         left: 0,
@@ -130,9 +122,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       animationDuration: 1200,
       tooltip: {
         trigger: 'axis',
-        position: function (pt) {
-          return [pt[0], '10%'];
-        },
       },
       grid: {
         left: 34,
@@ -143,7 +132,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: commits.map((com) => com.date),
+        data: this.shared.commits.value.map((com) => com.date),
       },
       yAxis: {
         splitLine: {
@@ -170,7 +159,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           symbol: 'none',
           type: 'line',
           sampling: 'lttb',
-          data: commits.map((com) => com.count),
+          data: this.shared.commits.value.map((com) => com.count),
           lineStyle: {
             width: 0,
           },
@@ -197,6 +186,42 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 color: '#0C8297',
               },
             ]),
+          },
+        },
+      ],
+    };
+
+    this.devFundChartOpts = {
+      animation: true,
+      animationEasing: 'elasticOut',
+      animationDuration: 1200,
+      tooltip: {
+        trigger: 'axis',
+      },
+      grid: {
+        left: -30,
+        top: 0,
+        right: -30,
+        bottom: 0,
+      },
+      xAxis: {
+        show: false,
+        data: this.shared.devFund.value.labels,
+      },
+      yAxis: {
+        show: false,
+      },
+      series: [
+        {
+          name: 'Balance',
+          symbol: 'none',
+          data: this.shared.devFund.value.data,
+          type: 'line',
+          itemStyle: {
+            color: '#1F67BD',
+          },
+          areaStyle: {
+            color: '#192F4B',
           },
         },
       ],

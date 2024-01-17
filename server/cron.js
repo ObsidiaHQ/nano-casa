@@ -471,8 +471,42 @@ async function checkPublicNodes() {
     return;
 }
 
+async function getDevFundHistory() {
+    axios
+        .post('https://rpc.nano.to', {
+            action: 'account_history',
+            account: '@Protocol_fund',
+            count: '-1',
+        })
+        .then(async (res) => {
+            res.data.history.reverse();
+            let balances = new Array(res.data.history.length);
+            let labels = new Array(res.data.history.length);
+            txSign = (type) => (type === 'send' ? -1 : 1);
+            res.data.history.forEach((tx, i) => {
+                labels[i] = new Date(
+                    parseInt(tx.local_timestamp) * 1000
+                ).toDateString();
+                if (i === 0) {
+                    balances[i] = Math.round(parseFloat(tx.amount_nano));
+                } else {
+                    balances[i] = Math.round(
+                        balances[i - 1] +
+                            parseFloat(tx.amount_nano) * txSign(tx.type)
+                    );
+                }
+            });
+            await models.Misc.findOneAndUpdate(
+                {},
+                { $set: { devFundData: balances, devFundLabels: labels } },
+                { new: true, upsert: true }
+            );
+        });
+}
+
 const job = new Cron('45 * * * *', async () => {
     await refreshMilestones();
+    await getDevFundHistory();
     await checkPublicNodes();
     const repos = await refreshRepos();
     await refreshCommitsAndContributors(repos);

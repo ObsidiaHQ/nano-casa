@@ -32,6 +32,10 @@ export class SharedService {
   nodeEvents = new BehaviorSubject<NodeEvent[]>([]);
   spotlight = new BehaviorSubject<Repo>({} as Repo);
   publicNodes = new BehaviorSubject<PublicNode[]>([]);
+  devFund = new BehaviorSubject<{ labels: string[]; data: number[] }>({
+    labels: [],
+    data: [],
+  });
 
   constructor(private http: HttpClient, private bp: BreakpointObserver) {
     this.fetchUser();
@@ -97,6 +101,10 @@ export class SharedService {
           this.commits.next(data.commits);
           this.events.next(data.events);
           this.milestones.next(data.milestones);
+          this.devFund.next({
+            data: data.misc.devFundData || [],
+            labels: data.misc.devFundLabels || [],
+          });
           this.spotlight.next(
             data.misc.spotlight ||
               data.repos[Math.floor(Math.random() * data.repos.length)]

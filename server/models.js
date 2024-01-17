@@ -110,6 +110,8 @@ const Misc = mongoose.model(
     'Misc',
     new mongoose.Schema({
         spotlight: Object,
+        devFundLabels: [String],
+        devFundData: [Number],
     })
 );
 

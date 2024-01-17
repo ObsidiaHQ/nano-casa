@@ -111,8 +111,6 @@
         </div>
       </div>
 
-
-
       <div class="col-12 col-md-4">
         <div class="card spotlight">
           @if (!shared.repos.value.length) {
@@ -140,6 +138,57 @@
             </div>
           </a>
           }
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="card">
+          <div class="card-body pb-0 px-0">
+            @if (!shared.devFund.value.data.length) {
+            <div class="d-flex justify-content-center">
+              <div class="spinner-grow text-secondary align-self-center" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            } @else {
+            <div class="row px-3 pb-1">
+              <div class="col-7">
+                <div class="d-flex align-items-center">
+                  <div class="subheader">Protocol Fund</div>
+                </div>
+                <div class="d-flex align-items-baseline">
+                  <span class="h1 mb-0 me-2" style="margin-left: -5px;">
+                    <app-icon icon="nano" size="25" classList="mb-1 d-inline-block"></app-icon>
+                    <span [countUp]="shared.devFund.value.data[shared.devFund.value.data.length - 1]"></span>
+                  </span>
+                  <!-- <div class="me-auto">
+                    <span class="text-green d-inline-flex align-items-center lh-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M3 17l6 -6l4 4l8 -8"></path>
+                        <path d="M14 7l7 0l0 7"></path>
+                      </svg>
+                    </span>
+                  </div> -->
+                </div>
+              </div>
+              <div class="col-5 text-end">
+                <a href="https://nano.to/Protocol_fund" target="_blank">
+                  Donate
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                    <path d="M12 6l-3.293 3.293a1 1 0 0 0 0 1.414l.543 .543c.69 .69 1.81 .69 2.5 0l1 -1a3.182 3.182 0 0 1 4.5 0l2.25 2.25" />
+                    <path d="M12.5 15.5l2 2" />
+                    <path d="M15 13l2 2" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            }
+            <div echarts [options]="devFundChartOpts" style="height: 66px;"></div>
+          </div>
         </div>
       </div>
 
@@ -510,9 +559,7 @@
         @if (selectedUser.profile?.bio) {
         <div class="subheader mt-3 mb-2">About {{selectedUser.login}}</div>
         }
-        <div>
-          {{selectedUser.profile?.bio}}
-        </div>
+        <div [innerHTML]="selectedUser.profile?.bio"></div>
 
         <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
         <div>
