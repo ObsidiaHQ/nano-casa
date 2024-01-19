@@ -1,6 +1,5 @@
 const express = require('express');
 const compression = require('compression');
-const path = require('path');
 const rateLimit = require('express-rate-limit');
 const passport = require('passport');
 const helmet = require('helmet');
@@ -14,10 +13,10 @@ const app = express();
 // Redis
 const createClient = require('redis').createClient;
 const redis = createClient({
-    host: 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASS,
-    //url: process.env.REDIS_URL,
+    //host: 'localhost',
+    //port: process.env.REDIS_PORT || 6379,
+    //password: process.env.REDIS_PASS,
+    url: process.env.REDIS_URL,
 });
 redis.on('error', (err) => console.log('Redis Client Error', err));
 redis.connect();
@@ -71,17 +70,13 @@ app.use(passport.initialize());
 // Rate limiter
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 300, // Limit each IP to 500 requests per `window`
+    max: 300, // Limit each IP to 300 requests per `window`
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use(limiter);
 
 // Misc
-const BUILD_PATH = './nano-casa';
-const EXPLORER_PATH = './html';
-app.use(express.static(path.join(__dirname, BUILD_PATH)));
-app.use(express.static(path.join(__dirname, EXPLORER_PATH)));
 app.use(compression());
 app.use(
     helmet({
@@ -95,7 +90,11 @@ app.use(
 );
 app.use(
     cors({
-        origin: ['https://nano.casa', 'https://nano.org'],
+        origin: [
+            'https://nano.casa',
+            'https://www.nano.casa',
+            'https://nano.org',
+        ],
     })
 );
 app.use(express.json());
@@ -178,15 +177,6 @@ app.post('/set-profile', async (req, res) => {
 
 app.get('/ping', async (req, res) => {
     res.status(200).send();
-});
-
-app.get('/explorer', async (req, res) => {
-    res.removeHeader('Content-Security-Policy');
-    res.sendFile(path.resolve(__dirname, EXPLORER_PATH, 'index.html'));
-});
-
-app.get('/*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, BUILD_PATH, 'index.html'));
 });
 
 app.listen(8080, () => {
