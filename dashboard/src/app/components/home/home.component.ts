@@ -199,9 +199,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
         trigger: 'axis',
       },
       grid: {
-        left: -30,
+        left: -4,
         top: 0,
-        right: -30,
+        right: -4,
         bottom: 0,
       },
       xAxis: {

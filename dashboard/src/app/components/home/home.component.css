@@ -2,11 +2,48 @@
   height: 410px;
   width: 100%;
 }
-.card.spotlight {
-  border-color: #ffaf1c;
-  box-shadow: 1px 1px 6px #ffaf1c;
-  transition: box-shadow 0.5s ease-in-out;
-}
+
 .card.spotlight a {
   text-decoration: none;
+  z-index: 1;
+}
+
+.card.spotlight {
+  --offset: 2px;
+  overflow: hidden;
+  background-image: conic-gradient(from 45deg, #213, #112 50%, #213);
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.card.spotlight::before {
+  content: "";
+  background: conic-gradient(transparent 75deg, #2b7cdf, #b12a40);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 1;
+  width: 100%;
+  animation: rotate 6s linear infinite;
+}
+
+.card.spotlight::after {
+  content: "";
+  background: inherit;
+  border-radius: inherit;
+  position: absolute;
+  inset: var(--offset);
+  height: calc(100% - 2 * var(--offset));
+  width: calc(100% - 2 * var(--offset));
+}
+
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) scale(1.2) rotate(0turn);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(1.2) rotate(1turn);
+  }
 }

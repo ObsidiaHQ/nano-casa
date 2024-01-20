@@ -101,3 +101,7 @@ a:hover {
 .font-size-13 {
   font-size: 13px;
 }
+.dropdown-toggle::after {
+  border-top: none !important;
+  border-right: none !important;
+}
