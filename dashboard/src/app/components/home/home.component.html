@@ -432,7 +432,7 @@
             <tbody>
               @for (user of contributorsPage; track user.login; let i = $index) {
               <tr>
-                <td class="py-2" scope="row">{{(i+1) + (40 * (contributorsPageIndex-1))}}</td>
+                <td class="py-2" scope="row">{{(i+1) + ((shared.isSmallScreen ? 12 : 40) * (contributorsPageIndex-1))}}</td>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
                     <img class="avatar me-3" [src]="user.avatar_url + '&s=40'" loading="lazy" [alt]="user.login">
