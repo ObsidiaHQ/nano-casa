@@ -7,6 +7,7 @@ import {
   ChartCommit,
   Commit,
   Contributor,
+  Donor,
   Milestone,
   NodeEvent,
   Profile,
@@ -32,9 +33,14 @@ export class SharedService {
   nodeEvents = new BehaviorSubject<NodeEvent[]>([]);
   spotlight = new BehaviorSubject<Repo>({} as Repo);
   publicNodes = new BehaviorSubject<PublicNode[]>([]);
-  devFund = new BehaviorSubject<{ labels: string[]; data: number[] }>({
+  devFund = new BehaviorSubject<{
+    labels: string[];
+    data: number[];
+    donors: Donor[];
+  }>({
     labels: [],
     data: [],
+    donors: [],
   });
 
   constructor(private http: HttpClient, private bp: BreakpointObserver) {
@@ -104,6 +110,7 @@ export class SharedService {
           this.devFund.next({
             data: data.misc.devFundData || [],
             labels: data.misc.devFundLabels || [],
+            donors: data.misc.devFundDonors || [],
           });
           this.spotlight.next(
             data.misc.spotlight ||

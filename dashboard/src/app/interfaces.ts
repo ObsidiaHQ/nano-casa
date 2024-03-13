@@ -55,7 +55,12 @@ export interface ServerResponse {
   milestones: Milestone[];
   events: Commit[];
   nodeEvents: NodeEvent[];
-  misc: { spotlight: Repo; devFundLabels: string[]; devFundData: number[] };
+  misc: {
+    spotlight: Repo;
+    devFundLabels: string[];
+    devFundData: number[];
+    devFundDonors: Donor[];
+  };
   publicNodes: PublicNode[];
 }
 export interface NodeEvent {
@@ -88,4 +93,12 @@ export interface PublicNode {
   version: string;
   resp_time: number;
   deprecated?: boolean;
+}
+export interface Donor {
+  account: string;
+  amount_nano: number;
+  username?: string;
+  website?: string;
+  twitter?: string;
+  github?: string;
 }

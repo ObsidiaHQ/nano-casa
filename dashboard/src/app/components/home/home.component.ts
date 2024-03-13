@@ -34,6 +34,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   commitsChartOpts: EChartsOption;
   reposChartOpts: EChartsOption;
   devFundChartOpts: EChartsOption;
+  donorsChartOpts: EChartsOption;
   selectedUser: Contributor = {} as Contributor;
   loggedUser: Profile;
   editMode = false;
@@ -223,6 +224,59 @@ export class HomeComponent implements OnInit, AfterViewInit {
           areaStyle: {
             color: '#192F4B',
           },
+        },
+      ],
+    };
+    this.donorsChartOpts = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'none',
+        },
+        formatter(param) {
+          return `Ӿ${param[0].value}`;
+        },
+      },
+      grid: {
+        left: 0,
+        top: 0,
+        right: '3%',
+        bottom: 0,
+      },
+      xAxis: {
+        show: false,
+      },
+      yAxis: {
+        show: false,
+        data: [...this.shared.devFund.value.donors]
+          .map((d) => d.username || d.account.substring(0, 15))
+          .slice(0, 5)
+          .reverse(),
+      },
+      series: [
+        {
+          name: 'Amount',
+          type: 'bar',
+          itemStyle: {
+            borderRadius: [0, 10, 10, 0],
+            color: new graphic.LinearGradient(0, 0, 1, 1, [
+              { offset: 0, color: '#DC538C' },
+              { offset: 1, color: '#EEC200' },
+            ]),
+          },
+          label: {
+            show: true,
+            fontSize: 10,
+            position: 'insideRight',
+            color: '#151F2C',
+            formatter(param) {
+              return `${param.name}`;
+            },
+          },
+          data: [...this.shared.devFund.value.donors]
+            .map((d) => Math.round(d.amount_nano))
+            .slice(0, 5)
+            .reverse(),
         },
       ],
     };

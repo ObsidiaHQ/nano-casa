@@ -8,6 +8,11 @@
   z-index: 1;
 }
 
+.card.spotlight .card-stamp-icon {
+  color: #a349ff;
+  background-color: transparent;
+}
+
 .card.spotlight {
   --offset: 2px;
   overflow: hidden;
