@@ -32,6 +32,7 @@ import { SortPipe } from './pipes/sort.pipe';
 import { AsRepoPipe, AsUserPipe } from './pipes/as.pipe';
 import { PublicNodesComponent } from './components/public-nodes/public-nodes.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 echarts.use([
   LineChart,
   BarChart,
@@ -55,6 +56,7 @@ echarts.use([
     AsUserPipe,
     PublicNodesComponent,
     LeaderboardComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -72,6 +74,11 @@ echarts.use([
     FormsModule,
     RouterModule.forRoot([
       {
+        path: '',
+        component: HomeComponent,
+        data: { animation: 'HomePage' },
+      },
+      {
         path: 'about',
         component: AboutComponent,
         data: { animation: 'AboutPage' },
@@ -88,8 +95,8 @@ echarts.use([
       },
       {
         path: '**',
-        component: HomeComponent,
-        data: { animation: 'HomePage' },
+        component: NotFoundComponent,
+        data: { animation: 'NodesPage' },
       },
     ]),
   ],
