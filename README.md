@@ -18,12 +18,12 @@ Monitoring open source development in the [nano](https://nano.org/) ecosystem.
 
 ## Contribute
 
-You can [suggest a repo to be included](https://github.com/obsidiaHQ/nano-casa/issues/1), a new feature or report a bug in [issues](https://github.com/obsidiaHQ/nano-casa/issues). PRs are welcome; just fork the repo and create a new branch for your work.
+You can [suggest a repo to be included](https://github.com/obsidiaHQ/nano-casa/issues/1), a new feature or report a bug in [issues](https://github.com/obsidiaHQ/nano-casa/issues). PRs are also welcome, but reach out first before starting work on something that may eventually not get merged.
 
 ## Local build
 
-Create a `server/.env` file with variables `GITHUB_TOKEN=your_token` and `DB_URL=mongodb_connection_string`.
+Rename `.env.sample` to `.env` and fill with your variables.
 
-Run `npm install` in both directories.
+Run `bun install`.
 
-Start the dashboard with `ng serve` and the server/cronjob with `npm run start/cron`.
+Start the dashboard with `ng serve` and the server/cronjob with `bun run server:start` and `bun run server:cron`.
