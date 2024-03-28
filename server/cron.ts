@@ -1,15 +1,6 @@
 import Cron from 'croner';
 import { Octokit } from 'octokit';
-import {
-  IRepo,
-  IContributor,
-  IMilestone,
-  ICommit,
-  IProfile,
-  IPublicNode,
-  INodeEvent,
-  IDonor,
-} from './interfaces';
+import { IDonor } from '../interfaces';
 import {
   Repo,
   Contributor,

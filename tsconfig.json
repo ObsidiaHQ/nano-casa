@@ -9,14 +9,13 @@
     "strict": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "moduleDetection": "force",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
@@ -25,8 +24,7 @@
       "dom"
     ],
     "useDefineForClassFields": false,
-    "types": ["bun-types"],
-    "esModuleInterop": true, 
+    "skipLibCheck": true,
     "resolveJsonModule": true
   },
   "angularCompilerOptions": {

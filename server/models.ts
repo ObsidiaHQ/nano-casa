@@ -170,6 +170,10 @@ export class Contributor {
               r != 'nanocurrency/nano-node'
           ),
           nodeContributor: repos.includes('nanocurrency/nano-node'),
+          bio: c.bio?.replace(
+            /\[(.*?)\]\((.*?)\)/gim,
+            "<a href='$2' target='_blank'>$1</a>"
+          ),
         };
       });
   }

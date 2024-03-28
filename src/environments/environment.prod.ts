@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  api: 'https://nano.casa/api',
+  server: 'https://nano.casa/',
 };

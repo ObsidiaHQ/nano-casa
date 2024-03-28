@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, take } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { environment } from 'src/environments/environment';
+import { treaty } from '@elysiajs/eden';
+import type { App } from '../../server/server';
 import {
   IChartCommit,
   ICommit,
@@ -13,13 +15,13 @@ import {
   IProfile,
   IPublicNode,
   IRepo,
-  IServerResponse,
 } from '../../interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SharedService {
+  readonly server = treaty<App>(environment.server);
   usersSort = new BehaviorSubject<'month' | 'total'>('month');
   reposSort = new BehaviorSubject<'date' | 'stars'>('date');
   loggedUser = new BehaviorSubject<IProfile>(null);
@@ -67,7 +69,7 @@ export class SharedService {
   fetchUser() {
     if (!this.loggedUser.value) {
       this.http
-        .get(`${environment.api}/auth/user`)
+        .get(`${environment.server}/api/auth/user`)
         .pipe(take(1))
         .subscribe((user: IProfile) => {
           this.loggedUser.next(user);
@@ -86,50 +88,36 @@ export class SharedService {
     }
   }
 
-  getData(): void {
-    if (!this.repos.value.length) {
-      this.http
-        .get(`${environment.api}/data`)
-        .pipe(take(1))
-        .subscribe((data: IServerResponse) => {
-          data.contributors = data.contributors.map((usr) => {
-            if (usr.profile) {
-              usr.profile.bio = usr.profile.bio?.replace(
-                /\[(.*?)\]\((.*?)\)/gim,
-                "<a href='$2' target='_blank'>$1</a>"
-              );
-            }
-            return usr;
-          });
-          this.nodeEvents.next(data.nodeEvents);
-          this.repos.next(data.repos);
-          this.contributors.next(data.contributors);
-          this.commits.next(data.commits);
-          this.events.next(data.events);
-          this.milestones.next(data.milestones);
-          this.devFund.next({
-            data: data.misc.devFundData || [],
-            labels: data.misc.devFundLabels || [],
-            donors: data.misc.devFundDonors || [],
-          });
-          this.spotlight.next(
-            data.misc.spotlight ||
-              data.repos[Math.floor(Math.random() * data.repos.length)]
-          );
-          this.publicNodes.next(data.publicNodes);
-        });
-    }
+  getData() {
+    this.server.api.data.get().then((res) => {
+      this.nodeEvents.next(res.data.nodeEvents);
+      this.repos.next(res.data.repos);
+      this.contributors.next(res.data.contributors);
+      this.commits.next(res.data.commits);
+      this.events.next(res.data.events);
+      this.milestones.next(res.data.milestones);
+      this.devFund.next({
+        data: res.data.misc.devFundData || [],
+        labels: res.data.misc.devFundLabels || [],
+        donors: res.data.misc.devFundDonors || [],
+      });
+      this.spotlight.next(
+        res.data.misc.spotlight ||
+          res.data.repos[Math.floor(Math.random() * res.data.repos.length)]
+      );
+      this.publicNodes.next(res.data.publicNodes);
+    });
   }
 
   updateProfile() {
     return this.http
-      .post(`${environment.api}/set-profile`, this.loggedUser.value)
+      .post(`${environment.server}/api/set-profile`, this.loggedUser.value)
       .pipe(take(1));
   }
 
   logOut() {
     this.http
-      .get(`${environment.api}/logout`)
+      .get(`${environment.server}/api/logout`)
       .pipe(take(1))
       .subscribe(() => this.loggedUser.next(null));
   }
