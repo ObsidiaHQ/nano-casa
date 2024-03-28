@@ -60,13 +60,14 @@ export interface IServerResponse {
   milestones: IMilestone[];
   events: ICommit[];
   nodeEvents: INodeEvent[];
-  misc: {
-    spotlight: IRepo;
-    devFundLabels: string[];
-    devFundData: number[];
-    devFundDonors: IDonor[];
-  };
+  misc: IMisc;
   publicNodes: IPublicNode[];
+}
+export interface IMisc {
+  spotlight: IRepo;
+  devFundLabels: string[];
+  devFundData: number[];
+  devFundDonors: IDonor[];
 }
 export interface IDonor {
   I;

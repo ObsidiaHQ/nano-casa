@@ -9,8 +9,6 @@ import {
   PublicNode,
   Repo,
 } from './models';
-import { IServerResponse } from '../interfaces';
-//import { refreshCommitsAndContributors, refreshRepos } from './cron';
 
 const app = new Elysia()
   .use(
@@ -23,8 +21,6 @@ const app = new Elysia()
     })
   )
   .get('/api/data', async () => {
-    // const repos = await refreshRepos();
-    // refreshCommitsAndContributors(repos);
     return {
       repos: Repo.getAll(),
       commits: Commit.activity(),
@@ -34,7 +30,7 @@ const app = new Elysia()
       nodeEvents: NodeEvent.getAll(),
       misc: Misc.getAll(),
       publicNodes: PublicNode.getAll(),
-    } as IServerResponse;
+    };
   })
   .get('/api/ping', () => 'pong')
   .listen(8080);

@@ -13,7 +13,7 @@ db.query(
     prs_7d INTEGER DEFAULT 0,
     commits_30d INTEGER DEFAULT 0,
     commits_7d INTEGER DEFAULT 0,
-    description TEXT
+    description TEXT,
     avatar_url TEXT
   )
 `

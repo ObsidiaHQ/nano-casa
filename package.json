@@ -11,9 +11,9 @@
     "test": "ng test",
     "bundle": "ng build --source-map=true; source-map-explorer ./dist/nano-casa/main.*.js",
     "postbuild": "node purgecss.js",
-    "server:start": "bun run server.ts",
-    "server:dev": "bun run --watch server.ts",
-    "server:cron": "bun cron.ts"
+    "server:start": "bun run server/server.ts",
+    "server:dev": "bun run --watch server/server.ts",
+    "server:cron": "bun server/cron.ts"
   },
   "private": true,
   "dependencies": {

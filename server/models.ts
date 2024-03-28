@@ -6,6 +6,7 @@ import {
   IProfile,
   IPublicNode,
   IRepo,
+  IMisc,
 } from 'interfaces';
 import db from './db';
 import { format } from 'date-fns';
@@ -46,7 +47,7 @@ export class Commit {
     return db
       .query(
         `
-      SELECT repo_full_name, author, date, message, avatar_url
+      SELECT *
       FROM Commits
       WHERE repo_full_name != ?
       ORDER BY date DESC
@@ -123,7 +124,7 @@ export class Misc {
     const res = db
       .query<{ key: string; value: string }, []>(`SELECT * FROM Misc`)
       .all();
-    const misc = {} as Misc satisfies Misc;
+    const misc = {} as IMisc;
     res.forEach((m) => (misc[m.key] = JSON.parse(m.value)));
     return misc;
   }
@@ -147,7 +148,7 @@ export class Contributor {
       .all()
       .map((r) => r.full_name);
     return db
-      .query<IContributor, []>(
+      .query<IContributor & IProfile, []>(
         `SELECT * FROM (
             SELECT * FROM Contributors
           ) AS c
@@ -158,8 +159,8 @@ export class Contributor {
           c.contributions DESC;`
       )
       .all()
-      .map((c: any) => {
-        const repos = JSON.parse(c.repos);
+      .map((c: IContributor & IProfile) => {
+        const repos = JSON.parse(c.repos as unknown as string);
         return {
           ...c,
           repos,
