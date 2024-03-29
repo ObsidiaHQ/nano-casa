@@ -48,7 +48,6 @@ db.query(
   `
   CREATE TABLE IF NOT EXISTS Profiles (
     login TEXT PRIMARY KEY,
-    avatar_url TEXT,
     bio TEXT,
     twitter_username TEXT,
     website TEXT,

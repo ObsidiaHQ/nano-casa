@@ -30,6 +30,18 @@ export interface IContributor {
   profile: IProfile;
   hasPopularRepo: boolean;
   nodeContributor: boolean;
+  //profile
+  bio?: string;
+  twitter_username?: string;
+  website?: string;
+  nano_address?: string;
+  gh_sponsors?: boolean;
+  patreon_url?: string;
+  goal_title?: string;
+  goal_amount?: number;
+  goal_nano_address?: string;
+  goal_website?: string;
+  goal_description?: string;
 }
 export interface IMilestone {
   title: string;

@@ -121,15 +121,15 @@
                     <span [countUp]="shared.devFund.value.data[shared.devFund.value.data.length - 1]"></span>
                   </span>
                   <!-- <div class="me-auto">
-                    <span class="text-green d-inline-flex align-items-center lh-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M3 17l6 -6l4 4l8 -8"></path>
-                        <path d="M14 7l7 0l0 7"></path>
-                      </svg>
-                    </span>
-                  </div> -->
+                      <span class="text-green d-inline-flex align-items-center lh-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                          stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                          <path d="M3 17l6 -6l4 4l8 -8"></path>
+                          <path d="M14 7l7 0l0 7"></path>
+                        </svg>
+                      </span>
+                    </div> -->
                 </div>
               </div>
               <div class="col-5 text-end">
@@ -432,23 +432,23 @@
                   <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
                 </td>
                 <td>
-                  @if (user.profile?.goal_amount) {
-                  <app-goal [amount]="user.profile?.goal_amount" [address]="user.profile?.goal_nano_address" [sid]="'id'+user.profile?.login"></app-goal>
+                  @if (user.goal_amount) {
+                  <app-goal [amount]="user.goal_amount" [address]="user.goal_nano_address" [sid]="'id'+user.login"></app-goal>
                   }
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap justify-content-end">
-                    @if (user.profile?.nano_address) {
-                    <a target="_blank" href="https://nano.to/{{user.profile?.nano_address}}" class="btn bg-azure-lt btn-icon" title="Donate nano">
+                    @if (user.nano_address) {
+                    <a target="_blank" href="https://nano.to/{{user.nano_address}}" class="btn bg-azure-lt btn-icon" title="Donate nano">
                       <app-icon icon="nano"></app-icon>
                     </a>
                     }
-                    @if (user.profile?.patreon_url) {
-                    <a target="_blank" href="{{user.profile?.patreon_url}}" class="btn bg-white-lt btn-icon" title="Become a patron">
+                    @if (user.patreon_url) {
+                    <a target="_blank" href="{{user.patreon_url}}" class="btn bg-white-lt btn-icon" title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>
                     }
-                    @if (user.profile?.gh_sponsors) {
+                    @if (user.gh_sponsors) {
                     <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon" title="Sponsor on GitHub">
                       <app-icon icon="heart"></app-icon>
                     </a>
@@ -483,33 +483,33 @@
 
         <div class="row">
           <div class="col-12 col-md-4 my-1">
-            @if (selectedUser.profile?.website) {
-            <a href="{{selectedUser.profile.website}}" target="_blank" class="h4 px-2" title="Their website">
+            @if (selectedUser.website) {
+            <a href="{{selectedUser.website}}" target="_blank" class="h4 px-2" title="Their website">
               <app-icon icon="web"></app-icon>
             </a>
             }
             <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
               <app-icon icon="github"></app-icon>
             </a>
-            @if (selectedUser.profile?.twitter_username) {
-            <a href="https://twitter.com/{{selectedUser.profile.twitter_username}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
+            @if (selectedUser.twitter_username) {
+            <a href="https://twitter.com/{{selectedUser.twitter_username}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
               <app-icon icon="twitter"></app-icon>
             </a>
             }
           </div>
           <div class="col-12 col-md-4"></div>
           <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
-            @if (selectedUser.profile?.nano_address) {
-            <a href="https://nano.to/{{selectedUser.profile.nano_address}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+            @if (selectedUser.nano_address) {
+            <a href="https://nano.to/{{selectedUser.nano_address}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
               <app-icon icon="nano"></app-icon>
             </a>
             }
-            @if (selectedUser.profile?.patreon_url) {
-            <a target="_blank" [href]="selectedUser.profile.patreon_url" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+            @if (selectedUser.patreon_url) {
+            <a target="_blank" [href]="selectedUser.patreon_url" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
               <app-icon icon="patreon"></app-icon>
             </a>
             }
-            @if (selectedUser.profile?.gh_sponsors) {
+            @if (selectedUser.gh_sponsors) {
             <a target="_blank" href="https://github.com/sponsors/{{selectedUser.login}}" class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
               <app-icon icon="heart"></app-icon>
             </a>
@@ -517,10 +517,10 @@
           </div>
         </div>
 
-        @if (selectedUser.profile?.bio) {
+        @if (selectedUser.bio) {
         <div class="subheader mt-3 mb-2">About {{selectedUser.login}}</div>
         }
-        <div [innerHTML]="selectedUser.profile?.bio"></div>
+        <div [innerHTML]="selectedUser.bio"></div>
 
         <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
         <div>
@@ -529,11 +529,11 @@
           }
         </div>
         <div class="subheader mt-3 mb-2">Funding goal</div>
-        @if (selectedUser.profile?.goal_amount) {
+        @if (selectedUser.goal_amount) {
         <div class="text-body d-block">
           <span class="inline-goal">
-            <app-goal [sid]="'id_'+selectedUser.profile?.login" [title]="selectedUser.profile?.goal_title" [amount]="selectedUser.profile?.goal_amount"
-              [address]="selectedUser.profile?.goal_nano_address" [barOnly]="false" [description]="selectedUser.profile?.goal_description">
+            <app-goal [sid]="'id_'+selectedUser.login" [title]="selectedUser.goal_title" [amount]="selectedUser.goal_amount"
+              [address]="selectedUser.goal_nano_address" [barOnly]="false" [description]="selectedUser.goal_description">
             </app-goal>
           </span>
         </div>
@@ -632,7 +632,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        @if (loggedUser && loggedUser?.login === selectedUser.profile?.login) {
+        @if (loggedUser && loggedUser?.login === selectedUser.login) {
         <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
         }
         @if (loggedUser && editMode) {

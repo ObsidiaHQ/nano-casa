@@ -148,18 +148,15 @@ export class Contributor {
       .all()
       .map((r) => r.full_name);
     return db
-      .query<IContributor & IProfile, []>(
-        `SELECT * FROM (
-            SELECT * FROM Contributors
-          ) AS c
-          LEFT JOIN (
-            SELECT * FROM Profiles
-          ) AS p ON c.login = p.login
+      .query<IContributor, []>(
+        `SELECT * FROM Contributors
+          LEFT JOIN Profiles 
+          ON Contributors.login = Profiles.login
         ORDER BY
-          c.contributions DESC;`
+          Contributors.contributions DESC;`
       )
       .all()
-      .map((c: IContributor & IProfile) => {
+      .map((c: IContributor) => {
         const repos = JSON.parse(c.repos as unknown as string);
         return {
           ...c,

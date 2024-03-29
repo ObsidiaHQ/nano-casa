@@ -1,3 +1,7 @@
+:root {
+  --tblr-secondary: #6e829c;
+}
+
 body {
   font-family: "Open Sans", Tahoma, Geneva, Arial, Helvetica, sans-serif;
   text-rendering: optimizeLegibility;
@@ -104,4 +108,7 @@ a:hover {
 .dropdown-toggle::after {
   border-top: none !important;
   border-right: none !important;
+}
+.text-muted {
+  color: var(--tblr-secondary) !important;
 }
