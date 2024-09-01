@@ -25,9 +25,6 @@
           <div class="nav-item dropdown">
             <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu" aria-expanded="true">
               <span class="avatar avatar-sm" style="background-image: url({{loggedUser.avatar_url}})"></span>
-              <div class="d-none d-xl-block ps-2">
-                <div>{{loggedUser.login}}</div>
-              </div>
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" data-bs-popper="static">
               <a (click)="shared.selectUser(null, true)" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-profile">Profile</a>

@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite';
-const db = new Database('db.sqlite', { create: true });
+const db = new Database('./db.sqlite', { create: true });
 db.exec('PRAGMA journal_mode = WAL;');
 
 db.query(
@@ -47,8 +47,10 @@ db.query(
 db.query(
   `
   CREATE TABLE IF NOT EXISTS Profiles (
-    login TEXT PRIMARY KEY,
+    id TEXT NOT NULL PRIMARY KEY,
+    login TEXT,
     bio TEXT,
+    avatar_url TEXT,
     twitter_username TEXT,
     website TEXT,
     nano_address TEXT,
@@ -89,26 +91,23 @@ db.query(
 ).run();
 
 db.query(
-  `
-  CREATE TABLE IF NOT EXISTS PublicNodes (
+  `CREATE TABLE IF NOT EXISTS PublicNodes (
     endpoint TEXT,
     website TEXT,
     websocket TEXT,
     up INTEGER,
     resp_time INTEGER,
     version TEXT,
-    error TEXT
-  )
-`
+    error TEXT,
+    deprecated INTEGER
+  )`
 ).run();
 
 db.query(
-  `
-  CREATE TABLE IF NOT EXISTS Misc (
+  `CREATE TABLE IF NOT EXISTS Misc (
     key TEXT PRIMARY KEY,
     value TEXT
-  );
-`
+  )`
 ).run();
 
 export default db;

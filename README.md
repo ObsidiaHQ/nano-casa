@@ -18,7 +18,7 @@ Monitoring open source development in the [nano](https://nano.org/) ecosystem.
 
 ## Contribute
 
-You can [suggest a repo to be included](https://github.com/obsidiaHQ/nano-casa/issues/1), a new feature or report a bug in [issues](https://github.com/obsidiaHQ/nano-casa/issues). PRs are also welcome, but reach out first before starting work on something that may eventually not get merged.
+You can [suggest a repo to be included](https://github.com/obsidiaHQ/nano-casa/issues/1), a new feature or report a bug in [issues](https://github.com/obsidiaHQ/nano-casa/issues). PRs are also welcome, but please reach out first before starting to work on something.
 
 ## Local build
 
@@ -26,4 +26,14 @@ Rename `.env.sample` to `.env` and fill with your variables.
 
 Run `bun install`.
 
-Start the dashboard with `ng serve` and the server/cronjob with `bun run server:start` and `bun run server:cron`.
+Start the dashboard with `bun run start` and the server/cronjob with `bun run server:dev` and `bun run server:cron`.
+
+Tech stack is Angular/Hono+Bun/SQLite.
+
+todo:
+finish login and profile editing
+update profile realtime on FE
+migrate profiles
+sync repos.json
+update angular
+test

@@ -1,20 +1,11 @@
-import {
-  ICommit,
-  IContributor,
-  IMilestone,
-  INodeEvent,
-  IProfile,
-  IPublicNode,
-  IRepo,
-  IMisc,
-} from 'interfaces';
 import db from './db';
 import { format } from 'date-fns';
+import { GitHubUser } from '@hono/oauth-providers/github';
 
 export class Repo {
   public static getAll() {
     return db
-      .query<IRepo, []>('SELECT * FROM Repos ORDER BY created_at ASC')
+      .query<Repo, []>('SELECT * FROM Repos ORDER BY created_at ASC')
       .all();
   }
 
@@ -26,10 +17,23 @@ export class Repo {
   }
 }
 
+export interface Repo {
+  name: string;
+  full_name: string;
+  created_at: string;
+  stargazers_count: number;
+  prs_30d: number;
+  prs_7d: number;
+  commits_30d: number;
+  commits_7d: number;
+  avatar_url: string;
+  description: string;
+}
+
 export class PublicNode {
   public static getAll() {
     return db
-      .query<IPublicNode, []>('SELECT * FROM PublicNodes ORDER BY endpoint ASC')
+      .query<PublicNode, []>('SELECT * FROM PublicNodes ORDER BY endpoint ASC')
       .all()
       .map((node) => ({ ...node, error: JSON.parse(node.error) }));
   }
@@ -40,6 +44,16 @@ export class PublicNode {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
   }
+}
+
+export interface PublicNode {
+  endpoint: string;
+  website?: string;
+  websocket?: string;
+  up: boolean;
+  error: any;
+  version: string;
+  resp_time: number;
 }
 
 export class Commit {
@@ -54,7 +68,7 @@ export class Commit {
       LIMIT ?
     `
       )
-      .all('nanocurrency/nano-node', 50) as ICommit[];
+      .all('nanocurrency/nano-node', 50) as Commit[];
   }
 
   public static activity() {
@@ -90,12 +104,18 @@ export class Commit {
   }
 }
 
+export interface Commit {
+  repo_full_name: string;
+  author: string;
+  message: string;
+  avatar_url: string;
+  date: string;
+}
+
 export class NodeEvent {
   public static getAll() {
     return db
-      .query<INodeEvent, []>(
-        `SELECT * FROM NodeEvents ORDER BY created_at DESC`
-      )
+      .query<NodeEvent, []>(`SELECT * FROM NodeEvents ORDER BY created_at DESC`)
       .all()
       .map((ev) => ({ ...ev, event: JSON.parse(ev.event as any) }));
   }
@@ -107,9 +127,23 @@ export class NodeEvent {
   }
 }
 
+export interface NodeEvent {
+  event: {
+    title?: string;
+    event_url: string;
+    action: string;
+    body?: string;
+    ref?: string;
+  };
+  type: string;
+  author: string;
+  avatar_url: string;
+  created_at: string;
+}
+
 export class Milestone {
   public static getAll() {
-    return db.query<IMilestone, []>(`SELECT * FROM Milestones`).all();
+    return db.query<Milestone, []>(`SELECT * FROM Milestones`).all();
   }
 
   public static insert() {
@@ -119,12 +153,20 @@ export class Milestone {
   }
 }
 
+export interface Milestone {
+  title: string;
+  open_issues: number;
+  closed_issues: number;
+  created_at: string;
+  number: number;
+}
+
 export class Misc {
   public static getAll() {
     const res = db
       .query<{ key: string; value: string }, []>(`SELECT * FROM Misc`)
       .all();
-    const misc = {} as IMisc;
+    const misc = {} as Misc;
     res.forEach((m) => (misc[m.key] = JSON.parse(m.value)));
     return misc;
   }
@@ -141,22 +183,29 @@ export class Misc {
   }
 }
 
+export interface Misc {
+  spotlight: Repo;
+  devFundLabels: string[];
+  devFundData: number[];
+  devFundDonors: Donor[];
+}
+
 export class Contributor {
   public static getAll() {
     const reposNames = db
-      .query<IRepo, []>('SELECT * FROM Repos ORDER BY stargazers_count DESC')
+      .query<Repo, []>('SELECT * FROM Repos ORDER BY stargazers_count DESC')
       .all()
       .map((r) => r.full_name);
     return db
-      .query<IContributor, []>(
-        `SELECT * FROM Contributors
-          LEFT JOIN Profiles 
-          ON Contributors.login = Profiles.login
+      .query<Contributor, []>(
+        `SELECT * FROM Profiles p
+          RIGHT JOIN Contributors c
+          USING (login)
         ORDER BY
-          Contributors.contributions DESC;`
+          c.contributions DESC;`
       )
       .all()
-      .map((c: IContributor) => {
+      .map((c: Contributor) => {
         const repos = JSON.parse(c.repos as unknown as string);
         return {
           ...c,
@@ -167,6 +216,7 @@ export class Contributor {
               reposNames.indexOf(r) < 15 &&
               r != 'nanocurrency/nano-node'
           ),
+          created_at: null,
           nodeContributor: repos.includes('nanocurrency/nano-node'),
           bio: c.bio?.replace(
             /\[(.*?)\]\((.*?)\)/gim,
@@ -182,7 +232,126 @@ export class Contributor {
     );
   }
 
-  public static updateProfile(login: string, profile: IProfile) {}
+  public static createProfile(profile: Partial<GitHubUser>) {
+    db.prepare(
+      `INSERT OR IGNORE INTO Profiles (bio, twitter_username, website, login, avatar_url) VALUES ($bio, $twitter, $website, $login, $avatar)`
+    ).run({
+      $bio: profile.bio,
+      $twitter: profile.twitter_username,
+      $website: profile.blog,
+      $avatar: profile.avatar_url,
+      $login: profile.login,
+    });
+  }
 
-  public static update(login: string, contributor: IContributor) {}
+  public static updateProfile(profile: Partial<Profile>, login: string) {
+    if (!login) {
+      return;
+    }
+    db.prepare(
+      `UPDATE Profiles
+       SET 
+          bio = $bio,
+          twitter_username = $twitter_username,
+          website = $website,
+          nano_address = $nano_address,
+          gh_sponsors = $gh_sponsors,
+          patreon_url = $patreon_url,
+          goal_title = $goal_title,
+          goal_amount = $goal_amount,
+          goal_nano_address = $goal_nano_address,
+          goal_website = $goal_website,
+          goal_description = $goal_description
+       WHERE login = $login`
+    ).run({
+      $bio: profile.bio,
+      $twitter_username: profile.twitter_username?.replace('@', ''),
+      $website: profile.website?.replace(/(http|https):\/\//i, ''),
+      $nano_address: profile.nano_address?.replace('@', '').trim(),
+      $gh_sponsors: profile.gh_sponsors,
+      $patreon_url: profile.patreon_url,
+      $goal_title: profile.goal_title,
+      $goal_amount: profile.goal_amount,
+      $goal_nano_address: profile.goal_nano_address?.replace('@', '').trim(),
+      $goal_website: profile.goal_website?.replace(/(http|https):\/\//i, ''),
+      $goal_description: profile.goal_description,
+      $login: login,
+    });
+  }
+
+  public static update(login: string, contributor: Contributor) {}
+}
+
+export interface Contributor {
+  login: string;
+  avatar_url: string;
+  contributions: number;
+  last_month: number;
+  repos: string[];
+  profile: Profile;
+  hasPopularRepo: boolean;
+  nodeContributor: boolean;
+  //profile
+  bio?: string;
+  twitter_username?: string;
+  website?: string;
+  nano_address?: string;
+  gh_sponsors?: boolean;
+  patreon_url?: string;
+  goal_title?: string;
+  goal_amount?: number;
+  goal_nano_address?: string;
+  goal_website?: string;
+  goal_description?: string;
+}
+
+export interface ChartCommit {
+  count: number;
+  date: string;
+}
+
+export interface Profile {
+  id: string;
+  login: string;
+  avatar_url: string; //deprecated
+  bio: string;
+  twitter_username: string;
+  website: string;
+  nano_address: string;
+  gh_sponsors: boolean;
+  patreon_url: string;
+  goal_title?: string;
+  goal_amount: number;
+  goal_nano_address: string;
+  goal_website?: string;
+  goal_description?: string;
+}
+
+export class Profile {
+  public static findByLogin(login: string) {
+    return db
+      .query<Profile, {}>(`SELECT * FROM Profiles WHERE login = ? LIMIT 1`)
+      .get(login);
+  }
+
+  public static update(key: string, value: any) {
+    db.query(
+      `
+      INSERT INTO Misc (key, value) 
+      VALUES (?1, ?2) 
+      ON CONFLICT(key)
+      DO UPDATE SET value = ?2
+      WHERE key = ?1`
+    ).run(key, JSON.stringify(value));
+  }
+}
+
+export interface Donor {
+  I;
+  account: string;
+  amount_nano: number;
+  username?: string;
+  website?: string;
+  twitter?: string;
+  github?: string;
 }

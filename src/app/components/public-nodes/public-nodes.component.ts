@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IPublicNode } from '../../../../interfaces';
+import { PublicNode } from '../../../../server/models';
 import { SharedService } from 'src/app/shared.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { SharedService } from 'src/app/shared.service';
   styleUrls: ['./public-nodes.component.css'],
 })
 export class PublicNodesComponent implements OnInit {
-  nodes: IPublicNode[] = [];
+  nodes: PublicNode[] = [];
 
   constructor(private shared: SharedService) {}
 

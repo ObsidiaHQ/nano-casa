@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { graphic } from 'echarts/core';
-import { IContributor, IProfile, IRepo } from '../../../../interfaces';
+import { Contributor, Profile, Repo } from '../../../../server/models';
 import { SharedService } from 'src/app/shared.service';
 import { SortPipe } from 'src/app/pipes/sort.pipe';
 import { combineLatest } from 'rxjs';
@@ -20,13 +20,13 @@ import { combineLatest } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, AfterViewInit {
-  reposPage: IRepo[] = [];
+  reposPage: Repo[] = [];
   reposNames: string[] = [];
   reposSort: 'date' | 'stars' = 'date';
   reposQuery = '';
   busyWindow: 'busyWeek' | 'busyMonth' = 'busyMonth';
 
-  contributorsPage: IContributor[] = [];
+  contributorsPage: Contributor[] = [];
   contributorsPageIndex = 0;
   contributorsSort: 'month' | 'total' = 'month';
   contributorsQuery = '';
@@ -35,8 +35,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   reposChartOpts: EChartsOption;
   devFundChartOpts: EChartsOption;
   donorsChartOpts: EChartsOption;
-  selectedUser: IContributor = {} as IContributor;
-  loggedUser: IProfile;
+  selectedUser: Contributor = {} as Contributor;
+  loggedUser: Profile;
   editMode = false;
 
   constructor(
@@ -67,7 +67,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     document
       .getElementById('modal-profile')
       .addEventListener('hidden.bs.modal', (e) => {
-        this.shared.selectedUser.next({} as IContributor);
+        this.shared.selectedUser.next({} as Contributor);
       });
   }
 
@@ -142,6 +142,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
           },
         },
         type: 'value',
+        max: 450,
+        min: 0,
+        interval: 50,
       },
       dataZoom: [
         {
@@ -284,16 +287,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   updateProfile() {
-    this.shared.updateProfile().subscribe((usr: IProfile) => {
+    console.log(this.loggedUser);
+    this.shared.updateProfile(this.loggedUser).then(() => {
       this.shared.contributors.next(
         this.shared.contributors.value.map((c) => {
-          if (c.login === usr.login) {
-            return { ...c, profile: usr };
+          if (c.login === this.loggedUser.login) {
+            return { ...c, profile: this.loggedUser };
           }
           return c;
         })
       );
-      this.shared.loggedUser.next(usr);
+      this.shared.loggedUser.next(this.loggedUser);
       this.shared.selectUser(null, true);
       this.editMode = false;
     });

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedService } from './shared.service';
-import { IContributor, IProfile } from '../../interfaces';
+import { Contributor, Profile } from '../../server/models';
 import { ChildrenOutletContexts } from '@angular/router';
 import { fader } from './animation';
 
@@ -10,8 +10,8 @@ import { fader } from './animation';
   animations: [fader],
 })
 export class AppComponent implements OnInit {
-  loggedUser: IProfile;
-  selectedUser: IContributor;
+  loggedUser: Profile;
+  selectedUser: Contributor;
 
   constructor(
     public shared: SharedService,
@@ -20,10 +20,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.shared.loggedUser.subscribe(
-      (user: IProfile) => (this.loggedUser = user)
+      (user: Profile) => (this.loggedUser = user)
     );
     this.shared.selectedUser.subscribe(
-      (user: IContributor) => (this.selectedUser = user)
+      (user: Contributor) => (this.selectedUser = user)
     );
   }
 

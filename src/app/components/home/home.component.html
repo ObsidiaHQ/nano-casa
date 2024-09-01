@@ -316,7 +316,8 @@
             </div>
           </div>
           <div class="ms-auto d-inline-block">
-            <input type="text" class="form-control form-control-sm" aria-label="Search repos" placeholder="Search by name/description" [(ngModel)]="reposQuery">
+            <input type="text" class="form-control form-control-sm search" aria-label="Search repos" placeholder="Search by name or description"
+              [(ngModel)]="reposQuery">
           </div>
         </div>
         <div class="table-responsive">
@@ -370,7 +371,7 @@
         <div class="card-header">
           <h3 class="card-title">Contributors</h3>
           <div class="ms-auto d-inline-block">
-            <input type="text" class="form-control form-control-sm" aria-label="Search users" placeholder="Search by username/repos"
+            <input type="text" class="form-control form-control-sm search" aria-label="Search users" placeholder="Search by username, repos"
               [(ngModel)]="contributorsQuery">
           </div>
         </div>
@@ -484,7 +485,7 @@
         <div class="row">
           <div class="col-12 col-md-4 my-1">
             @if (selectedUser.website) {
-            <a href="{{selectedUser.website}}" target="_blank" class="h4 px-2" title="Their website">
+            <a href="https://{{selectedUser.website}}" target="_blank" class="h4 px-2" title="Their website">
               <app-icon icon="web"></app-icon>
             </a>
             }
@@ -636,8 +637,8 @@
         <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
         }
         @if (loggedUser && editMode) {
-        <button type="button" class="btn btn-primary" [disabled]="!loggedUser.goal_nano_address || !loggedUser.goal_amount"
-          (click)="updateProfile()">Save</button>
+        <button type="button" class="btn btn-primary" (click)="updateProfile()">Save</button>
+        <!-- [disabled]="!loggedUser.goal_nano_address || !loggedUser.goal_amount" -->
         }
       </div>
     </div>

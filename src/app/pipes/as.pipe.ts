@@ -1,11 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { IContributor, IRepo } from '../../../interfaces';
+import { Contributor, Repo } from '../../../server/models';
 
 @Pipe({
   name: 'asRepo',
 })
 export class AsRepoPipe implements PipeTransform {
-  transform(value: any, args?: any): IRepo[] {
+  transform(value: any, args?: any): Repo[] {
     return value;
   }
 }
@@ -14,7 +14,7 @@ export class AsRepoPipe implements PipeTransform {
   name: 'asUser',
 })
 export class AsUserPipe implements PipeTransform {
-  transform(value: any, args?: any): IContributor[] {
+  transform(value: any, args?: any): Contributor[] {
     return value;
   }
 }

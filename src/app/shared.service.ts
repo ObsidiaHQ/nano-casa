@@ -1,51 +1,54 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, take } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { treaty } from '@elysiajs/eden';
+import { hc } from 'hono/client';
 import type { App } from '../../server/server';
 import {
-  IChartCommit,
-  ICommit,
-  IContributor,
-  IDonor,
-  IMilestone,
-  INodeEvent,
-  IProfile,
-  IPublicNode,
-  IRepo,
-} from '../../interfaces';
+  ChartCommit,
+  Commit,
+  Contributor,
+  Donor,
+  Milestone,
+  NodeEvent,
+  Profile,
+  PublicNode,
+  Repo,
+} from '../../server/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SharedService {
-  readonly server = treaty<App>(environment.server);
+  readonly server = hc<App>(environment.server, {
+    init: {
+      credentials: 'include',
+    },
+  });
   usersSort = new BehaviorSubject<'month' | 'total'>('month');
   reposSort = new BehaviorSubject<'date' | 'stars'>('date');
-  loggedUser = new BehaviorSubject<IProfile>(null);
-  selectedUser = new BehaviorSubject<IContributor>(null);
+  loggedUser = new BehaviorSubject<Profile>(null);
+  selectedUser = new BehaviorSubject<Contributor>(null);
 
-  repos = new BehaviorSubject<IRepo[]>([]);
-  commits = new BehaviorSubject<IChartCommit[]>([]);
-  contributors = new BehaviorSubject<IContributor[]>([]);
-  milestones = new BehaviorSubject<IMilestone[]>([]);
-  events = new BehaviorSubject<ICommit[]>([]);
-  nodeEvents = new BehaviorSubject<INodeEvent[]>([]);
-  spotlight = new BehaviorSubject<IRepo>({} as IRepo);
-  publicNodes = new BehaviorSubject<IPublicNode[]>([]);
+  repos = new BehaviorSubject<Repo[]>([]);
+  commits = new BehaviorSubject<ChartCommit[]>([]);
+  contributors = new BehaviorSubject<Contributor[]>([]);
+  milestones = new BehaviorSubject<Milestone[]>([]);
+  events = new BehaviorSubject<Commit[]>([]);
+  nodeEvents = new BehaviorSubject<NodeEvent[]>([]);
+  spotlight = new BehaviorSubject<Repo>({} as Repo);
+  publicNodes = new BehaviorSubject<PublicNode[]>([]);
   devFund = new BehaviorSubject<{
     labels: string[];
     data: number[];
-    donors: IDonor[];
+    donors: Donor[];
   }>({
     labels: [],
     data: [],
     donors: [],
   });
 
-  constructor(private http: HttpClient, private bp: BreakpointObserver) {
+  constructor(private bp: BreakpointObserver) {
     this.fetchUser();
     this.getData();
     const perfUS =
@@ -66,18 +69,7 @@ export class SharedService {
     localStorage.setItem('reposSort', by);
   }
 
-  fetchUser() {
-    if (!this.loggedUser.value) {
-      this.http
-        .get(`${environment.server}/api/auth/user`)
-        .pipe(take(1))
-        .subscribe((user: IProfile) => {
-          this.loggedUser.next(user);
-        });
-    }
-  }
-
-  selectUser(user: IContributor, editMode = false) {
+  selectUser(user: Contributor, editMode = false) {
     if (editMode) {
       const loggedContrib = this.contributors.value.find(
         (c) => c.login === this.loggedUser.value.login
@@ -88,38 +80,40 @@ export class SharedService {
     }
   }
 
-  getData() {
-    this.server.api.data.get().then((res) => {
-      this.nodeEvents.next(res.data.nodeEvents);
-      this.repos.next(res.data.repos);
-      this.contributors.next(res.data.contributors);
-      this.commits.next(res.data.commits);
-      this.events.next(res.data.events);
-      this.milestones.next(res.data.milestones);
-      this.devFund.next({
-        data: res.data.misc.devFundData || [],
-        labels: res.data.misc.devFundLabels || [],
-        donors: res.data.misc.devFundDonors || [],
-      });
-      this.spotlight.next(
-        res.data.misc.spotlight ||
-          res.data.repos[Math.floor(Math.random() * res.data.repos.length)]
-      );
-      this.publicNodes.next(res.data.publicNodes);
+  fetchUser() {
+    this.server.api.auth.user.$get().then(async (user) => {
+      this.loggedUser.next(await user.json());
     });
   }
 
-  updateProfile() {
-    return this.http
-      .post(`${environment.server}/api/set-profile`, this.loggedUser.value)
-      .pipe(take(1));
+  getData() {
+    this.server.api.data.$get().then(async (res) => {
+      const data = await res.json();
+      this.nodeEvents.next(data.nodeEvents);
+      this.repos.next(data.repos);
+      this.contributors.next(data.contributors);
+      this.commits.next(data.commits);
+      this.events.next(data.events);
+      this.milestones.next(data.milestones);
+      this.devFund.next({
+        data: data.misc.devFundData || [],
+        labels: data.misc.devFundLabels || [],
+        donors: data.misc.devFundDonors || [],
+      });
+      this.spotlight.next(
+        data.misc.spotlight ||
+          data.repos[Math.floor(Math.random() * data.repos.length)]
+      );
+      this.publicNodes.next(data.publicNodes);
+    });
+  }
+
+  async updateProfile(loggedUser) {
+    await this.server.api['update-profile'].$post({ json: loggedUser });
   }
 
   logOut() {
-    this.http
-      .get(`${environment.server}/api/logout`)
-      .pipe(take(1))
-      .subscribe(() => this.loggedUser.next(null));
+    this.server.api.logout.$get().then(() => this.loggedUser.next(null));
   }
 
   get isSmallScreen(): boolean {

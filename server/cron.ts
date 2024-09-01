@@ -1,6 +1,5 @@
 import Cron from 'croner';
 import { Octokit } from 'octokit';
-import { IDonor } from '../interfaces';
 import {
   Repo,
   Contributor,
@@ -9,9 +8,10 @@ import {
   PublicNode,
   NodeEvent,
   Misc,
+  Donor,
 } from './models';
 import db from './db';
-const octo = new Octokit({ auth: process.env['GITHUB_TOKEN'] });
+const octo = new Octokit({ auth: Bun.env.GITHUB_TOKEN });
 import REPOS from './repos.json';
 import axios from 'axios';
 axios.defaults.headers.common['Accept-Encoding'] = 'gzip';
@@ -511,7 +511,7 @@ export async function getDevFundHistory() {
       account: '@Protocol_fund',
       count: '-1',
       reverse: true,
-      key: process.env['NANO_RPC_KEY'],
+      key: Bun.env.NANO_RPC_KEY,
     })
     .then(async (res) => {
       const balances = new Array(res.data.history.length);
@@ -545,7 +545,7 @@ export async function getDevFundHistory() {
 
       const donors = Object.values(donorsMap)
         .slice(1)
-        .map((donor: IDonor) => {
+        .map((donor: Donor) => {
           if (!donor.username) {
             return donor;
           }
@@ -567,7 +567,7 @@ export async function getDevFundHistory() {
     });
 }
 
-const job = new Cron('30 * * * *', async () => {
+const job = new Cron('09 * * * *', async () => {
   refreshMilestones();
   getDevFundHistory();
   checkPublicNodes();

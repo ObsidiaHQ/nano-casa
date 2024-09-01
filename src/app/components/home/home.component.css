@@ -43,6 +43,17 @@
   width: calc(100% - 2 * var(--offset));
 }
 
+input.search {
+  width: 250px;
+  height: 30px;
+}
+
+@media only screen and (max-width: 600px) {
+  input.search {
+    width: 100%;
+  }
+}
+
 @keyframes rotate {
   from {
     transform: translate(-50%, -50%) scale(1.2) rotate(0turn);
