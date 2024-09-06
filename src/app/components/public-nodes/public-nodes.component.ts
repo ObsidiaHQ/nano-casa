@@ -1,18 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { PublicNode } from '../../../../server/models';
-import { SharedService } from 'src/app/shared.service';
+import { Component, inject } from '@angular/core';
+import { SharedService } from '../../shared.service';
+import { IconComponent } from '../icon/icon.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-public-nodes',
+  standalone: true,
+  imports: [CommonModule, IconComponent],
   templateUrl: './public-nodes.component.html',
   styleUrls: ['./public-nodes.component.css'],
 })
-export class PublicNodesComponent implements OnInit {
-  nodes: PublicNode[] = [];
-
-  constructor(private shared: SharedService) {}
-
-  ngOnInit() {
-    this.shared.publicNodes.subscribe((nodes) => (this.nodes = nodes));
-  }
+export class PublicNodesComponent {
+  readonly shared = inject(SharedService);
 }

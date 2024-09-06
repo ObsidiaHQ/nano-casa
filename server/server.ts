@@ -7,7 +7,7 @@ import { createMiddleware } from 'hono/factory';
 import { zValidator } from '@hono/zod-validator';
 import { githubAuth } from '@hono/oauth-providers/github';
 import { Session, sessionMiddleware } from 'hono-sessions';
-import { BunSqliteStore } from 'node_modules/hono-sessions/esm/src/store/bun/BunSqliteStore'; // TODO fix path
+import { BunSqliteStore } from 'hono-sessions/bun-sqlite-store'; // TODO fix path
 import { z } from 'zod';
 import {
   Commit,
@@ -24,7 +24,7 @@ type Env = {
   Variables: {
     session: Session;
     session_key_rotation: boolean;
-    user?: Profile;
+    user: Profile | null;
     isAuthenticated?: () => boolean;
   };
 };
@@ -40,7 +40,7 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
   await next();
 });
 
-const app = new Hono<Env>()
+const app = new Hono<Env>({ strict: false })
   .use(
     cors({
       origin: [
@@ -118,7 +118,7 @@ const app = new Hono<Env>()
       })
     ),
     (c) => {
-      if (!c.var.isAuthenticated()) {
+      if (c.var.isAuthenticated && !c.var.isAuthenticated()) {
         return new Response('not logged in', {
           status: 401,
         });
@@ -126,7 +126,7 @@ const app = new Hono<Env>()
 
       Contributor.updateProfile(
         c.req.valid('json') as Partial<Profile>,
-        c.var.user.login
+        c.var.user?.login
       );
 
       return new Response('updated', {
@@ -142,13 +142,18 @@ const app = new Hono<Env>()
     return new Response();
   })
   .get('/api/ping', (c) => c.text('pong'))
-  .get('/:filename{.+\\.(js|png|ico|css|svg)$}', async (c) => {
-    const filePath = './dist/nano-casa' + new URL(c.req.url).pathname;
+  .get('/explorer', async (c) => {
+    const filePath = './html/index.html';
     const file = Bun.file(filePath);
     return new Response(file);
   })
-  .get('/', async (c) => {
-    const filePath = './dist/nano-casa/' + 'index.html';
+  .get('/:filename{.+\\.(js|png|ico|css|svg|map)$}', async (c) => {
+    const filePath = './dist/nano-casa/browser' + new URL(c.req.url).pathname;
+    const file = Bun.file(filePath);
+    return new Response(file);
+  })
+  .get('/*', async (c) => {
+    const filePath = './dist/nano-casa/browser' + '/index.html';
     const file = Bun.file(filePath);
     return new Response(file);
   });

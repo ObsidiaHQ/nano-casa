@@ -29,11 +29,3 @@ Run `bun install`.
 Start the dashboard with `bun run start` and the server/cronjob with `bun run server:dev` and `bun run server:cron`.
 
 Tech stack is Angular/Hono+Bun/SQLite.
-
-todo:
-finish login and profile editing
-update profile realtime on FE
-migrate profiles
-sync repos.json
-update angular
-test

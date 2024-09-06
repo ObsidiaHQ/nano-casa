@@ -3,24 +3,27 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  inject,
 } from '@angular/core';
-import { SharedService } from 'src/app/shared.service';
+import { SharedService } from '../../shared.service';
 import { EChartsOption } from 'echarts';
 import { graphic } from 'echarts/core';
+import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
 
 @Component({
   selector: 'app-leaderboard',
   templateUrl: './leaderboard.component.html',
+  standalone: true,
+  imports: [NgxEchartsDirective],
+  providers: [provideEcharts()],
   styleUrl: './leaderboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeaderboardComponent implements AfterViewInit {
   donorsChartOpts: EChartsOption;
 
-  constructor(
-    protected shared: SharedService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  protected shared = inject(SharedService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -46,7 +49,7 @@ export class LeaderboardComponent implements AfterViewInit {
         },
         yAxis: {
           show: false,
-          data: [...this.shared.devFund.value.donors]
+          data: [...this.shared.devFund().donors]
             .filter((d) => d.amount_nano > 0.5)
             .map((d) => d.username || d.account.substring(0, 18))
             .reverse(),
@@ -71,7 +74,7 @@ export class LeaderboardComponent implements AfterViewInit {
                 return `${param.name}`;
               },
             },
-            data: [...this.shared.devFund.value.donors]
+            data: [...this.shared.devFund().donors]
               .filter((d) => d.amount_nano > 0.5)
               .map((d) => Math.round(d.amount_nano))
               .reverse(),
@@ -79,6 +82,6 @@ export class LeaderboardComponent implements AfterViewInit {
         ],
       };
       this.cdr.markForCheck();
-    }, 500);
+    }, 250);
   }
 }

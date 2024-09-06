@@ -32,7 +32,9 @@
     "PlasmaPower/orv-privacy",
     "PlasmaPower/distributed-vanity",
     "PlasmaPower/distributed-vanity-server",
-    "pRizz/nanocurrency-node"
+    "PlasmaPower/nano-bip32",
+    "pRizz/nanocurrency-node",
+    "superdarkbit/nano-bip32-ed25519"
   ],
   "partial": {
     "repos": ["cypherstack/stack_wallet", "cake-tech/cake_wallet"],
@@ -51,7 +53,8 @@
     "SlowestTimelord/slowesttimelord.github.io",
     "gr0vity-dev/nanotps-front",
     "CarlosFGordian/MasterMinds",
-    "0xGilang/RaiblocksOne"
+    "0xGilang/RaiblocksOne",
+    "gr0vity-dev/nano-node-builder"
   ],
   "queries": [
     "topic:nanocurrency",

@@ -5,7 +5,7 @@
         <h3 class="card-title">Public Nodes</h3>
       </div>
       <div class="list-group list-group-flush list-group-hoverable">
-        @for (node of nodes; track node.endpoint) {
+        @for (node of shared.publicNodes(); track node.endpoint) {
         <div class="list-group-item">
           <div class="row align-items-center">
             <div class="col-auto">

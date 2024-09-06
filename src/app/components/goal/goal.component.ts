@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, Input } from '@angular/core';
-declare var nano;
+declare var nano: any;
 
 @Component({
   selector: 'app-goal',
+  standalone: true,
   template: `
     @if (barOnly) {
 
@@ -50,16 +51,14 @@ declare var nano;
   `,
 })
 export class GoalComponent implements AfterViewInit {
-  @Input() sid: string;
-  @Input() address: string;
-  @Input() title: string;
-  @Input() amount: number;
+  @Input() sid!: string;
+  @Input() address!: string;
+  @Input() title!: string;
+  @Input() amount!: number;
   @Input() color: string = '#4299e1';
-  @Input() website: string;
-  @Input() description: string;
+  @Input() website!: string;
+  @Input() description!: string;
   @Input() barOnly = true;
-
-  constructor() {}
 
   ngAfterViewInit(): void {
     nano.goal({

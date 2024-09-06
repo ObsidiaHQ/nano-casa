@@ -3,6 +3,7 @@ import { Contributor, Repo } from '../../../server/models';
 
 @Pipe({
   name: 'asRepo',
+  standalone: true,
 })
 export class AsRepoPipe implements PipeTransform {
   transform(value: any, args?: any): Repo[] {
@@ -12,6 +13,7 @@ export class AsRepoPipe implements PipeTransform {
 
 @Pipe({
   name: 'asUser',
+  standalone: true,
 })
 export class AsUserPipe implements PipeTransform {
   transform(value: any, args?: any): Contributor[] {

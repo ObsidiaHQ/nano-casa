@@ -567,7 +567,7 @@ export async function getDevFundHistory() {
     });
 }
 
-const job = new Cron('09 * * * *', async () => {
+const job = new Cron('12 * * * *', async () => {
   refreshMilestones();
   getDevFundHistory();
   checkPublicNodes();

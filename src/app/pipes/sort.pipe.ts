@@ -3,6 +3,7 @@ import { Contributor, Repo } from '../../../server/models';
 
 @Pipe({
   name: 'sort',
+  standalone: true,
 })
 export class SortPipe implements PipeTransform {
   transform(

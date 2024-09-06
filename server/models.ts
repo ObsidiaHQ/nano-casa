@@ -166,7 +166,7 @@ export class Misc {
     const res = db
       .query<{ key: string; value: string }, []>(`SELECT * FROM Misc`)
       .all();
-    const misc = {} as Misc;
+    const misc = {} as Record<string, Misc>;
     res.forEach((m) => (misc[m.key] = JSON.parse(m.value)));
     return misc;
   }
@@ -206,7 +206,7 @@ export class Contributor {
       )
       .all()
       .map((c: Contributor) => {
-        const repos = JSON.parse(c.repos as unknown as string);
+        const repos: string[] = JSON.parse(c.repos as unknown as string);
         return {
           ...c,
           repos,
@@ -232,22 +232,25 @@ export class Contributor {
     );
   }
 
-  public static createProfile(profile: Partial<GitHubUser>) {
+  public static createProfile(profile: Partial<GitHubUser> | undefined) {
+    if (!profile) return;
     db.prepare(
       `INSERT OR IGNORE INTO Profiles (bio, twitter_username, website, login, avatar_url) VALUES ($bio, $twitter, $website, $login, $avatar)`
-    ).run({
-      $bio: profile.bio,
-      $twitter: profile.twitter_username,
-      $website: profile.blog,
-      $avatar: profile.avatar_url,
-      $login: profile.login,
-    });
+    ) //@ts-ignore
+      .run({
+        $bio: profile.bio,
+        $twitter: profile.twitter_username,
+        $website: profile.blog,
+        $avatar: profile.avatar_url,
+        $login: profile.login,
+      });
   }
 
-  public static updateProfile(profile: Partial<Profile>, login: string) {
-    if (!login) {
-      return;
-    }
+  public static updateProfile(
+    profile: Partial<Profile>,
+    login: string | undefined
+  ) {
+    if (!login) return;
     db.prepare(
       `UPDATE Profiles
        SET 
@@ -263,20 +266,21 @@ export class Contributor {
           goal_website = $goal_website,
           goal_description = $goal_description
        WHERE login = $login`
-    ).run({
-      $bio: profile.bio,
-      $twitter_username: profile.twitter_username?.replace('@', ''),
-      $website: profile.website?.replace(/(http|https):\/\//i, ''),
-      $nano_address: profile.nano_address?.replace('@', '').trim(),
-      $gh_sponsors: profile.gh_sponsors,
-      $patreon_url: profile.patreon_url,
-      $goal_title: profile.goal_title,
-      $goal_amount: profile.goal_amount,
-      $goal_nano_address: profile.goal_nano_address?.replace('@', '').trim(),
-      $goal_website: profile.goal_website?.replace(/(http|https):\/\//i, ''),
-      $goal_description: profile.goal_description,
-      $login: login,
-    });
+    ) //@ts-ignore
+      .run({
+        $bio: profile.bio,
+        $twitter_username: profile.twitter_username?.replace('@', ''),
+        $website: profile.website?.replace(/(http|https):\/\//i, ''),
+        $nano_address: profile.nano_address?.replace('@', '').trim(),
+        $gh_sponsors: profile.gh_sponsors,
+        $patreon_url: profile.patreon_url,
+        $goal_title: profile.goal_title,
+        $goal_amount: profile.goal_amount,
+        $goal_nano_address: profile.goal_nano_address?.replace('@', '').trim(),
+        $goal_website: profile.goal_website?.replace(/(http|https):\/\//i, ''),
+        $goal_description: profile.goal_description,
+        $login: login,
+      });
   }
 
   public static update(login: string, contributor: Contributor) {}
@@ -320,11 +324,11 @@ export interface Profile {
   nano_address: string;
   gh_sponsors: boolean;
   patreon_url: string;
-  goal_title?: string;
+  goal_title: string | null;
   goal_amount: number;
   goal_nano_address: string;
-  goal_website?: string;
-  goal_description?: string;
+  goal_website: string | null;
+  goal_description: string | null;
 }
 
 export class Profile {
@@ -347,7 +351,6 @@ export class Profile {
 }
 
 export interface Donor {
-  I;
   account: string;
   amount_nano: number;
   username?: string;

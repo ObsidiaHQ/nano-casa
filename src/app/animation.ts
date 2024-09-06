@@ -22,7 +22,7 @@ export const fader = trigger('routeAnimations', [
       { optional: true }
     ),
     // Animate the new page in
-    query(':enter', [animate('400ms ease', style({ opacity: 1 }))], {
+    query(':enter', [animate('600ms ease', style({ opacity: 1 }))], {
       optional: true,
     }),
   ]),

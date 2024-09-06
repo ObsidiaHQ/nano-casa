@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   Input,
@@ -13,6 +14,8 @@ import paginate from 'jw-paginate';
 
 @Component({
   selector: 'app-pagination',
+  imports: [CommonModule],
+  standalone: true,
   template: ` <div class="card-footer d-flex align-items-center">
     <ul class="pagination m-0 ms-auto">
       <li
@@ -42,7 +45,8 @@ import paginate from 'jw-paginate';
           prev
         </a>
       </li>
-      @for (_ of [].constructor(pager.totalPages); track _; let i = $index) {
+      @for (_ of [].constructor(pager.totalPages); track $index; let i = $index)
+      {
       <li
         class="page-item d-none d-md-inline-block"
         [ngClass]="{ active: pager.currentPage === i + 1 }"
@@ -79,13 +83,13 @@ import paginate from 'jw-paginate';
   encapsulation: ViewEncapsulation.None,
 })
 export class PaginationComponent implements OnInit, OnChanges {
-  @Input() items: Array<any>;
+  @Input() items: Array<any> = [];
   @Output() itemsChange = new EventEmitter<any>(true);
-  initialPage = 1;
   @Input() pageSize = 10;
   @Input() maxPages = 10;
 
   pager: any = {};
+  initialPage = 1;
 
   ngOnInit() {
     if (this.items && this.items.length) {

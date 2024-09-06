@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-icon',
+  standalone: true,
   template: `
     <svg
       attr.width="{{ size }}px"
@@ -13,17 +14,15 @@ import { Component, Input, OnInit } from '@angular/core';
       stroke-linecap="round"
       stroke-linejoin="round"
     >
-      <use attr.xlink:href="assets/icons/{{ icon }}.svg#{{ icon }}"></use>
+      <use attr.xlink:href="icons/{{ icon }}.svg#{{ icon }}"></use>
     </svg>
   `,
 })
-export class IconComponent implements OnInit {
+export class IconComponent {
   @Input() icon!: string;
   @Input() size?: string = '20';
   @Input() fill?: string = 'none';
   @Input() classList?: string;
   @Input() strokeColor?: string = 'currentColor';
   @Input() strokeWidth?: string = '1.5';
-
-  ngOnInit(): void {}
 }

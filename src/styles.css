@@ -112,3 +112,6 @@ a:hover {
 .text-muted {
   color: var(--tblr-secondary) !important;
 }
+.nav-link.active {
+  color: lightblue !important;
+}

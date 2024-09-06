@@ -3,6 +3,7 @@ import { Contributor, Repo } from '../../../server/models';
 
 @Pipe({
   name: 'filter',
+  standalone: true,
 })
 export class FilterPipe implements PipeTransform {
   transform(
@@ -10,8 +11,10 @@ export class FilterPipe implements PipeTransform {
     type: 'repo' | 'user' | 'busyWeek' | 'busyMonth',
     query?: string
   ) {
-    if (query?.length < 3 && type === 'repo') return values as Repo[];
-    if (query?.length < 3 && type === 'user') return values as Contributor[];
+    if (!query || (query.length < 3 && type === 'repo'))
+      return values as Repo[];
+    if (!query || (query.length < 3 && type === 'user'))
+      return values as Contributor[];
 
     if (type === 'repo') {
       return [...values].filter((value: Repo) => {

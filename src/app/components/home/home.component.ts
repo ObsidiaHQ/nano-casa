@@ -1,27 +1,47 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { graphic } from 'echarts/core';
 import { Contributor, Profile, Repo } from '../../../../server/models';
-import { SharedService } from 'src/app/shared.service';
-import { SortPipe } from 'src/app/pipes/sort.pipe';
-import { combineLatest } from 'rxjs';
+import { SortPipe } from '../../pipes/sort.pipe';
+import { SharedService } from '../../shared.service';
+import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
+import { IconComponent } from '../icon/icon.component';
+import { CommonModule } from '@angular/common';
+import { FilterPipe } from '../../pipes/filter.pipe';
+import { AsRepoPipe, AsUserPipe } from '../../pipes/as.pipe';
+import { TimeagoModule } from 'ngx-timeago';
+import { FormsModule } from '@angular/forms';
+import { PaginationComponent } from '../paginate/paginate.component';
+import { GoalComponent } from '../goal/goal.component';
+import { CountUpModule } from 'ngx-countup';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    TimeagoModule,
+    FormsModule,
+    CountUpModule,
+    NgxEchartsDirective,
+    IconComponent,
+    PaginationComponent,
+    GoalComponent,
+    SortPipe,
+    FilterPipe,
+    AsRepoPipe,
+    AsUserPipe,
+    RouterLink,
+  ],
   styleUrls: ['./home.component.css'],
-  providers: [SortPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideEcharts()],
 })
 export class HomeComponent implements OnInit, AfterViewInit {
+  protected shared = inject(SharedService);
+
   reposPage: Repo[] = [];
-  reposNames: string[] = [];
   reposSort: 'date' | 'stars' = 'date';
   reposQuery = '';
   busyWindow: 'busyWeek' | 'busyMonth' = 'busyMonth';
@@ -35,39 +55,21 @@ export class HomeComponent implements OnInit, AfterViewInit {
   reposChartOpts: EChartsOption;
   devFundChartOpts: EChartsOption;
   donorsChartOpts: EChartsOption;
-  selectedUser: Contributor = {} as Contributor;
   loggedUser: Profile;
   editMode = false;
 
-  constructor(
-    public shared: SharedService,
-    private sort: SortPipe,
-    private cdr: ChangeDetectorRef
-  ) {}
-
   ngOnInit() {
-    combineLatest({
-      repos: this.shared.repos,
-      loggedUser: this.shared.loggedUser,
-      selectedUser: this.shared.selectedUser,
-    }).subscribe(({ repos, loggedUser, selectedUser }) => {
-      this.reposNames = this.sort
-        .transform(repos, 'repo', 'stars')
-        .map((r) => r.full_name);
-      setTimeout(() => {
-        this.initCharts();
-      }, 400);
-      this.loggedUser = loggedUser;
-      this.selectedUser = selectedUser;
-      this.cdr.markForCheck();
-    });
+    this.shared.loggedUser$.subscribe((u) => (this.loggedUser = u));
+    setTimeout(() => {
+      this.initCharts();
+    }, 350);
   }
 
   ngAfterViewInit(): void {
     document
       .getElementById('modal-profile')
       .addEventListener('hidden.bs.modal', (e) => {
-        this.shared.selectedUser.next({} as Contributor);
+        this.shared.selectedUser.set({} as Contributor);
       });
   }
 
@@ -80,7 +82,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     for (const year of YEARS) {
       YEARS_DICT[year] = 0;
     }
-    this.shared.repos.value.forEach((repo, i) => {
+    this.shared.repos().forEach((repo, i) => {
       const year = new Date(repo.created_at).getFullYear();
       YEARS_DICT[year] += 1;
     });
@@ -133,7 +135,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: this.shared.commits.value.map((com) => com.date),
+        data: this.shared.commits().map((com) => com.date),
       },
       yAxis: {
         splitLine: {
@@ -142,18 +144,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
           },
         },
         type: 'value',
-        max: 450,
+        max: 400,
         min: 0,
         interval: 50,
       },
       dataZoom: [
         {
           type: 'inside',
-          start: 10,
+          start: 0,
           end: 100,
         },
         {
-          start: 10,
+          start: 0,
           end: 100,
         },
       ],
@@ -163,7 +165,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           symbol: 'none',
           type: 'line',
           sampling: 'lttb',
-          data: this.shared.commits.value.map((com) => com.count),
+          data: this.shared.commits().map((com) => com.count),
           lineStyle: {
             width: 0,
           },
@@ -210,7 +212,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       },
       xAxis: {
         show: false,
-        data: this.shared.devFund.value.labels,
+        data: this.shared.devFund().labels,
       },
       yAxis: {
         show: false,
@@ -219,7 +221,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         {
           name: 'Balance',
           symbol: 'none',
-          data: this.shared.devFund.value.data,
+          data: this.shared.devFund().data,
           type: 'line',
           itemStyle: {
             color: '#1F67BD',
@@ -251,7 +253,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       },
       yAxis: {
         show: false,
-        data: [...this.shared.devFund.value.donors]
+        data: [...this.shared.devFund().donors]
           .map((d) => d.username || d.account.substring(0, 15))
           .slice(0, 5)
           .reverse(),
@@ -276,48 +278,41 @@ export class HomeComponent implements OnInit, AfterViewInit {
               return `${param.name}`;
             },
           },
-          data: [...this.shared.devFund.value.donors]
+          data: [...this.shared.devFund().donors]
             .map((d) => Math.round(d.amount_nano))
             .slice(0, 5)
             .reverse(),
         },
       ],
     };
-    this.cdr.markForCheck();
   }
 
   updateProfile() {
-    console.log(this.loggedUser);
     this.shared.updateProfile(this.loggedUser).then(() => {
-      this.shared.contributors.next(
-        this.shared.contributors.value.map((c) => {
+      this.shared.contributors.update((contributors) =>
+        contributors.map((c) => {
           if (c.login === this.loggedUser.login) {
-            return { ...c, profile: this.loggedUser };
+            return { ...c, ...this.loggedUser };
           }
           return c;
         })
       );
-      this.shared.loggedUser.next(this.loggedUser);
       this.shared.selectUser(null, true);
       this.editMode = false;
     });
   }
 
   setGoal() {
-    const usr = this.shared.loggedUser.value;
-    usr.goal_title = 'New goal';
-    usr.goal_amount = 5;
-    usr.goal_nano_address = usr.nano_address;
-    usr.goal_description = '';
-    this.shared.loggedUser.next(usr);
+    this.loggedUser.goal_title = 'New goal';
+    this.loggedUser.goal_amount = 5;
+    this.loggedUser.goal_nano_address = this.loggedUser.nano_address || 'nano_';
+    this.loggedUser.goal_description = '';
   }
 
   deleteGoal() {
-    const usr = this.shared.loggedUser.value;
-    usr.goal_title = null;
-    usr.goal_amount = null;
-    usr.goal_nano_address = null;
-    usr.goal_description = null;
-    this.shared.loggedUser.next(usr);
+    this.loggedUser.goal_title = null;
+    this.loggedUser.goal_amount = null;
+    this.loggedUser.goal_nano_address = null;
+    this.loggedUser.goal_description = null;
   }
 }

@@ -12,10 +12,10 @@
                   <div class="subheader">Projects</div>
                 </div>
                 <div class="d-flex align-items-baseline">
-                  <div class="h2 mb-2 me-2" [countUp]="shared.repos.value.length"></div>
+                  <div class="h2 mb-2 me-2" [countUp]="shared.repos().length"></div>
                   <div class="me-auto">
                     <span class="text-pink d-inline-flex align-items-center lh-1">
-                      {{shared.repos.value[shared.repos.value.length-1]?.name}}
+                      {{shared.repos()[shared.repos().length-1]?.name}}
                       <app-icon icon="spark" class="ms-1" size="16"></app-icon>
                     </span>
                   </div>
@@ -26,11 +26,11 @@
                   <div class="subheader">Contributors</div>
                 </div>
                 <div class="d-flex align-items-baseline">
-                  <div class="h2 mb-2 me-2" [countUp]="shared.contributors.value.length"></div>
+                  <div class="h2 mb-2 me-2" [countUp]="shared.contributors().length"></div>
                 </div>
               </div>
             </div>
-            <div echarts [options]="reposChartOpts" style="height: 70px;"></div>
+            <div echarts [options]="reposChartOpts" style="height: 70px;" id="reposChart"></div>
           </div>
         </div>
       </div>
@@ -48,13 +48,13 @@
             </div>
             <div id="carousel-indicators-dot" class="carousel slide carousel-fade" data-bs-ride="carousel">
               <div class="carousel-indicators carousel-indicators-dot">
-                @for (milestone of shared.milestones.value; track milestone.number; let i = $index) {
+                @for (milestone of shared.milestones(); track $index; let i = $index) {
                 <button type="button" data-bs-target="#carousel-indicators-dot" aria-label="carousel indicator dot" [ngClass]="{'active': i === 0}"
                   [attr.data-bs-slide-to]="i"></button>
                 }
               </div>
               <div class="carousel-inner">
-                @for (milestone of shared.milestones.value; track milestone.number; let i = $index) {
+                @for (milestone of shared.milestones(); track $index; let i = $index) {
                 <div class="carousel-item" [ngClass]="{'active': i === 0}">
                   <div class="row align-items-center">
                     <div class="col">
@@ -88,7 +88,7 @@
 
       <div class="col-12 col-md-4 mt-3">
         <div class="card spotlight">
-          <a href="https://github.com/{{shared.spotlight.value.full_name}}" target="_blank">
+          <a href="https://github.com/{{shared.spotlight().full_name}}" target="_blank">
             <div class="card-body">
               <div class="card-stamp">
                 <div class="card-stamp-icon">
@@ -99,9 +99,9 @@
                 <div class="subheader">Spotlight</div>
               </div>
               <div class="d-flex align-items-baseline">
-                <div class="h2 mb-2 me-2">{{shared.spotlight.value.name}}</div>
+                <div class="h2 mb-2 me-2">{{shared.spotlight().name}}</div>
               </div>
-              <p class="text-muted">{{shared.spotlight.value.description}}</p>
+              <p class="text-muted">{{shared.spotlight().description}}</p>
             </div>
           </a>
         </div>
@@ -118,7 +118,7 @@
                 <div class="d-flex align-items-baseline px-1">
                   <span class="h1 mb-0 me-2" style="margin-left: -5px;">
                     <app-icon icon="nano" size="25" classList="mb-1 d-inline-block"></app-icon>
-                    <span [countUp]="shared.devFund.value.data[shared.devFund.value.data.length - 1]"></span>
+                    <span [countUp]="shared.devFund().data[shared.devFund().data.length - 1]"></span>
                   </span>
                   <!-- <div class="me-auto">
                       <span class="text-green d-inline-flex align-items-center lh-1">
@@ -145,7 +145,7 @@
                 </a>
               </div>
             </div>
-            <div echarts [options]="devFundChartOpts" style="height: 66px;"></div>
+            <div echarts [options]="devFundChartOpts" style="height: 66px;" id="devFundChart"></div>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@
                 </a>
               </div>
             </div>
-            <div echarts [options]="donorsChartOpts" style="height: 90px;"></div>
+            <div echarts [options]="donorsChartOpts" style="height: 90px;" id="donorsChart"></div>
           </div>
         </div>
       </div>
@@ -200,7 +200,7 @@
           </div>
           <div class="card-body">
             <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
-              @for (busy of shared.repos.value | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; track busy.full_name; let last = $last) {
+              @for (busy of shared.repos() | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; track $index; let last = $last) {
               <div [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
                 <img [src]="busy.avatar_url + '&s=40'" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
                 <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
@@ -227,7 +227,7 @@
             <div class="card-title pt-3 px-3 pt-md-0 px-md-0">
               <h3>Weekly activity</h3>
             </div>
-            <div echarts [options]="commitsChartOpts" class="chart"></div>
+            <div echarts [options]="commitsChartOpts" class="chart" id="commitsChart"></div>
           </div>
         </div>
       </div>
@@ -254,7 +254,7 @@
               <div class="tab-pane active show" id="node-tab" role="tabpanel">
                 <table class="table table-vcenter">
                   <tbody>
-                    @for (event of shared.nodeEvents.value; track event) {
+                    @for (event of shared.nodeEvents(); track $index) {
                     <tr>
                       <td class="w-1 py-1">
                         <a target="_blank" [href]="event.event.event_url">
@@ -276,7 +276,7 @@
               <div class="tab-pane" id="ecosystem-tab" role="tabpanel">
                 <table class="table table-vcenter">
                   <tbody>
-                    @for (event of shared.events.value; track event) {
+                    @for (event of shared.events(); track $index) {
                     <tr>
                       <td class="w-1 py-1">
                         <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url + '&s=40'}}"
@@ -332,7 +332,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (repo of reposPage; track repo.full_name) {
+              @for (repo of reposPage; track $index) {
               <tr>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
@@ -361,7 +361,7 @@
             </tbody>
           </table>
         </div>
-        <app-pagination [pageSize]="15" [items]="shared.repos.value | filter:'repo':reposQuery | sort:'repo':reposSort"
+        <app-pagination [pageSize]="15" [items]="shared.repos() | filter:'repo':reposQuery | sort:'repo':reposSort"
           (itemsChange)="reposPage = $event.items"></app-pagination>
       </div>
     </div>
@@ -392,7 +392,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (user of contributorsPage; track user.login; let i = $index) {
+              @for (user of contributorsPage; track $index; let i = $index) {
               <tr>
                 <td class="py-2" scope="row">{{(i+1) + ((shared.isSmallScreen ? 12 : 40) * (contributorsPageIndex-1))}}</td>
                 <td data-label="Name" class="py-2">
@@ -466,7 +466,7 @@
           </table>
         </div>
         <app-pagination [pageSize]="shared.isSmallScreen ? 12 : 40"
-          [items]="shared.contributors.value | filter:'user':contributorsQuery | sort:'user':contributorsSort"
+          [items]="shared.contributors() | filter:'user':contributorsQuery | sort:'user':contributorsSort"
           (itemsChange)="contributorsPage = $event.items; contributorsPageIndex = $event.page"></app-pagination>
       </div>
     </div>
@@ -476,65 +476,66 @@
 
 <div class="modal modal-blur fade" id="modal-profile" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    @if (selectedUser) {
+    @if (shared.selectedUser()) {
     <div class="modal-content">
       <div class="modal-body pt-5">
-        <img [src]="selectedUser.avatar_url + '&s=100'" class="profile avatar" [alt]="selectedUser.login">
+        <img [src]="shared.selectedUser().avatar_url + '&s=100'" class="profile avatar" [alt]="shared.selectedUser().login">
         @if (!editMode) {
 
         <div class="row">
           <div class="col-12 col-md-4 my-1">
-            @if (selectedUser.website) {
-            <a href="https://{{selectedUser.website}}" target="_blank" class="h4 px-2" title="Their website">
+            @if (shared.selectedUser().website) {
+            <a href="https://{{shared.selectedUser().website}}" target="_blank" class="h4 px-2" title="Their website">
               <app-icon icon="web"></app-icon>
             </a>
             }
-            <a href="https://github.com/{{selectedUser.login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
+            <a href="https://github.com/{{shared.selectedUser().login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
               <app-icon icon="github"></app-icon>
             </a>
-            @if (selectedUser.twitter_username) {
-            <a href="https://twitter.com/{{selectedUser.twitter_username}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
+            @if (shared.selectedUser().twitter_username) {
+            <a href="https://twitter.com/{{shared.selectedUser().twitter_username}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
               <app-icon icon="twitter"></app-icon>
             </a>
             }
           </div>
           <div class="col-12 col-md-4"></div>
           <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
-            @if (selectedUser.nano_address) {
-            <a href="https://nano.to/{{selectedUser.nano_address}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+            @if (shared.selectedUser().nano_address) {
+            <a href="https://nano.to/{{shared.selectedUser().nano_address}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
               <app-icon icon="nano"></app-icon>
             </a>
             }
-            @if (selectedUser.patreon_url) {
-            <a target="_blank" [href]="selectedUser.patreon_url" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+            @if (shared.selectedUser().patreon_url) {
+            <a target="_blank" [href]="shared.selectedUser().patreon_url" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
               <app-icon icon="patreon"></app-icon>
             </a>
             }
-            @if (selectedUser.gh_sponsors) {
-            <a target="_blank" href="https://github.com/sponsors/{{selectedUser.login}}" class="btn bg-pink-lt w-100 btn-icon" title="Sponsor on GitHub">
+            @if (shared.selectedUser().gh_sponsors) {
+            <a target="_blank" href="https://github.com/sponsors/{{shared.selectedUser().login}}" class="btn bg-pink-lt w-100 btn-icon"
+              title="Sponsor on GitHub">
               <app-icon icon="heart"></app-icon>
             </a>
             }
           </div>
         </div>
 
-        @if (selectedUser.bio) {
-        <div class="subheader mt-3 mb-2">About {{selectedUser.login}}</div>
+        @if (shared.selectedUser().bio) {
+        <div class="subheader mt-3 mb-2">About {{shared.selectedUser().login}}</div>
         }
-        <div [innerHTML]="selectedUser.bio"></div>
+        <div [innerHTML]="shared.selectedUser().bio"></div>
 
-        <div class="subheader mt-3 mb-2">{{selectedUser.login}} contributed to</div>
+        <div class="subheader mt-3 mb-2">{{shared.selectedUser().login}} contributed to</div>
         <div>
-          @for (repo of selectedUser.repos; track repo) {
+          @for (repo of shared.selectedUser().repos; track $index) {
           <a href="https://github.com/{{repo}}"><span class="badge badge-outline badge-pill text-azure me-2 mb-2 p-2">{{repo}}</span></a>
           }
         </div>
         <div class="subheader mt-3 mb-2">Funding goal</div>
-        @if (selectedUser.goal_amount) {
+        @if (shared.selectedUser().goal_amount) {
         <div class="text-body d-block">
           <span class="inline-goal">
-            <app-goal [sid]="'id_'+selectedUser.login" [title]="selectedUser.goal_title" [amount]="selectedUser.goal_amount"
-              [address]="selectedUser.goal_nano_address" [barOnly]="false" [description]="selectedUser.goal_description">
+            <app-goal [sid]="'id_'+shared.selectedUser().login" [title]="shared.selectedUser().goal_title" [amount]="shared.selectedUser().goal_amount"
+              [address]="shared.selectedUser().goal_nano_address" [barOnly]="false" [description]="shared.selectedUser().goal_description">
             </app-goal>
           </span>
         </div>
@@ -633,12 +634,12 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        @if (loggedUser && loggedUser?.login === selectedUser.login) {
+        @if (shared.loggedUser()?.login === shared.selectedUser().login && !editMode) {
         <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
         }
-        @if (loggedUser && editMode) {
+        @if (shared.loggedUser() && editMode) {
         <button type="button" class="btn btn-primary" (click)="updateProfile()">Save</button>
-        <!-- [disabled]="!loggedUser.goal_nano_address || !loggedUser.goal_amount" -->
+        <!-- [disabled]="!loggedUser().goal_nano_address || !loggedUser().goal_amount" -->
         }
       </div>
     </div>
