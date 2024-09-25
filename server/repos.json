@@ -120,6 +120,11 @@
       "endpoint": "https://nodes.nanswap.com/XNO",
       "website": "https://nanswap.com/nodes",
       "websocket": "wss://nodes.nanswap.com/ws/?ticker=XNO"
+    },
+    {
+      "endpoint": "https://node.spynano.org/proxy",
+      "website": "https://spynano.org",
+      "websocket": "wss://node.spynano.org/websocket"
     }
   ]
 }
