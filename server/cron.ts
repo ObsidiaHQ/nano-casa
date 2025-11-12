@@ -316,6 +316,7 @@ export async function updateSpotlight() {
 export async function refreshNodeEvents() {
   // Copyright (c) 2021 nano.community contributors
   const formatEvent = (item) => {
+    console.log(item);
     switch (item.type) {
       case 'CommitCommentEvent':
         return {
@@ -346,8 +347,8 @@ export async function refreshNodeEvents() {
         return {
           action: `${item.payload.action.replace('_', ' ')} pr`, // opened, closed, reopened, assigned, unassigned, review_requested, review_request_removed, labeled, unlabeled, and synchronize
           ref: item.payload.pull_request.number,
-          title: item.payload.pull_request.title,
-          event_url: item.payload.pull_request.html_url,
+          title: item.payload.pull_request.number,
+          event_url: item.payload.pull_request.url,
           body: item.payload.pull_request.body,
         };
 
@@ -370,16 +371,11 @@ export async function refreshNodeEvents() {
         };
 
       case 'PushEvent':
+        //console.log(item.payload);
         return {
-          action: `pushed ${item.payload.commits.length} commit${
-            item.payload.commits.length > 1 ? 's' : ''
-          } to ${item.payload.ref.slice(
-            item.payload.ref.lastIndexOf('/') + 1
-          )}`,
-          event_url: item.payload.commits[0]?.url
-            .replace('api.', '')
-            .replace('/repos', ''),
-          title: item.payload.commits[0]?.message,
+          action: `pushed 1 commit to ${item.payload.ref.slice(item.payload.ref.lastIndexOf('/') + 1)}`,
+          event_url: `https://github.com/nanocurrency/nano-node/commit/${item.payload.head}`,
+          title: null,
         };
 
       case 'ReleaseEvent':
@@ -468,7 +464,7 @@ export async function checkPublicNodes() {
         error.code === 'ECONNABORTED'
           ? 'Timeout'
           : error.response?.data?.error ||
-            `Failed with status code ${error.response?.status}`;
+          `Failed with status code ${error.response?.status}`;
       endpointStatuses.push({
         endpoint: node.endpoint,
         website: node.website,
@@ -567,18 +563,20 @@ export async function getDevFundHistory() {
     });
 }
 
-const job = new Cron('12 * * * *', async () => {
-  refreshMilestones();
-  getDevFundHistory();
-  checkPublicNodes();
+const job = new Cron('1 * * * *', async () => {
+  //refreshMilestones();
+  //getDevFundHistory();
+  //checkPublicNodes();
   const repos = await refreshRepos();
   refreshCommitsAndContributors(repos);
 });
 
-const eventsJob = new Cron('*/20 * * * *', async () => {
+const eventsJob = new Cron('*/26 * * * *', async () => {
   refreshNodeEvents();
 });
 
 const spotlightJob = new Cron('0 0 * * *', async () => {
   updateSpotlight();
 });
+await rate();
+// await refreshNodeEvents();

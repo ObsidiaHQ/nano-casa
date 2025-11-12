@@ -1,14 +1,10 @@
-import { Database } from 'bun:sqlite';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { getCookie } from 'hono/cookie';
 import { createMiddleware } from 'hono/factory';
 import { zValidator } from '@hono/zod-validator';
-import { githubAuth } from '@hono/oauth-providers/github';
-import { Session, sessionMiddleware } from 'hono-sessions';
-import { BunSqliteStore } from 'hono-sessions/bun-sqlite-store'; // TODO fix path
 import { z } from 'zod';
+import { auth } from './auth';
 import {
   Commit,
   Contributor,
@@ -18,26 +14,52 @@ import {
   PublicNode,
   Repo,
   Profile,
+  CronJobRun,
+  Log,
 } from './models';
+import { BotsManager } from './bots';
+import db from './db'; // Import db instance
 
 type Env = {
   Variables: {
-    session: Session;
-    session_key_rotation: boolean;
-    user: Profile | null;
-    isAuthenticated?: () => boolean;
+    user: typeof auth.$Infer.Session.user | null;
+    session: typeof auth.$Infer.Session.session | null;
   };
 };
 
-const db = new Database('./db.sqlite');
-const store = new BunSqliteStore(db, 'Sessions');
-const authMiddleware = createMiddleware<Env>(async (c, next) => {
-  const session = c.get('session');
-  const userLogin = JSON.parse(session.get('user') as string)?.['login'];
+const BM = new BotsManager();
 
-  c.set('isAuthenticated', () => session.sessionValid() && userLogin);
-  c.set('user', Profile.findByLogin(userLogin));
+const authMiddleware = createMiddleware<Env>(async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+  if (!session) {
+    c.set('user', null);
+    c.set('session', null);
+    await next();
+    return;
+  }
+
+  c.set('user', session.user);
+  c.set('session', session.session);
   await next();
+});
+
+const adminMiddleware = createMiddleware<Env>(async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+  if (!session || !session.user) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+
+  // Check if user is admin (you can adjust this logic as needed)
+  const userLogin = session.user.email?.split('@')[0] || '';
+  if (userLogin !== 'geommr') {
+    return c.json({ error: 'Forbidden: Admin access required' }, 403);
+  }
+
+  c.set('user', session.user);
+  c.set('session', session.session);
+  return await next();
 });
 
 const app = new Hono<Env>({ strict: false })
@@ -49,54 +71,28 @@ const app = new Hono<Env>({ strict: false })
         'https://nano.casa',
       ],
       credentials: true,
+      allowHeaders: ['Content-Type', 'Authorization'],
+      allowMethods: ['POST', 'GET', 'OPTIONS'],
+      exposeHeaders: ['Content-Length'],
+      maxAge: 600,
     })
   )
   .use(logger())
-  .use(
-    '*',
-    sessionMiddleware({
-      store,
-      encryptionKey: Bun.env.SESSION_SECRET,
-      expireAfterSeconds: 60 * 60 * 24 * 7,
-      cookieOptions: {
-        sameSite: 'none',
-        path: '/',
-        httpOnly: true,
-        domain: '127.0.0.1',
-      },
-    })
-  )
-  .get(
-    '/api/auth/github',
-    githubAuth({
-      client_id: Bun.env.GITHUB_CLIENT_ID,
-      client_secret: Bun.env.GITHUB_CLIENT_SECRET,
-      scope: [],
-      oauthApp: true,
-    }),
-    async (c) => {
-      const profile = c.get('user-github');
-      Contributor.createProfile(profile);
-
-      const session = c.get('session');
-      session?.set('user', JSON.stringify(profile));
-      console.log('user sesh', session.get('user'), getCookie(c, 'session'));
-
-      c.header('Set-Cookie', JSON.stringify(getCookie(c, 'session'))); // TODO remove?
-      return c.redirect('/');
-    }
-  )
+  .on(['POST', 'GET'], '/api/auth/**', (c) => {
+    return auth.handler(c.req.raw);
+  })
   .get('/api/data', async (c) => {
-    return c.json({
-      repos: Repo.getAll(),
-      commits: Commit.activity(),
-      contributors: Contributor.getAll(),
-      milestones: Milestone.getAll(),
-      events: Commit.latestEcosystem(),
-      nodeEvents: NodeEvent.getAll(),
-      misc: Misc.getAll(),
-      publicNodes: PublicNode.getAll(),
-    });
+    const data = {
+      repos: await Repo.getAll(),
+      commits: await Commit.activity(),
+      contributors: await Contributor.getAll(),
+      milestones: await Milestone.getAll(),
+      events: await Commit.latestEcosystem(),
+      nodeEvents: await NodeEvent.getAll(),
+      misc: await Misc.getAll(),
+      publicNodes: await PublicNode.getAll(),
+    };
+    return c.json(data);
   })
   .post(
     '/api/update-profile',
@@ -105,28 +101,32 @@ const app = new Hono<Env>({ strict: false })
       'json',
       z.object({
         bio: z.nullable(z.string()),
-        twitter_username: z.nullable(z.string()),
+        twitterUsername: z.nullable(z.string()),
         website: z.nullable(z.string()),
-        nano_address: z.nullable(z.string()),
-        gh_sponsors: z.nullable(z.boolean()),
-        patreon_url: z.nullable(z.string()),
-        goal_title: z.nullable(z.string()),
-        goal_amount: z.nullable(z.number()),
-        goal_nano_address: z.nullable(z.string()),
-        goal_website: z.nullable(z.string()),
-        goal_description: z.nullable(z.string()),
+        nanoAddress: z.nullable(z.string()),
+        ghSponsors: z.nullable(z.number()),
+        patreonUrl: z.nullable(z.string()),
+        goalTitle: z.nullable(z.string()),
+        goalAmount: z.nullable(z.number()),
+        goalNanoAddress: z.nullable(z.string()),
+        goalWebsite: z.nullable(z.string()),
+        goalDescription: z.nullable(z.string()),
       })
     ),
-    (c) => {
-      if (c.var.isAuthenticated && !c.var.isAuthenticated()) {
+    async (c) => {
+      const user = c.var.user;
+      if (!user) {
         return new Response('not logged in', {
           status: 401,
         });
       }
 
-      Contributor.updateProfile(
+      // Get the GitHub login from the user's account
+      const login = user.email?.split('@')[0] || user.name || '';
+
+      await Contributor.updateProfile(
         c.req.valid('json') as Partial<Profile>,
-        c.var.user?.login
+        login
       );
 
       return new Response('updated', {
@@ -134,14 +134,43 @@ const app = new Hono<Env>({ strict: false })
       });
     }
   )
-  .get('/api/auth/user', authMiddleware, async (c) => {
-    return c.json(c.var.user);
+  .post('/api/bounty', async (c) => {
+    BM.notify(await c.req.json());
+    return c.json({ msg: 'ok' });
   })
-  .get('/api/logout', async (c) => {
-    c.var.session.deleteSession();
-    return new Response();
+  .get('/api/auth/user', authMiddleware, async (c) => {
+    const user = c.var.user;
+    if (!user) {
+      return c.json(null);
+    }
+
+    // Try to find the profile from our database
+    const login = user.email?.split('@')[0] || user.name || '';
+    const profile = await Profile.findByLogin(login);
+
+    return c.json(profile || user);
+  })
+  .post('/api/logout', async (c) => {
+    await auth.api.signOut({ headers: c.req.raw.headers });
+    return c.json({ success: true });
   })
   .get('/api/ping', (c) => c.text('pong'))
+  .get('/api/logs', adminMiddleware, async (c) => {
+    const { cronJobRuns, logs: logsTable } = await import('./schema');
+    const { desc, eq } = await import('drizzle-orm');
+
+    const runs = await db.select().from(cronJobRuns).orderBy(desc(cronJobRuns.startTimestamp));
+    const logs = await db.select().from(logsTable).orderBy(logsTable.timestamp);
+
+    const runsWithLogs = runs.map(run => {
+      return {
+        ...run,
+        logs: logs.filter(log => log.jobRunId === run.id)
+      };
+    });
+
+    return c.json(runsWithLogs);
+  })
   .get('/explorer', async (c) => {
     const filePath = './html/index.html';
     const file = Bun.file(filePath);
@@ -172,8 +201,23 @@ declare module 'bun' {
     SESSION_SECRET: string;
     NANO_RPC_KEY: string;
     PORT: number;
-    PRODUCTION: boolean;
+    DISCORD_BOT_TOKEN: string;
+    DISCORD_APP_ID: string;
+    DISCORD_USER_ID: string;
   }
 }
 
-export type App = typeof app;
+type CronJobRunWithLogsRow = {
+  run_id: number;
+  job_name: string;
+  start_timestamp: string;
+  end_timestamp: string;
+  status: string;
+  run_duration_ms: number;
+  log_id: number | null;
+  job_run_id: number | null;
+  timestamp: string | null;
+  level: string | null;
+  message: string | null;
+  log_duration_ms: number | null;
+};

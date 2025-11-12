@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Contributor, Repo } from '../../../server/models';
+import { Contributor, Repo } from '../api.types';
 
 @Pipe({
   name: 'filter',
@@ -19,7 +19,7 @@ export class FilterPipe implements PipeTransform {
     if (type === 'repo') {
       return [...values].filter((value: Repo) => {
         return (
-          value.full_name.toLowerCase().includes(query.toLowerCase()) ||
+          value.fullName.toLowerCase().includes(query.toLowerCase()) ||
           value.description?.toLowerCase().includes(query.toLowerCase())
         );
       }) as Repo[];
@@ -36,8 +36,8 @@ export class FilterPipe implements PipeTransform {
     } else {
       return [...values].filter((value: Repo) => {
         return type === 'busyWeek'
-          ? value.commits_7d + value.prs_7d > 0
-          : value.commits_30d + value.prs_30d > 0;
+          ? value.commits7d + value.prs7d > 0
+          : value.commits30d + value.prs30d > 0;
       }) as Repo[];
     }
   }

@@ -60,21 +60,21 @@
                     <div class="col">
                       <div class="row g-2 align-items-center mb-3">
                         <div class="col-auto h2 mb-0">
-                          {{milestone.closed_issues/(milestone.open_issues + milestone.closed_issues) | percent}}
+                          {{milestone.closedIssues/(milestone.openIssues + milestone.closedIssues) | percent}}
                         </div>
                         <div class="col">
                           <div class="progress progress-sm">
                             <div class="progress-bar bg-purple" role="progressbar" attr.aria-label="{{milestone.title}} progress"
-                              [ngStyle]="{width: milestone.closed_issues*100/(milestone.open_issues + milestone.closed_issues)+'%' }"
-                              [attr.aria-valuenow]="milestone.closed_issues" [attr.aria-valuemin]="0"
-                              [attr.aria-valuemax]="milestone.open_issues + milestone.closed_issues">
+                              [ngStyle]="{width: milestone.closedIssues*100/(milestone.openIssues + milestone.closedIssues)+'%' }"
+                              [attr.aria-valuenow]="milestone.closedIssues" [attr.aria-valuemin]="0"
+                              [attr.aria-valuemax]="milestone.openIssues + milestone.closedIssues">
                             </div>
                           </div>
                         </div>
                       </div>
                       <a class="text-muted mt-1 d-block"
                         href="https://github.com/nanocurrency/nano-node/milestone{{milestone.number ? '/' + milestone.number : 's'}}" target="_blank">
-                        {{milestone.title}} ({{milestone.closed_issues}}/{{milestone.closed_issues+milestone.open_issues}})
+                        {{milestone.title}} ({{milestone.closedIssues}}/{{milestone.closedIssues+milestone.openIssues}})
                       </a>
                     </div>
                   </div>
@@ -88,7 +88,7 @@
 
       <div class="col-12 col-md-4 mt-3">
         <div class="card spotlight">
-          <a href="https://github.com/{{shared.spotlight().full_name}}" target="_blank">
+          <a href="https://github.com/{{shared.spotlight().fullName}}" target="_blank">
             <div class="card-body">
               <div class="card-stamp">
                 <div class="card-stamp-icon">
@@ -202,15 +202,15 @@
             <div class="d-flex pb-2" style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 10px; scrollbar-width: thin;">
               @for (busy of shared.repos() | filter:busyWindow | asRepo | sort:busyWindow | asRepo | slice:0:20; track $index; let last = $last) {
               <div [ngClass]="last ? '' : 'me-4'" class="p-3 mt-2 busy-repo" style="scroll-snap-align: end;">
-                <img [src]="busy.avatar_url + '&s=40'" [alt]="busy.full_name" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
-                <a [href]="'https://github.com/' + busy.full_name" [attr.aria-label]="busy.full_name.split('/')[1]">{{busy.full_name.split('/')[1]}}</a>
+                <img [src]="busy.avatarUrl + '&s=40'" [alt]="busy.fullName" width="36" height="36" style="border-radius: 4px;" class="d-block me-3 mb-2">
+                <a [href]="'https://github.com/' + busy.fullName" [attr.aria-label]="busy.fullName.split('/')[1]">{{busy.fullName.split('/')[1]}}</a>
                 <div class="mt-2">
                   <span class="text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;" title="Commits">
                     <app-icon icon="commit"></app-icon>
-                    {{busyWindow === 'busyWeek' ? busy.commits_7d : busy.commits_30d || 0}}</span>
+                    {{busyWindow === 'busyWeek' ? busy.commits7d : busy.commits30d || 0}}</span>
                   <span class="ms-2 text-muted d-inline-block" style="font-size: 0.8rem; vertical-align: middle; line-height: 0.8rem;" title="Pull requests">
                     <app-icon icon="pr"></app-icon>
-                    {{busyWindow === 'busyWeek' ? busy.prs_7d : busy.prs_30d}}</span>
+                    {{busyWindow === 'busyWeek' ? busy.prs7d : busy.prs30d}}</span>
                 </div>
               </div>
               }
@@ -258,7 +258,7 @@
                     <tr>
                       <td class="w-1 py-1">
                         <a target="_blank" [href]="event.event.event_url">
-                          <img class="avatar avatar-sm" src="{{event.avatar_url + '&s=40'}}" [alt]="event.author" [title]="event.author" loading="lazy">
+                          <img class="avatar avatar-sm" src="{{event.avatarUrl + '&s=40'}}" [alt]="event.author" [title]="event.author" loading="lazy">
                         </a>
                       </td>
                       <td class="td-truncate p-1">
@@ -267,7 +267,7 @@
                           <a class="text-white" [href]="event.event.event_url" [title]="event.event.title">{{event.event.title}}</a>
                         </div>
                       </td>
-                      <td class="text-nowrap text-muted py-1 font-size-13" [title]="event.created_at | date:'short'">{{event.created_at | timeago}}</td>
+                      <td class="text-nowrap text-muted py-1 font-size-13" [title]="event.createdAt | date:'short'">{{event.createdAt | timeago}}</td>
                     </tr>
                     }
                   </tbody>
@@ -279,8 +279,8 @@
                     @for (event of shared.events(); track $index) {
                     <tr>
                       <td class="w-1 py-1">
-                        <a target="_blank" href="https://github.com/{{event.repo_full_name}}"><img class="avatar avatar-sm" src="{{event.avatar_url + '&s=40'}}"
-                            [alt]="event.repo_full_name" [title]="event.repo_full_name" loading="lazy">
+                        <a target="_blank" href="https://github.com/{{event.repoFullName}}"><img class="avatar avatar-sm" src="{{event.avatarUrl + '&s=40'}}"
+                            [alt]="event.repoFullName" [title]="event.repoFullName" loading="lazy">
                         </a>
                       </td>
                       <td class="td-truncate p-1">
@@ -336,14 +336,14 @@
               <tr>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
-                    <img class="avatar avatar-sm me-2" [src]="repo.avatar_url + '&s=40'" loading="lazy" [alt]="repo.name">
+                    <img class="avatar avatar-sm me-2" [src]="repo.avatarUrl + '&s=40'" loading="lazy" [alt]="repo.name">
                     <div class="flex-fill">
                       <div class="font-weight-medium">
-                        <a href="https://github.com/{{repo.full_name}}" target="_blank">
+                        <a href="https://github.com/{{repo.fullName}}" target="_blank">
                           <span style="vertical-align: middle;">{{repo.name}}</span>
                           <span class="badge bg-yellow-lt ms-2">
                             <app-icon fill="#f59f00" icon="star" size="14"></app-icon>
-                            {{repo.stargazers_count}}
+                            {{repo.stargazersCount}}
                           </span>
                         </a>
                       </div>
@@ -353,8 +353,8 @@
                 <td data-label="Description">
                   <span class="opacity-75">{{repo.description}}</span>
                 </td>
-                <td data-label="Date created" class="text-muted text-center" [title]="repo.created_at | date">
-                  {{repo.created_at | timeago}}
+                <td data-label="Date created" class="text-muted text-center" [title]="repo.createdAt | date">
+                  {{repo.createdAt | timeago}}
                 </td>
               </tr>
               }
@@ -397,7 +397,7 @@
                 <td class="py-2" scope="row">{{(i+1) + ((shared.isSmallScreen ? 12 : 40) * (contributorsPageIndex-1))}}</td>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
-                    <img class="avatar me-3" [src]="user.avatar_url + '&s=40'" loading="lazy" [alt]="user.login">
+                    <img class="avatar me-3" [src]="user.avatarUrl + '&s=40'" loading="lazy" [alt]="user.login">
                     <div class="flex-fill">
                       <div class="font-weight-medium">
                         <a class="me-2" href="https://github.com/{{user.login}}" target="_blank">
@@ -430,27 +430,27 @@
                   </span>
                 </td>
                 <td class="py-2" data-label="Past 30 days">
-                  <span [ngStyle]="{opacity: user.last_month ? 0.75 : 0.25}">{{user.last_month}}</span>
+                  <span [ngStyle]="{opacity: user.lastMonth ? 0.75 : 0.25}">{{user.lastMonth}}</span>
                 </td>
                 <td>
-                  @if (user.goal_amount) {
-                  <app-goal [amount]="user.goal_amount" [address]="user.goal_nano_address" [sid]="'id'+user.login"></app-goal>
+                  @if (user.goalAmount) {
+                  <app-goal [amount]="user.goalAmount" [address]="user.goalNanoAddress" [sid]="'id'+user.login"></app-goal>
                   }
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap justify-content-end">
-                    @if (user.nano_address) {
-                    <a target="_blank" href="https://nano.to/{{user.nano_address}}" class="btn bg-azure-lt btn-icon" title="Donate nano">
+                    @if (user.nanoAddress) {
+                    <a (click)="makeTx(user.nanoAddress)" class="btn bg-azure-lt btn-icon" title="Donate nano">
                       <app-icon icon="nano"></app-icon>
                     </a>
                     }
-                    @if (user.patreon_url) {
-                    <a target="_blank" href="{{user.patreon_url}}" class="btn bg-white-lt btn-icon" title="Become a patron">
+                    @if (user.patreonUrl) {
+                    <a target="_blank" href="{{user.patreonUrl}}" class="btn bg-white-lt btn-icon" title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>
                     }
-                    @if (user.gh_sponsors) {
-                    <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon" title="Sponsor on GitHub">
+                    @if (user.ghSponsors) {
+                      <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon" title="Sponsor on GitHub">
                       <app-icon icon="heart"></app-icon>
                     </a>
                     }
@@ -479,7 +479,7 @@
     @if (shared.selectedUser()) {
     <div class="modal-content">
       <div class="modal-body pt-5">
-        <img [src]="shared.selectedUser().avatar_url + '&s=100'" class="profile avatar" [alt]="shared.selectedUser().login">
+        <img [src]="shared.selectedUser().avatarUrl + '&s=100'" class="profile avatar" [alt]="shared.selectedUser().login">
         @if (!editMode) {
 
         <div class="row">
@@ -492,25 +492,25 @@
             <a href="https://github.com/{{shared.selectedUser().login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
               <app-icon icon="github"></app-icon>
             </a>
-            @if (shared.selectedUser().twitter_username) {
-            <a href="https://twitter.com/{{shared.selectedUser().twitter_username}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
+            @if (shared.selectedUser().twitterUsername) {
+            <a href="https://twitter.com/{{shared.selectedUser().twitterUsername}}" target="_blank" class="h4 px-2" title="Follow on Twitter">
               <app-icon icon="twitter"></app-icon>
             </a>
             }
           </div>
           <div class="col-12 col-md-4"></div>
           <div class="col-12 col-md-4 btn-list flex-nowrap my-1">
-            @if (shared.selectedUser().nano_address) {
-            <a href="https://nano.to/{{shared.selectedUser().nano_address}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
+            @if (shared.selectedUser().nanoAddress) {
+            <a href="https://nano.to/{{shared.selectedUser().nanoAddress}}" target="_blank" class="btn bg-azure-lt w-100 btn-icon" title="Donate nano">
               <app-icon icon="nano"></app-icon>
             </a>
             }
-            @if (shared.selectedUser().patreon_url) {
-            <a target="_blank" [href]="shared.selectedUser().patreon_url" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
+            @if (shared.selectedUser().patreonUrl) {
+            <a target="_blank" [href]="shared.selectedUser().patreonUrl" class="btn bg-white-lt w-100 btn-icon" title="Become a patron">
               <app-icon icon="patreon"></app-icon>
             </a>
             }
-            @if (shared.selectedUser().gh_sponsors) {
+            @if (shared.selectedUser().ghSponsors) {
             <a target="_blank" href="https://github.com/sponsors/{{shared.selectedUser().login}}" class="btn bg-pink-lt w-100 btn-icon"
               title="Sponsor on GitHub">
               <app-icon icon="heart"></app-icon>
@@ -531,11 +531,11 @@
           }
         </div>
         <div class="subheader mt-3 mb-2">Funding goal</div>
-        @if (shared.selectedUser().goal_amount) {
+        @if (shared.selectedUser().goalAmount) {
         <div class="text-body d-block">
           <span class="inline-goal">
-            <app-goal [sid]="'id_'+shared.selectedUser().login" [title]="shared.selectedUser().goal_title" [amount]="shared.selectedUser().goal_amount"
-              [address]="shared.selectedUser().goal_nano_address" [barOnly]="false" [description]="shared.selectedUser().goal_description">
+            <app-goal [sid]="'id_'+shared.selectedUser().login" [title]="shared.selectedUser().goalTitle" [amount]="shared.selectedUser().goalAmount"
+              [address]="shared.selectedUser().goalNanoAddress" [barOnly]="false" [description]="shared.selectedUser().goalDescription">
             </app-goal>
           </span>
         </div>
@@ -552,23 +552,23 @@
           </div>
           <div class="col-12 col-md-4 mb-3">
             <label class="form-label">Twitter handle</label>
-            <input type="text" class="form-control" placeholder="username" [(ngModel)]="loggedUser.twitter_username">
+            <input type="text" class="form-control" placeholder="username" [(ngModel)]="loggedUser.twitterUsername">
           </div>
           <div class="col-12 col-md-4 mb-3">
             <label class="form-label">Patreon</label>
-            <input type="text" class="form-control" placeholder="link to your Patreon" [(ngModel)]="loggedUser.patreon_url">
+            <input type="text" class="form-control" placeholder="link to your Patreon" [(ngModel)]="loggedUser.patreonUrl">
           </div>
         </div>
 
         <div class="row">
           <div class="col-12 col-md-7 mb-3">
             <label class="form-label">Nano address</label>
-            <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.nano_address">
+            <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.nanoAddress">
           </div>
 
           <div class="col-auto pt-md-4 mb-3">
             <label class="form-check">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="loggedUser.gh_sponsors" [checked]="loggedUser.gh_sponsors">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="loggedUser.ghSponsors" [checked]="loggedUser.ghSponsors">
               <span class="form-check-label">GitHub Sponsors?</span>
             </label>
           </div>
@@ -584,38 +584,38 @@
         <div class="row">
           <div class="col-12">
             <label class="form-label d-inline-block me-3 mb-3">Funding goal</label>
-            @if (!loggedUser.goal_nano_address) {
+            @if (!loggedUser.goalNanoAddress) {
             <a type="button" class="text-azure" (click)="setGoal()"><app-icon icon="plus"></app-icon> New</a>
             }
-            @if (loggedUser.goal_nano_address) {
+            @if (loggedUser.goalNanoAddress) {
             <a type="button" class="list-group-item-actions" (click)="deleteGoal()" title="Delete goal">
               <app-icon icon="trash" strokeColor="#B13539"></app-icon>
             </a>
             }
-            @if (loggedUser?.goal_nano_address) {
+            @if (loggedUser?.goalNanoAddress) {
             <div class="card mb-2" style="min-height: unset;">
               <div class="list-group list-group-flush">
                 <div class="list-group-item list-group-item-action">
                   <div class="row">
                     <div class="col-9 col-md-7 mb-3">
                       <label class="form-label">Title</label>
-                      <input type="text" class="form-control" placeholder="server cost, etc.." [(ngModel)]="loggedUser.goal_title">
+                      <input type="text" class="form-control" placeholder="server cost, etc.." [(ngModel)]="loggedUser.goalTitle">
                     </div>
                     <div class="col-3 col-md-5 mb-3">
                       <label class="form-label">Goal</label>
-                      <input type="number" class="form-control" min="1" [(ngModel)]="loggedUser.goal_amount">
+                      <input type="number" class="form-control" min="1" [(ngModel)]="loggedUser.goalAmount">
                     </div>
                     <div class="col-12 col-md-7 mb-3">
                       <label class="form-label">Nano address</label>
-                      <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.goal_nano_address">
+                      <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.goalNanoAddress">
                     </div>
                     <div class="col-12 col-md-5 mb-3">
                       <label class="form-label">Website</label>
-                      <input type="text" class="form-control" placeholder="optional" [(ngModel)]="loggedUser.goal_website">
+                      <input type="text" class="form-control" placeholder="optional" [(ngModel)]="loggedUser.goalWebsite">
                     </div>
                     <div class="col-12">
                       <label class="form-label">Description</label>
-                      <textarea class="form-control" rows="2" [(ngModel)]="loggedUser.goal_description" placeholder="optional"></textarea>
+                      <textarea class="form-control" rows="2" [(ngModel)]="loggedUser.goalDescription" placeholder="optional"></textarea>
                     </div>
                   </div>
                 </div>

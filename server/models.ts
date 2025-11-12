@@ -1,129 +1,129 @@
 import db from './db';
 import { format } from 'date-fns';
-import { GitHubUser } from '@hono/oauth-providers/github';
+import { eq, desc, sql } from 'drizzle-orm';
+import * as schema from './schema';
 
 export class Repo {
-  public static getAll() {
-    return db
-      .query<Repo, []>('SELECT * FROM Repos ORDER BY created_at ASC')
-      .all();
+  public static async getAll(): Promise<Repo[]> {
+    const results = await db
+      .select()
+      .from(schema.repos)
+      .orderBy(schema.repos.createdAt);
+    return results as Repo[];
   }
 
   public static insert() {
-    return db.prepare(`
-      INSERT INTO Repos (name, full_name, created_at, stargazers_count, prs_30d, prs_7d, description, avatar_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    return db.insert(schema.repos);
   }
 }
 
 export interface Repo {
-  name: string;
-  full_name: string;
-  created_at: string;
-  stargazers_count: number;
-  prs_30d: number;
-  prs_7d: number;
-  commits_30d: number;
-  commits_7d: number;
-  avatar_url: string;
-  description: string;
+  name: string | null;
+  fullName: string;
+  createdAt: string | null;
+  stargazersCount: number | null;
+  prs30d: number | null;
+  prs7d: number | null;
+  commits30d: number | null;
+  commits7d: number | null;
+  avatarUrl: string | null;
+  description: string | null;
 }
 
 export class PublicNode {
-  public static getAll() {
-    return db
-      .query<PublicNode, []>('SELECT * FROM PublicNodes ORDER BY endpoint ASC')
-      .all()
-      .map((node) => ({ ...node, error: JSON.parse(node.error) }));
+  public static async getAll(): Promise<PublicNode[]> {
+    const nodes = await db
+      .select()
+      .from(schema.publicNodes)
+      .orderBy(schema.publicNodes.endpoint);
+
+    return nodes.map((node) => ({
+      ...node,
+      error: JSON.parse(node.error || 'null'),
+    })) as PublicNode[];
   }
 
   public static insert() {
-    return db.prepare(`
-      INSERT INTO PublicNodes (endpoint, website, websocket, up, resp_time, version, error)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
+    return db.insert(schema.publicNodes);
   }
 }
 
 export interface PublicNode {
-  endpoint: string;
-  website?: string;
-  websocket?: string;
-  up: boolean;
+  endpoint: string | null;
+  website: string | null;
+  websocket: string | null;
+  up: number | null;
   error: any;
-  version: string;
-  resp_time: number;
+  version: string | null;
+  respTime: number | null;
+  deprecated: number | null;
 }
 
 export class Commit {
-  public static latestEcosystem() {
-    return db
-      .query(
-        `
-      SELECT *
-      FROM Commits
-      WHERE repo_full_name != ?
-      ORDER BY date DESC
-      LIMIT ?
-    `
-      )
-      .all('nanocurrency/nano-node', 50) as Commit[];
+  public static async latestEcosystem(): Promise<Commit[]> {
+    const results = await db
+      .select()
+      .from(schema.commits)
+      .where(sql`${schema.commits.repoFullName} != 'nanocurrency/nano-node'`)
+      .orderBy(desc(schema.commits.date))
+      .limit(50);
+    return results as Commit[];
   }
 
-  public static activity() {
-    const result = db
-      .query(
-        `
-        SELECT 
-          CAST(strftime('%Y', date) AS INTEGER) AS year,
-          CAST(strftime('%W', date) AS INTEGER) AS week,
-          COUNT(*) AS count
-        FROM Commits
-        GROUP BY year, week
-        ORDER BY year, week
-      `
+  public static async activity(): Promise<ChartCommit[]> {
+    const rows = await db
+      .select({
+        year: sql<number>`CAST(strftime('%Y', ${schema.commits.date}) AS INTEGER)`,
+        week: sql<number>`CAST(strftime('%W', ${schema.commits.date}) AS INTEGER)`,
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(schema.commits)
+      .groupBy(
+        sql`CAST(strftime('%Y', ${schema.commits.date}) AS INTEGER)`,
+        sql`CAST(strftime('%W', ${schema.commits.date}) AS INTEGER)`
       )
-      .all();
+      .orderBy(
+        sql`CAST(strftime('%Y', ${schema.commits.date}) AS INTEGER)`,
+        sql`CAST(strftime('%W', ${schema.commits.date}) AS INTEGER)`
+      );
 
-    const formattedResult = result.map((row: any) => ({
+    return rows.map((row: any) => ({
       date: `${row.year}|${format(
         new Date(row.year, 0, (row.week + 1) * 7),
         'w'
       )}`,
       count: row.count,
     }));
-    return formattedResult;
   }
 
   public static insert() {
-    return db.prepare(`
-      INSERT INTO Commits (repo_full_name, author, date, message, avatar_url)
-      VALUES (?, ?, ?, ?, ?)
-    `);
+    return db.insert(schema.commits);
   }
 }
 
 export interface Commit {
-  repo_full_name: string;
-  author: string;
-  message: string;
-  avatar_url: string;
-  date: string;
+  repoFullName: string | null;
+  author: string | null;
+  message: string | null;
+  avatarUrl: string | null;
+  date: string | null;
 }
 
 export class NodeEvent {
-  public static getAll() {
-    return db
-      .query<NodeEvent, []>(`SELECT * FROM NodeEvents ORDER BY created_at DESC`)
-      .all()
-      .map((ev) => ({ ...ev, event: JSON.parse(ev.event as any) }));
+  public static async getAll(): Promise<NodeEvent[]> {
+    const events = await db
+      .select()
+      .from(schema.nodeEvents)
+      .orderBy(desc(schema.nodeEvents.createdAt));
+
+    return events.map((ev) => ({
+      ...ev,
+      event: JSON.parse(ev.event as any),
+    })) as NodeEvent[];
   }
 
   public static insert() {
-    return db.prepare(
-      'INSERT INTO NodeEvents (event, type, author, avatar_url, created_at) VALUES (?,?,?,?,?)'
-    );
+    return db.insert(schema.nodeEvents);
   }
 }
 
@@ -135,51 +135,48 @@ export interface NodeEvent {
     body?: string;
     ref?: string;
   };
-  type: string;
-  author: string;
-  avatar_url: string;
-  created_at: string;
+  type: string | null;
+  author: string | null;
+  avatarUrl: string | null;
+  createdAt: string | null;
 }
 
 export class Milestone {
-  public static getAll() {
-    return db.query<Milestone, []>(`SELECT * FROM Milestones`).all();
+  public static async getAll(): Promise<Milestone[]> {
+    const results = await db.select().from(schema.milestones);
+    return results as Milestone[];
   }
 
   public static insert() {
-    return db.prepare(
-      'INSERT INTO Milestones (title, open_issues, closed_issues, url, number) VALUES (?,?,?,?,?)'
-    );
+    return db.insert(schema.milestones);
   }
 }
 
 export interface Milestone {
-  title: string;
-  open_issues: number;
-  closed_issues: number;
-  created_at: string;
-  number: number;
+  title: string | null;
+  openIssues: number | null;
+  closedIssues: number | null;
+  createdAt: string | null;
+  number: number | null;
+  url: string | null;
 }
 
 export class Misc {
-  public static getAll() {
-    const res = db
-      .query<{ key: string; value: string }, []>(`SELECT * FROM Misc`)
-      .all();
-    const misc = {} as Record<string, Misc>;
-    res.forEach((m) => (misc[m.key] = JSON.parse(m.value)));
+  public static async getAll(): Promise<Record<string, any>> {
+    const res = await db.select().from(schema.misc);
+    const misc = {} as Record<string, any>;
+    res.forEach((m) => (misc[m.key!] = JSON.parse(m.value || 'null')));
     return misc;
   }
 
-  public static update(key: string, value: any) {
-    db.query(
-      `
-      INSERT INTO Misc (key, value) 
-      VALUES (?1, ?2) 
-      ON CONFLICT(key)
-      DO UPDATE SET value = ?2
-      WHERE key = ?1`
-    ).run(key, JSON.stringify(value));
+  public static async update(key: string, value: any): Promise<void> {
+    await db
+      .insert(schema.misc)
+      .values({ key, value: JSON.stringify(value) })
+      .onConflictDoUpdate({
+        target: schema.misc.key,
+        set: { value: JSON.stringify(value) },
+      });
   }
 }
 
@@ -191,122 +188,113 @@ export interface Misc {
 }
 
 export class Contributor {
-  public static getAll() {
-    const reposNames = db
-      .query<Repo, []>('SELECT * FROM Repos ORDER BY stargazers_count DESC')
-      .all()
-      .map((r) => r.full_name);
-    return db
-      .query<Contributor, []>(
-        `SELECT * FROM Profiles p
-          RIGHT JOIN Contributors c
-          USING (login)
-        ORDER BY
-          c.contributions DESC;`
+  public static async getAll(): Promise<Contributor[]> {
+    const reposNames = (
+      await db
+        .select()
+        .from(schema.repos)
+        .orderBy(desc(schema.repos.stargazersCount))
+    ).map((r) => r.fullName);
+
+    const contributors = await db
+      .select()
+      .from(schema.contributors)
+      .leftJoin(
+        schema.profiles,
+        eq(schema.contributors.login, schema.profiles.login)
       )
-      .all()
-      .map((c: Contributor) => {
-        const repos: string[] = JSON.parse(c.repos as unknown as string);
-        return {
-          ...c,
-          repos,
-          hasPopularRepo: repos.some(
-            (r) =>
-              reposNames.indexOf(r) >= 0 &&
-              reposNames.indexOf(r) < 15 &&
-              r != 'nanocurrency/nano-node'
-          ),
-          created_at: null,
-          nodeContributor: repos.includes('nanocurrency/nano-node'),
-          bio: c.bio?.replace(
-            /\[(.*?)\]\((.*?)\)/gim,
-            "<a href='$2' target='_blank'>$1</a>"
-          ),
-        };
-      });
+      .orderBy(desc(schema.contributors.contributions));
+
+    return contributors.map((c: any) => {
+      const repos: string[] = JSON.parse(c.Contributors.repos || '[]');
+      return {
+        ...c.Contributors,
+        ...c.Profiles,
+        repos,
+        hasPopularRepo: repos.some(
+          (r) =>
+            reposNames.indexOf(r) >= 0 &&
+            reposNames.indexOf(r) < 15 &&
+            r != 'nanocurrency/nano-node'
+        ),
+        created_at: null,
+        nodeContributor: repos.includes('nanocurrency/nano-node'),
+        bio: c.Profiles?.bio?.replace(
+          /\[(.*?)\]\((.*?)\)/gim,
+          "<a href='$2' target='_blank'>$1</a>"
+        ),
+      };
+    }) as Contributor[];
   }
 
   public static insert() {
-    return db.prepare(
-      'INSERT INTO Contributors (avatar_url, login, contributions, last_month, repos) VALUES (?,?,?,?,?)'
-    );
+    return db.insert(schema.contributors);
   }
 
-  public static createProfile(profile: Partial<GitHubUser> | undefined) {
+  public static async createProfile(profile: any) {
     if (!profile) return;
-    db.prepare(
-      `INSERT OR IGNORE INTO Profiles (bio, twitter_username, website, login, avatar_url) VALUES ($bio, $twitter, $website, $login, $avatar)`
-    ) //@ts-ignore
-      .run({
-        $bio: profile.bio,
-        $twitter: profile.twitter_username,
-        $website: profile.blog,
-        $avatar: profile.avatar_url,
-        $login: profile.login,
-      });
+    await db
+      .insert(schema.profiles)
+      .values({
+        id: String(profile.id),
+        bio: profile.bio || null,
+        twitterUsername: profile.twitter_username || null,
+        website: profile.blog || null,
+        avatarUrl: profile.avatar_url || null,
+        login: profile.login || null,
+      })
+      .onConflictDoNothing();
   }
 
-  public static updateProfile(
+  public static async updateProfile(
     profile: Partial<Profile>,
     login: string | undefined
   ) {
     if (!login) return;
-    db.prepare(
-      `UPDATE Profiles
-       SET 
-          bio = $bio,
-          twitter_username = $twitter_username,
-          website = $website,
-          nano_address = $nano_address,
-          gh_sponsors = $gh_sponsors,
-          patreon_url = $patreon_url,
-          goal_title = $goal_title,
-          goal_amount = $goal_amount,
-          goal_nano_address = $goal_nano_address,
-          goal_website = $goal_website,
-          goal_description = $goal_description
-       WHERE login = $login`
-    ) //@ts-ignore
-      .run({
-        $bio: profile.bio,
-        $twitter_username: profile.twitter_username?.replace('@', ''),
-        $website: profile.website?.replace(/(http|https):\/\//i, ''),
-        $nano_address: profile.nano_address?.replace('@', '').trim(),
-        $gh_sponsors: profile.gh_sponsors,
-        $patreon_url: profile.patreon_url,
-        $goal_title: profile.goal_title,
-        $goal_amount: profile.goal_amount,
-        $goal_nano_address: profile.goal_nano_address?.replace('@', '').trim(),
-        $goal_website: profile.goal_website?.replace(/(http|https):\/\//i, ''),
-        $goal_description: profile.goal_description,
-        $login: login,
-      });
+    await db
+      .update(schema.profiles)
+      .set({
+        bio: profile.bio,
+        twitterUsername: profile.twitterUsername?.replace('@', ''),
+        website: profile.website?.replace(/(http|https):\/\//i, ''),
+        nanoAddress: profile.nanoAddress?.replace('@', '').trim(),
+        ghSponsors: profile.ghSponsors,
+        patreonUrl: profile.patreonUrl,
+        goalTitle: profile.goalTitle,
+        goalAmount: profile.goalAmount,
+        goalNanoAddress: profile.goalNanoAddress?.replace('@', '').trim(),
+        goalWebsite: profile.goalWebsite?.replace(/(http|https):\/\//i, ''),
+        goalDescription: profile.goalDescription,
+      })
+      .where(eq(schema.profiles.login, login));
   }
 
-  public static update(login: string, contributor: Contributor) {}
+  public static update(login: string, contributor: Contributor) {
+    // Implementation if needed
+  }
 }
 
 export interface Contributor {
   login: string;
-  avatar_url: string;
+  avatarUrl: string;
   contributions: number;
-  last_month: number;
+  lastMonth: number;
   repos: string[];
-  profile: Profile;
+  profile?: Profile;
   hasPopularRepo: boolean;
   nodeContributor: boolean;
   //profile
   bio?: string;
-  twitter_username?: string;
+  twitterUsername?: string;
   website?: string;
-  nano_address?: string;
-  gh_sponsors?: boolean;
-  patreon_url?: string;
-  goal_title?: string;
-  goal_amount?: number;
-  goal_nano_address?: string;
-  goal_website?: string;
-  goal_description?: string;
+  nanoAddress?: string;
+  ghSponsors?: number;
+  patreonUrl?: string;
+  goalTitle?: string;
+  goalAmount?: number;
+  goalNanoAddress?: string;
+  goalWebsite?: string;
+  goalDescription?: string;
 }
 
 export interface ChartCommit {
@@ -316,37 +304,40 @@ export interface ChartCommit {
 
 export interface Profile {
   id: string;
-  login: string;
-  avatar_url: string; //deprecated
-  bio: string;
-  twitter_username: string;
-  website: string;
-  nano_address: string;
-  gh_sponsors: boolean;
-  patreon_url: string;
-  goal_title: string | null;
-  goal_amount: number;
-  goal_nano_address: string;
-  goal_website: string | null;
-  goal_description: string | null;
+  login: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
+  twitterUsername: string | null;
+  website: string | null;
+  nanoAddress: string | null;
+  ghSponsors: number | null;
+  patreonUrl: string | null;
+  goalTitle: string | null;
+  goalAmount: number | null;
+  goalNanoAddress: string | null;
+  goalWebsite: string | null;
+  goalDescription: string | null;
+  createdAt: string | null;
 }
 
 export class Profile {
-  public static findByLogin(login: string) {
-    return db
-      .query<Profile, {}>(`SELECT * FROM Profiles WHERE login = ? LIMIT 1`)
-      .get(login);
+  public static async findByLogin(login: string): Promise<Profile | null> {
+    const result = await db
+      .select()
+      .from(schema.profiles)
+      .where(eq(schema.profiles.login, login))
+      .limit(1);
+    return (result[0] as Profile) || null;
   }
 
-  public static update(key: string, value: any) {
-    db.query(
-      `
-      INSERT INTO Misc (key, value) 
-      VALUES (?1, ?2) 
-      ON CONFLICT(key)
-      DO UPDATE SET value = ?2
-      WHERE key = ?1`
-    ).run(key, JSON.stringify(value));
+  public static async update(key: string, value: any): Promise<void> {
+    await db
+      .insert(schema.misc)
+      .values({ key, value: JSON.stringify(value) })
+      .onConflictDoUpdate({
+        target: schema.misc.key,
+        set: { value: JSON.stringify(value) },
+      });
   }
 }
 
@@ -357,4 +348,23 @@ export interface Donor {
   website?: string;
   twitter?: string;
   github?: string;
+}
+
+export interface Log {
+  id: number;
+  jobRunId: number;
+  timestamp: string;
+  level: string;
+  message: string;
+  durationMs: number | null;
+}
+
+export interface CronJobRun {
+  id: number;
+  jobName: string;
+  startTimestamp: string;
+  endTimestamp: string | null;
+  status: string;
+  durationMs: number | null;
+  logs: Log[];
 }

@@ -54,7 +54,9 @@
     "gr0vity-dev/nanotps-front",
     "CarlosFGordian/MasterMinds",
     "0xGilang/RaiblocksOne",
-    "gr0vity-dev/nano-node-builder"
+    "gr0vity-dev/nano-node-builder",
+    "Macacaqatar/Biota",
+    "MCP-Mirror/kilkelly_nano-currency-mcp-server"
   ],
   "queries": [
     "topic:nanocurrency",
@@ -86,11 +88,6 @@
       "websocket": "wss://node.somenano.com/websocket"
     },
     {
-      "endpoint": "https://www.nanolooker.com/api/rpc",
-      "website": "https://www.nanolooker.com",
-      "deprecated": true
-    },
-    {
       "endpoint": "https://rpc.wenano.net/api/node-api",
       "website": "https://wenano.net"
     },
@@ -120,6 +117,11 @@
       "endpoint": "https://nodes.nanswap.com/XNO",
       "website": "https://nanswap.com/nodes",
       "websocket": "wss://nodes.nanswap.com/ws/?ticker=XNO"
+    },
+    {
+      "endpoint": "https://node.spynano.org/proxy",
+      "website": "https://spynano.org",
+      "websocket": "wss://node.spynano.org/websocket"
     }
   ]
 }

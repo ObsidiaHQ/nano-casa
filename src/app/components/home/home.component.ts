@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { graphic } from 'echarts/core';
-import { Contributor, Profile, Repo } from '../../../../server/models';
+import { Contributor, Profile, Repo } from '../../api.types';
 import { SortPipe } from '../../pipes/sort.pipe';
 import { SharedService } from '../../shared.service';
 import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
@@ -15,6 +15,17 @@ import { PaginationComponent } from '../paginate/paginate.component';
 import { GoalComponent } from '../goal/goal.component';
 import { CountUpModule } from 'ngx-countup';
 import { RouterLink } from '@angular/router';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+
+declare global {
+  interface Window {
+    ethereum: MetaMaskInpageProvider;
+  }
+}
+
+const { ethereum } = window;
+
+const snapId = 'npm:@obsidia/xnap';
 
 @Component({
   selector: 'app-home',
@@ -83,7 +94,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       YEARS_DICT[year] = 0;
     }
     this.shared.repos().forEach((repo, i) => {
-      const year = new Date(repo.created_at).getFullYear();
+      const year = new Date(repo.createdAt).getFullYear();
       YEARS_DICT[year] += 1;
     });
 
@@ -303,16 +314,39 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   setGoal() {
-    this.loggedUser.goal_title = 'New goal';
-    this.loggedUser.goal_amount = 5;
-    this.loggedUser.goal_nano_address = this.loggedUser.nano_address || 'nano_';
-    this.loggedUser.goal_description = '';
+    this.loggedUser.goalTitle = 'New goal';
+    this.loggedUser.goalAmount = 5;
+    this.loggedUser.goalNanoAddress = this.loggedUser.nanoAddress || 'nano_';
+    this.loggedUser.goalDescription = '';
   }
 
   deleteGoal() {
-    this.loggedUser.goal_title = null;
-    this.loggedUser.goal_amount = null;
-    this.loggedUser.goal_nano_address = null;
-    this.loggedUser.goal_description = null;
+    this.loggedUser.goalTitle = null;
+    this.loggedUser.goalAmount = null;
+    this.loggedUser.goalNanoAddress = null;
+    this.loggedUser.goalDescription = null;
+  }
+
+  async makeTx(account: string) {
+    let res: number;
+    try {
+      res = await ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId,
+          request: {
+            method: 'xno_makeTransaction',
+            params: {
+              to: account, // account,
+              value: '0.0001'
+            },
+          },
+        },
+      }) as number;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      alert(JSON.stringify(res));
+    }
   }
 }

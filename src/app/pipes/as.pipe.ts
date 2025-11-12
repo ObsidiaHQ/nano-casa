@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Contributor, Repo } from '../../../server/models';
+import { Contributor, Repo } from '../api.types';
 
 @Pipe({
   name: 'asRepo',

@@ -1,0 +1,10 @@
+POST http://127.0.0.1:8080/api/bounty
+content-type: application/json
+
+{
+    "title": "Refactor Legacy Codebase",
+    "description": "Refactor the legacy code to adhere to modern best practices. The goal is to improve readability, reduce technical debt, and make the code easier to maintain for future contributors.",
+    "deadline": 1725888009650,
+    "reward": 150,
+    "creator": "geommr"
+}

@@ -4,6 +4,8 @@ import { AboutComponent } from './components/about/about.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { PublicNodesComponent } from './components/public-nodes/public-nodes.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import { BountiesComponent } from './components/bounties/bounties.component';
+import { LogComponent } from './components/log/log.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +26,16 @@ export const routes: Routes = [
   {
     path: 'leaderboard',
     component: LeaderboardComponent,
+    data: { animation: 'NodesPage' },
+  },
+  {
+    path: 'bounties',
+    component: BountiesComponent,
+    data: { animation: 'NodesPage' },
+  },
+  {
+    path: 'logs',
+    component: LogComponent,
     data: { animation: 'NodesPage' },
   },
   {

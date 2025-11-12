@@ -14,6 +14,12 @@
         </h1>
         <div class="navbar-nav flex-row order-md-last">
           <div class="d-none d-md-flex me-2">
+            <!-- <a style="margin-right: 10px;" (click)="makeTx()">acc </a>
+            <a style="margin-right: 10px;" (click)="signMessage()">sign </a>
+            <a style="margin-right: 10px;" (click)="getCurrentAddress()">get </a> -->
+            <a class="d-flex align-items-center nav-link" (click)="connectMetamask()">
+              <img style="width: 22px;" src="icons/mm.png" alt=""> <span class="ms-1">{{snapConnected ? 'Connected' : 'Connect'}}</span>
+            </a>
             <a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="nav-link" title="Source code">
               <app-icon icon="github"></app-icon>
             </a>
@@ -24,7 +30,7 @@
           @if (shared.loggedUser()) {
           <div class="nav-item dropdown">
             <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu" aria-expanded="true">
-              <span class="avatar avatar-sm" [style]="'background-image: url('+shared.loggedUser().avatar_url+')'"></span>
+              <span class="avatar avatar-sm" [style]="'background-image: url('+shared.loggedUser().avatarUrl+')'"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" data-bs-popper="static">
               <a (click)="shared.selectUser(null, true)" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-profile">Profile</a>
@@ -101,13 +107,11 @@
             <ul class="list-inline list-inline-dots mb-0">
               @if (shared.milestones().length) {
               <li class="list-inline-item text-secondary">
-                Updated {{shared.milestones()[0].created_at | timeago:false}} ago
+                <a routerLink="/logs" class="link-secondary">Updated {{shared.milestones()[0].createdAt | timeago:false}} ago</a>
               </li>
               }
               <li class="list-inline-item"><a class="link-secondary" routerLink="/public-nodes">Public Nodes</a></li>
               <li class="list-inline-item"><a routerLink="/about" class="link-secondary">About</a></li>
-              <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa/blob/main/LICENSE" target="_blank" class="link-secondary">License</a>
-              </li>
               <li class="list-inline-item"><a href="https://github.com/obsidiaHQ/nano-casa" target="_blank" class="link-secondary" rel="noopener">Source
                   code</a></li>
               <li class="list-inline-item">
@@ -115,12 +119,15 @@
                   Twitter
                 </a>
               </li>
+              <li class="list-inline-item">
+                <a href="https://obsidia.io/imprint" target="_blank" class="link-secondary">Imprint</a>
+              </li>
             </ul>
           </div>
           <div class="col-12 col-lg-auto mt-3 mt-lg-0">
             <ul class="list-inline list-inline-dots mb-0">
               <li class="list-inline-item">
-                Obsidia
+                Made with 💚 by <a href="https://obsidia.io" target="_blank" class="link-secondary">Obsidia</a>
               </li>
             </ul>
           </div>
