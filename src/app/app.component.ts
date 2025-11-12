@@ -128,17 +128,16 @@ export async function getCurrentAddress(cb: (acc: { address: string, icon: strin
 }
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    IconComponent,
-    RouterLinkActive,
-    TimeagoModule,
-    RouterLink,
-  ],
-  templateUrl: './app.component.html',
-  animations: [fader],
+    selector: 'app-root',
+    imports: [
+        RouterOutlet,
+        IconComponent,
+        RouterLinkActive,
+        TimeagoModule,
+        RouterLink,
+    ],
+    templateUrl: './app.component.html',
+    animations: [fader]
 })
 export class AppComponent {
   snapConnected: boolean;

@@ -3,11 +3,10 @@ import { SharedService } from '../../shared.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-log',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './log.component.html',
-  styleUrl: './log.component.css'
+    selector: 'app-log',
+    imports: [CommonModule],
+    templateUrl: './log.component.html',
+    styleUrl: './log.component.css'
 })
 export class LogComponent {
   shared = inject(SharedService);

@@ -11,13 +11,12 @@ import { graphic } from 'echarts/core';
 import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
 
 @Component({
-  selector: 'app-leaderboard',
-  templateUrl: './leaderboard.component.html',
-  standalone: true,
-  imports: [NgxEchartsDirective],
-  providers: [provideEcharts()],
-  styleUrl: './leaderboard.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-leaderboard',
+    templateUrl: './leaderboard.component.html',
+    imports: [NgxEchartsDirective],
+    providers: [provideEcharts()],
+    styleUrl: './leaderboard.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LeaderboardComponent implements AfterViewInit {
   donorsChartOpts: EChartsOption;
