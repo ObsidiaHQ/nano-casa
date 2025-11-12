@@ -23,69 +23,71 @@
     </section>
 
     <div class="row row-cards">
-      <div class="col-12" *ngFor="let bounty of bounties">
-        <div class="card">
-          <div class="card-status-top bg-primary"></div>
-          <div class="card-body">
-            <h3 class="card-title">{{bounty.title}}</h3>
-            <p class="text-muted">{{bounty.description}}...</p>
-          </div>
-          <div class="card-footer">
-            <div class="datagrid">
-              <div class="datagrid-item">
-                <div class="datagrid-title">Creator</div>
-                <div class="datagrid-content">
-                  <div class="d-flex align-items-center">
-                    <span class="avatar avatar-xs me-2 rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
-                    {{bounty.creator}}
+      @for (bounty of bounties; track bounty) {
+        <div class="col-12">
+          <div class="card">
+            <div class="card-status-top bg-primary"></div>
+            <div class="card-body">
+              <h3 class="card-title">{{bounty.title}}</h3>
+              <p class="text-muted">{{bounty.description}}...</p>
+            </div>
+            <div class="card-footer">
+              <div class="datagrid">
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Creator</div>
+                  <div class="datagrid-content">
+                    <div class="d-flex align-items-center">
+                      <span class="avatar avatar-xs me-2 rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
+                      {{bounty.creator}}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Reward</div>
-                <div class="datagrid-content">Ӿ{{bounty.reward}}</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Expiration date</div>
-                <div class="datagrid-content">{{bounty.deadline ? (bounty.deadline | date) : 'Open-ended'}}</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Bounty Age</div>
-                <div class="datagrid-content">{{bounty.created_at | timeago}}</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Port number</div>
-                <div class="datagrid-content">3306</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Registrar</div>
-                <div class="datagrid-content">Third Party</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Tags</div>
-                <div class="datagrid-content">
-                  <span class="status status-green">
-                    Active
-                  </span>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Reward</div>
+                  <div class="datagrid-content">Ӿ{{bounty.reward}}</div>
                 </div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title">Activity</div>
-                <div class="datagrid-content">
-                  <div class="avatar-list avatar-list-stacked">
-                    <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
-                    <span class="avatar avatar-xs rounded">JL</span>
-                    <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
-                    <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
-                    <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
-                    <span class="avatar avatar-xs rounded">+3</span>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Expiration date</div>
+                  <div class="datagrid-content">{{bounty.deadline ? (bounty.deadline | date) : 'Open-ended'}}</div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Bounty Age</div>
+                  <div class="datagrid-content">{{bounty.created_at | timeago}}</div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Port number</div>
+                  <div class="datagrid-content">3306</div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Registrar</div>
+                  <div class="datagrid-content">Third Party</div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Tags</div>
+                  <div class="datagrid-content">
+                    <span class="status status-green">
+                      Active
+                    </span>
+                  </div>
+                </div>
+                <div class="datagrid-item">
+                  <div class="datagrid-title">Activity</div>
+                  <div class="datagrid-content">
+                    <div class="avatar-list avatar-list-stacked">
+                      <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
+                      <span class="avatar avatar-xs rounded">JL</span>
+                      <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
+                      <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
+                      <span class="avatar avatar-xs rounded" style="background-image: url(https://i.pravatar.cc/100)"></span>
+                      <span class="avatar avatar-xs rounded">+3</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </div>

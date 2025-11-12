@@ -13,9 +13,10 @@ import {
 import paginate from 'jw-paginate';
 
 @Component({
-    selector: 'app-pagination',
-    imports: [CommonModule],
-    template: ` <div class="card-footer d-flex align-items-center">
+  selector: 'app-pagination',
+  standalone: true,
+  imports: [CommonModule],
+  template: ` <div class="card-footer d-flex align-items-center">
     <ul class="pagination m-0 ms-auto">
       <li
         class="page-item mx-2"
@@ -79,7 +80,7 @@ import paginate from 'jw-paginate';
       </li>
     </ul>
   </div>`,
-    encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None
 })
 export class PaginationComponent implements OnInit, OnChanges {
   @Input() items: Array<any> = [];

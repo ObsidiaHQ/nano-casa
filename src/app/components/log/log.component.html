@@ -16,8 +16,8 @@
                     aria-expanded="false"
                     [attr.aria-controls]="'collapse' + i"
                   >
-                    <span class="mx-1 text-muted">{{ run.start_timestamp | date:'medium' }}</span>
-                    <span class="mx-1">{{run.job_name}}</span>
+                    <span class="mx-1 text-muted">{{ run.startTimestamp | date:'medium' }}</span>
+                    <span class="mx-1">{{run.jobName}}</span>
                     <span class="badge mx-1 badge-outline"
                           [ngClass]="{
                             'text-green': run.status === 'success',
@@ -25,7 +25,7 @@
                             'text-yellow': run.status === 'running',
                             'text-default': run.status !== 'success' && run.status !== 'failed' && run.status !== 'running'
                           }">{{run.status}}</span>
-                    <span class="mx-1 text-muted"><strong>[{{run.duration_ms / 1000 | number:'1.0-2'}}s]</strong></span>
+                    <span class="mx-1 text-muted"><strong>[{{run.durationMs / 1000 | number:'1.0-2'}}s]</strong></span>
                   </button>
                 </h2>
                 <div
@@ -41,8 +41,8 @@
                             'text-red': log.level === 'error'
                           }">
                           <span class="text-muted">{{log.timestamp | date:'mediumTime'}}</span> {{log.message}}
-                          @if (log.duration_ms) {
-                            <span class="text-muted">[{{log.duration_ms / 1000 | number:'1.0-2'}}ms]</span>
+                          @if (log.durationMs) {
+                            <span class="text-muted">[{{log.durationMs / 1000 | number:'1.0-2'}}ms]</span>
                           }
                         </p>
                       }

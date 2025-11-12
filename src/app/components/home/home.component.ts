@@ -28,25 +28,26 @@ const { ethereum } = window;
 const snapId = 'npm:@obsidia/xnap';
 
 @Component({
-    selector: 'app-home',
-    templateUrl: './home.component.html',
-    imports: [
-        CommonModule,
-        TimeagoModule,
-        FormsModule,
-        CountUpModule,
-        NgxEchartsDirective,
-        IconComponent,
-        PaginationComponent,
-        GoalComponent,
-        SortPipe,
-        FilterPipe,
-        AsRepoPipe,
-        AsUserPipe,
-        RouterLink,
-    ],
-    styleUrls: ['./home.component.css'],
-    providers: [provideEcharts()]
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    TimeagoModule,
+    FormsModule,
+    CountUpModule,
+    NgxEchartsDirective,
+    IconComponent,
+    PaginationComponent,
+    GoalComponent,
+    SortPipe,
+    FilterPipe,
+    AsRepoPipe,
+    AsUserPipe,
+    RouterLink,
+  ],
+  styleUrls: ['./home.component.css'],
+  providers: [provideEcharts()]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   protected shared = inject(SharedService);

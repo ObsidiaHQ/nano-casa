@@ -1,5 +1,13 @@
-:root {
+[data-bs-theme="dark"] {
   --tblr-secondary: #6e829c;
+  --tblr-body-bg: #151F2C;
+  --tblr-card-bg: #182433;
+  --tblr-bg-surface: #182433;
+  --tblr-bg-surface-tertiary: #141f2c;
+  --tblr-table-striped-bg: #151F2C;
+  --tblr-navbar-border-color: #486e9524;
+  --tblr-btn-border-color: #486e9524;
+  --tblr-border-color: #486e9524;
 }
 
 body {

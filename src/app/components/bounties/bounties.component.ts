@@ -5,10 +5,11 @@ import { CommonModule } from '@angular/common';
 import { TimeagoModule } from 'ngx-timeago';
 
 @Component({
-    selector: 'app-bounties',
-    imports: [CommonModule, IconComponent, TimeagoModule],
-    templateUrl: './bounties.component.html',
-    styleUrls: ['./bounties.component.css']
+  selector: 'app-bounties',
+  standalone: true,
+  imports: [CommonModule, IconComponent, TimeagoModule],
+  templateUrl: './bounties.component.html',
+  styleUrls: ['./bounties.component.css']
 })
 export class BountiesComponent {
   readonly shared = inject(SharedService);
