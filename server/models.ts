@@ -20,7 +20,7 @@ export class Repo {
 export interface Repo {
   name: string | null;
   fullName: string;
-  createdAt: string | null;
+  createdAt: Date | null;
   stargazersCount: number | null;
   prs30d: number | null;
   prs7d: number | null;
@@ -138,7 +138,7 @@ export interface NodeEvent {
   type: string | null;
   author: string | null;
   avatarUrl: string | null;
-  createdAt: string | null;
+  createdAt: Date | null;
 }
 
 export class Milestone {
@@ -156,7 +156,7 @@ export interface Milestone {
   title: string | null;
   openIssues: number | null;
   closedIssues: number | null;
-  createdAt: string | null;
+  createdAt: Date | null;
   number: number | null;
   url: string | null;
 }
@@ -187,8 +187,14 @@ export interface Misc {
   devFundDonors: Donor[];
 }
 
+
+export interface ChartCommit {
+  count: number;
+  date: string;
+}
+
 export class Contributor {
-  public static async getAll(): Promise<Contributor[]> {
+  public static async getAll(): Promise<ContributorWithProfile[]> {
     const reposNames = (
       await db
         .select()
@@ -196,149 +202,473 @@ export class Contributor {
         .orderBy(desc(schema.repos.stargazersCount))
     ).map((r) => r.fullName);
 
-    const contributors = await db
+    // Get all unique contributors from commits
+    const contributorStats = await db
+      .select({
+        githubLogin: schema.commits.author,
+        contributions: sql<number>`COUNT(*)`,
+        lastMonth: sql<number>`SUM(CASE WHEN ${schema.commits.date} >= date('now', '-30 days') THEN 1 ELSE 0 END)`,
+        repos: sql<string>`GROUP_CONCAT(DISTINCT ${schema.commits.repoFullName})`,
+        avatarUrl: sql<string>`MAX(${schema.commits.avatarUrl})`,
+      })
+      .from(schema.commits)
+      .groupBy(schema.commits.author)
+      .orderBy(desc(sql`COUNT(*)`));
+
+    // Get all developer profiles
+    const profiles = await db
       .select()
-      .from(schema.contributors)
-      .leftJoin(
-        schema.profiles,
-        eq(schema.contributors.login, schema.profiles.login)
-      )
-      .orderBy(desc(schema.contributors.contributions));
+      .from(schema.developerProfiles)
+      .leftJoin(schema.user, eq(schema.developerProfiles.userId, schema.user.id));
 
-    return contributors.map((c: any) => {
-      const repos: string[] = JSON.parse(c.Contributors.repos || '[]');
+    // Create a map of githubLogin -> profile
+    const profileMap = new Map();
+    profiles.forEach((p) => {
+      if (p.developer_profiles) {
+        profileMap.set(p.developer_profiles.githubLogin, {
+          ...p.developer_profiles,
+          userName: p.user?.name,
+          userEmail: p.user?.email,
+          userImage: p.user?.image,
+        });
+      }
+    });
+
+    // Combine contributor stats with profile data
+    const result: ContributorWithProfile[] = contributorStats.map((stat) => {
+      const repos: string[] = stat.repos ? stat.repos.split(',') : [];
+      const hasPopularRepo = repos.some(
+        (r) =>
+          reposNames.indexOf(r) >= 0 &&
+          reposNames.indexOf(r) < 15 &&
+          r !== 'nanocurrency/nano-node'
+      );
+
+      const profile = profileMap.get(stat.githubLogin);
+
       return {
-        ...c.Contributors,
-        ...c.Profiles,
+        githubLogin: stat.githubLogin,
+        avatarUrl: stat.avatarUrl,
+        contributions: stat.contributions,
+        lastMonth: stat.lastMonth,
         repos,
-        hasPopularRepo: repos.some(
-          (r) =>
-            reposNames.indexOf(r) >= 0 &&
-            reposNames.indexOf(r) < 15 &&
-            r != 'nanocurrency/nano-node'
-        ),
-        created_at: null,
+        hasPopularRepo,
         nodeContributor: repos.includes('nanocurrency/nano-node'),
-        bio: c.Profiles?.bio?.replace(
-          /\[(.*?)\]\((.*?)\)/gim,
-          "<a href='$2' target='_blank'>$1</a>"
-        ),
+        // Profile data (if exists)
+        userId: profile?.userId || null,
+        bio: profile?.bio || null,
+        twitterUsername: profile?.twitterUsername || null,
+        website: profile?.website || null,
+        nanoAddress: profile?.nanoAddress || null,
+        ghSponsors: profile?.ghSponsors || null,
+        patreonUrl: profile?.patreonUrl || null,
+        goalTitle: profile?.goalTitle || null,
+        goalAmount: profile?.goalAmount || null,
+        goalNanoAddress: profile?.goalNanoAddress || null,
+        goalWebsite: profile?.goalWebsite || null,
+        goalDescription: profile?.goalDescription || null,
+        name: profile?.userName || null,
+        email: profile?.userEmail || null,
+        image: profile?.userImage || stat.avatarUrl,
       };
-    }) as Contributor[];
-  }
+    });
 
-  public static insert() {
-    return db.insert(schema.contributors);
-  }
-
-  public static async createProfile(profile: any) {
-    if (!profile) return;
-    await db
-      .insert(schema.profiles)
-      .values({
-        id: String(profile.id),
-        bio: profile.bio || null,
-        twitterUsername: profile.twitter_username || null,
-        website: profile.blog || null,
-        avatarUrl: profile.avatar_url || null,
-        login: profile.login || null,
-      })
-      .onConflictDoNothing();
-  }
-
-  public static async updateProfile(
-    profile: Partial<Profile>,
-    login: string | undefined
-  ) {
-    if (!login) return;
-    await db
-      .update(schema.profiles)
-      .set({
-        bio: profile.bio,
-        twitterUsername: profile.twitterUsername?.replace('@', ''),
-        website: profile.website?.replace(/(http|https):\/\//i, ''),
-        nanoAddress: profile.nanoAddress?.replace('@', '').trim(),
-        ghSponsors: profile.ghSponsors,
-        patreonUrl: profile.patreonUrl,
-        goalTitle: profile.goalTitle,
-        goalAmount: profile.goalAmount,
-        goalNanoAddress: profile.goalNanoAddress?.replace('@', '').trim(),
-        goalWebsite: profile.goalWebsite?.replace(/(http|https):\/\//i, ''),
-        goalDescription: profile.goalDescription,
-      })
-      .where(eq(schema.profiles.login, login));
-  }
-
-  public static update(login: string, contributor: Contributor) {
-    // Implementation if needed
+    return result;
   }
 }
 
-export interface Contributor {
-  login: string;
+export interface ContributorWithProfile {
+  githubLogin: string;
   avatarUrl: string;
   contributions: number;
   lastMonth: number;
   repos: string[];
-  profile?: Profile;
   hasPopularRepo: boolean;
   nodeContributor: boolean;
-  //profile
-  bio?: string;
-  twitterUsername?: string;
-  website?: string;
-  nanoAddress?: string;
-  ghSponsors?: number;
-  patreonUrl?: string;
-  goalTitle?: string;
-  goalAmount?: number;
-  goalNanoAddress?: string;
-  goalWebsite?: string;
-  goalDescription?: string;
-}
-
-export interface ChartCommit {
-  count: number;
-  date: string;
-}
-
-export interface Profile {
-  id: string;
-  login: string | null;
-  avatarUrl: string | null;
+  // Profile data (nullable - only if user has logged in)
+  userId: string | null;
   bio: string | null;
   twitterUsername: string | null;
   website: string | null;
   nanoAddress: string | null;
-  ghSponsors: number | null;
+  ghSponsors: boolean | null;
   patreonUrl: string | null;
   goalTitle: string | null;
   goalAmount: number | null;
   goalNanoAddress: string | null;
   goalWebsite: string | null;
   goalDescription: string | null;
-  createdAt: string | null;
+  name: string | null;
+  email: string | null;
+  image: string | null;
 }
 
-export class Profile {
-  public static async findByLogin(login: string): Promise<Profile | null> {
-    const result = await db
+export class DeveloperProfile {
+  public static async getAll(): Promise<DeveloperProfileWithStats[]> {
+    const reposNames = (
+      await db
+        .select()
+        .from(schema.repos)
+        .orderBy(desc(schema.repos.stargazersCount))
+    ).map((r) => r.fullName);
+
+    // Get all developer profiles with user info
+    const profiles = await db
       .select()
-      .from(schema.profiles)
-      .where(eq(schema.profiles.login, login))
-      .limit(1);
-    return (result[0] as Profile) || null;
+      .from(schema.developerProfiles)
+      .leftJoin(schema.user, eq(schema.developerProfiles.userId, schema.user.id))
+      .leftJoin(
+        schema.account,
+        sql`${schema.account.userId} = ${schema.developerProfiles.userId} AND ${schema.account.providerId} = 'github'`
+      );
+
+    // Compute stats from commits for each developer
+    const result: DeveloperProfileWithStats[] = [];
+
+    for (const profile of profiles) {
+      const githubLogin = profile.developer_profiles.githubLogin;
+
+      // Get commit stats
+      const commitStats = await db
+        .select({
+          count: sql<number>`COUNT(*)`,
+          repos: sql<string>`GROUP_CONCAT(DISTINCT ${schema.commits.repoFullName})`,
+        })
+        .from(schema.commits)
+        .where(eq(schema.commits.author, githubLogin));
+
+      // Get last month contributions
+      const lastMonthStats = await db
+        .select({
+          count: sql<number>`COUNT(*)`,
+        })
+        .from(schema.commits)
+        .where(
+          sql`${schema.commits.author} = ${githubLogin} AND ${schema.commits.date} >= date('now', '-30 days')`
+        );
+
+      const repos: string[] = commitStats[0]?.repos
+        ? commitStats[0].repos.split(',')
+        : [];
+
+      const hasPopularRepo = repos.some(
+        (r) =>
+          reposNames.indexOf(r) >= 0 &&
+          reposNames.indexOf(r) < 15 &&
+          r !== 'nanocurrency/nano-node'
+      );
+
+      result.push({
+        userId: profile.developer_profiles.userId,
+        githubLogin: profile.developer_profiles.githubLogin,
+        bio: profile.developer_profiles.bio,
+        twitterUsername: profile.developer_profiles.twitterUsername,
+        website: profile.developer_profiles.website,
+        nanoAddress: profile.developer_profiles.nanoAddress,
+        ghSponsors: profile.developer_profiles.ghSponsors,
+        patreonUrl: profile.developer_profiles.patreonUrl,
+        goalTitle: profile.developer_profiles.goalTitle,
+        goalAmount: profile.developer_profiles.goalAmount,
+        goalNanoAddress: profile.developer_profiles.goalNanoAddress,
+        goalWebsite: profile.developer_profiles.goalWebsite,
+        goalDescription: profile.developer_profiles.goalDescription,
+        createdAt: profile.developer_profiles.createdAt,
+        updatedAt: profile.developer_profiles.updatedAt,
+        // User info
+        name: profile.user?.name || null,
+        email: profile.user?.email || null,
+        image: profile.user?.image || null,
+        // Computed stats
+        contributions: commitStats[0]?.count || 0,
+        lastMonth: lastMonthStats[0]?.count || 0,
+        repos,
+        hasPopularRepo,
+        nodeContributor: repos.includes('nanocurrency/nano-node'),
+      });
+    }
+
+    return result.sort((a, b) => b.contributions - a.contributions);
   }
 
-  public static async update(key: string, value: any): Promise<void> {
-    await db
-      .insert(schema.misc)
-      .values({ key, value: JSON.stringify(value) })
-      .onConflictDoUpdate({
-        target: schema.misc.key,
-        set: { value: JSON.stringify(value) },
-      });
+  public static async findByGithubLogin(
+    githubLogin: string
+  ): Promise<DeveloperProfileWithStats | null> {
+    const profile = await db
+      .select()
+      .from(schema.developerProfiles)
+      .leftJoin(schema.user, eq(schema.developerProfiles.userId, schema.user.id))
+      .where(eq(schema.developerProfiles.githubLogin, githubLogin))
+      .limit(1);
+
+    if (!profile[0]) return null;
+
+    const reposNames = (
+      await db
+        .select()
+        .from(schema.repos)
+        .orderBy(desc(schema.repos.stargazersCount))
+    ).map((r) => r.fullName);
+
+    // Get commit stats
+    const commitStats = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+        repos: sql<string>`GROUP_CONCAT(DISTINCT ${schema.commits.repoFullName})`,
+      })
+      .from(schema.commits)
+      .where(eq(schema.commits.author, githubLogin));
+
+    // Get last month contributions
+    const lastMonthStats = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(schema.commits)
+      .where(
+        sql`${schema.commits.author} = ${githubLogin} AND ${schema.commits.date} >= date('now', '-30 days')`
+      );
+
+    const repos: string[] = commitStats[0]?.repos
+      ? commitStats[0].repos.split(',')
+      : [];
+
+    const hasPopularRepo = repos.some(
+      (r) =>
+        reposNames.indexOf(r) >= 0 &&
+        reposNames.indexOf(r) < 15 &&
+        r !== 'nanocurrency/nano-node'
+    );
+
+    return {
+      userId: profile[0].developer_profiles.userId,
+      githubLogin: profile[0].developer_profiles.githubLogin,
+      bio: profile[0].developer_profiles.bio,
+      twitterUsername: profile[0].developer_profiles.twitterUsername,
+      website: profile[0].developer_profiles.website,
+      nanoAddress: profile[0].developer_profiles.nanoAddress,
+      ghSponsors: profile[0].developer_profiles.ghSponsors,
+      patreonUrl: profile[0].developer_profiles.patreonUrl,
+      goalTitle: profile[0].developer_profiles.goalTitle,
+      goalAmount: profile[0].developer_profiles.goalAmount,
+      goalNanoAddress: profile[0].developer_profiles.goalNanoAddress,
+      goalWebsite: profile[0].developer_profiles.goalWebsite,
+      goalDescription: profile[0].developer_profiles.goalDescription,
+      createdAt: profile[0].developer_profiles.createdAt,
+      updatedAt: profile[0].developer_profiles.updatedAt,
+      // User info
+      name: profile[0].user?.name || null,
+      email: profile[0].user?.email || null,
+      image: profile[0].user?.image || null,
+      // Computed stats
+      contributions: commitStats[0]?.count || 0,
+      lastMonth: lastMonthStats[0]?.count || 0,
+      repos,
+      hasPopularRepo,
+      nodeContributor: repos.includes('nanocurrency/nano-node'),
+    };
   }
+
+  public static async findByUserId(
+    userId: string
+  ): Promise<DeveloperProfileWithStats | null> {
+    const profile = await db
+      .select()
+      .from(schema.developerProfiles)
+      .leftJoin(schema.user, eq(schema.developerProfiles.userId, schema.user.id))
+      .where(eq(schema.developerProfiles.userId, userId))
+      .limit(1);
+
+    if (!profile[0]) return null;
+
+    const githubLogin = profile[0].developer_profiles.githubLogin;
+    const reposNames = (
+      await db
+        .select()
+        .from(schema.repos)
+        .orderBy(desc(schema.repos.stargazersCount))
+    ).map((r) => r.fullName);
+
+    // Get commit stats
+    const commitStats = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+        repos: sql<string>`GROUP_CONCAT(DISTINCT ${schema.commits.repoFullName})`,
+      })
+      .from(schema.commits)
+      .where(eq(schema.commits.author, githubLogin));
+
+    // Get last month contributions
+    const lastMonthStats = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(schema.commits)
+      .where(
+        sql`${schema.commits.author} = ${githubLogin} AND ${schema.commits.date} >= date('now', '-30 days')`
+      );
+
+    const repos: string[] = commitStats[0]?.repos
+      ? commitStats[0].repos.split(',')
+      : [];
+
+    const hasPopularRepo = repos.some(
+      (r) =>
+        reposNames.indexOf(r) >= 0 &&
+        reposNames.indexOf(r) < 15 &&
+        r !== 'nanocurrency/nano-node'
+    );
+
+    return {
+      userId: profile[0].developer_profiles.userId,
+      githubLogin: profile[0].developer_profiles.githubLogin,
+      bio: profile[0].developer_profiles.bio,
+      twitterUsername: profile[0].developer_profiles.twitterUsername,
+      website: profile[0].developer_profiles.website,
+      nanoAddress: profile[0].developer_profiles.nanoAddress,
+      ghSponsors: profile[0].developer_profiles.ghSponsors,
+      patreonUrl: profile[0].developer_profiles.patreonUrl,
+      goalTitle: profile[0].developer_profiles.goalTitle,
+      goalAmount: profile[0].developer_profiles.goalAmount,
+      goalNanoAddress: profile[0].developer_profiles.goalNanoAddress,
+      goalWebsite: profile[0].developer_profiles.goalWebsite,
+      goalDescription: profile[0].developer_profiles.goalDescription,
+      createdAt: profile[0].developer_profiles.createdAt,
+      updatedAt: profile[0].developer_profiles.updatedAt,
+      // User info
+      name: profile[0].user?.name || null,
+      email: profile[0].user?.email || null,
+      image: profile[0].user?.image || null,
+      // Computed stats
+      contributions: commitStats[0]?.count || 0,
+      lastMonth: lastMonthStats[0]?.count || 0,
+      repos,
+      hasPopularRepo,
+      nodeContributor: repos.includes('nanocurrency/nano-node'),
+    };
+  }
+
+  public static async createOrUpdate(
+    userId: string,
+    data: Partial<DeveloperProfileInput>
+  ): Promise<void> {
+    // 1. Check if user already has a profile linked
+    const existingByUserId = await db
+      .select()
+      .from(schema.developerProfiles)
+      .where(eq(schema.developerProfiles.userId, userId))
+      .limit(1);
+
+    if (existingByUserId.length > 0) {
+      // Update existing profile found by userId
+      await db
+        .update(schema.developerProfiles)
+        .set({
+          bio: data.bio,
+          twitterUsername: data.twitterUsername?.replace('@', ''),
+          website: data.website?.replace(/(http|https):\/\//i, ''),
+          nanoAddress: data.nanoAddress?.replace('@', '').trim(),
+          ghSponsors: data.ghSponsors,
+          patreonUrl: data.patreonUrl,
+          goalTitle: data.goalTitle,
+          goalAmount: data.goalAmount,
+          goalNanoAddress: data.goalNanoAddress?.replace('@', '').trim(),
+          goalWebsite: data.goalWebsite?.replace(/(http|https):\/\//i, ''),
+          goalDescription: data.goalDescription,
+        })
+        .where(eq(schema.developerProfiles.userId, userId));
+    } else {
+      // 2. User has no linked profile yet. 
+      // Check if there is an unlinked profile with this githubLogin (Legacy Migration)
+      if (!data.githubLogin) {
+        throw new Error('githubLogin is required to create or claim a developer profile');
+      }
+
+      const existingByLogin = await db
+        .select()
+        .from(schema.developerProfiles)
+        .where(eq(schema.developerProfiles.githubLogin, data.githubLogin))
+        .limit(1);
+
+      if (existingByLogin.length > 0) {
+        // Claim the existing unlinked profile!
+        await db
+          .update(schema.developerProfiles)
+          .set({
+            userId: userId, // LINK THE USER HERE
+            bio: data.bio || existingByLogin[0].bio, // Prefer new data, fallback to old
+            twitterUsername: data.twitterUsername?.replace('@', '') || existingByLogin[0].twitterUsername,
+            // ... map other fields similarly if you want to update them on login, 
+            // or just set userId if you want to preserve legacy data strictly.
+            // For simplicity, let's update common fields:
+            website: data.website?.replace(/(http|https):\/\//i, '') || existingByLogin[0].website,
+          })
+          .where(eq(schema.developerProfiles.githubLogin, data.githubLogin));
+      } else {
+        // 3. Create entirely new profile
+        await db.insert(schema.developerProfiles).values({
+          userId,
+          githubLogin: data.githubLogin,
+          bio: data.bio || null,
+          twitterUsername: data.twitterUsername?.replace('@', '') || null,
+          website: data.website?.replace(/(http|https):\/\//i, '') || null,
+          nanoAddress: data.nanoAddress?.replace('@', '').trim() || null,
+          ghSponsors: data.ghSponsors || null,
+          patreonUrl: data.patreonUrl || null,
+          goalTitle: data.goalTitle || null,
+          goalAmount: data.goalAmount || null,
+          goalNanoAddress: data.goalNanoAddress?.replace('@', '').trim() || null,
+          goalWebsite: data.goalWebsite?.replace(/(http|https):\/\//i, '') || null,
+          goalDescription: data.goalDescription || null
+        });
+      }
+    }
+  }
+}
+
+export interface DeveloperProfile {
+  userId: string;
+  githubLogin: string;
+  bio: string | null;
+  twitterUsername: string | null;
+  website: string | null;
+  nanoAddress: string | null;
+  ghSponsors: boolean | null;
+  patreonUrl: string | null;
+  goalTitle: string | null;
+  goalAmount: number | null;
+  goalNanoAddress: string | null;
+  goalWebsite: string | null;
+  goalDescription: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DeveloperProfileWithStats extends DeveloperProfile {
+  // User info from better-auth
+  name: string | null;
+  email: string | null;
+  image: string | null;
+  // Computed stats from commits
+  contributions: number;
+  lastMonth: number;
+  repos: string[];
+  hasPopularRepo: boolean;
+  nodeContributor: boolean;
+}
+
+export interface DeveloperProfileInput {
+  githubLogin: string;
+  bio?: string;
+  twitterUsername?: string;
+  website?: string;
+  nanoAddress?: string;
+  ghSponsors?: boolean;
+  patreonUrl?: string;
+  goalTitle?: string;
+  goalAmount?: number;
+  goalNanoAddress?: string;
+  goalWebsite?: string;
+  goalDescription?: string;
 }
 
 export interface Donor {

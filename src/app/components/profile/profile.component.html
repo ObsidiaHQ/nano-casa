@@ -1,0 +1,189 @@
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-cards">
+      
+      @if (shared.loggedUser(); as user) {
+      <!-- Sidebar / Preview -->
+      <div class="col-md-4">
+          <div class="card">
+            <div class="card-body p-4 text-center">
+              <img [src]="user.image + '&s=100'" class="avatar-xl mb-3 rounded" [alt]="user.name">
+              <h3 class="m-0 mb-1">{{ user.name }}</h3>
+              <div class="text-muted">{{ user.githubLogin }}</div>
+              <div class="mt-3">
+                <span class="badge bg-purple-lt">{{ user.isDeveloper ? 'Developer' : 'User' }}</span>
+              </div>
+            </div>
+            <div class="d-flex">
+              <a href="https://github.com/{{ user.githubLogin }}" target="_blank" class="card-btn">
+                <app-icon icon="github" class="me-2 text-muted"></app-icon>
+                Github
+              </a>
+              @if (user.twitterUsername) {
+                <a href="https://twitter.com/{{ user.twitterUsername }}" target="_blank" class="card-btn">
+                  <app-icon icon="twitter" class="me-2 text-muted"></app-icon>
+                  Twitter
+                </a>
+              }
+            </div>
+             @if (user.website) {
+              <div class="card-footer">
+                 <a href="{{ user.website }}" target="_blank" class="text-muted text-truncate d-block">
+                    <app-icon icon="web" class="me-2 text-muted" size="16"></app-icon>
+                    {{ user.website }}
+                 </a>
+              </div>
+             }
+          </div>
+
+          @if (user.bio) {
+            <div class="card mt-3">
+              <div class="card-body">
+                <div class="card-title">About</div>
+                <div class="mb-2">
+                  <p>{{ user.bio }}</p>
+                </div>
+              </div>
+            </div>
+          }
+          
+          @if (user.goalAmount) {
+            <div class="card mt-3">
+                <div class="card-body">
+                     <div class="card-title">Funding Goal</div>
+                     <app-goal 
+                        [sid]="'preview_' + user.githubLogin" 
+                        [title]="user.goalTitle || 'Goal'" 
+                        [amount]="user.goalAmount" 
+                        [address]="user.goalNanoAddress || user.nanoAddress"
+                        [description]="user.goalDescription"
+                        [barOnly]="false">
+                     </app-goal>
+                </div>
+            </div>
+          }
+      </div>
+
+      <!-- Edit Form -->
+      <div class="col-md-8">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="card">
+          <div class="card-header">
+            <h3 class="card-title">Edit Profile</h3>
+          </div>
+          <div class="card-body">
+            
+            <div class="mb-3">
+              <label class="form-label">Bio</label>
+              <textarea class="form-control" rows="3" formControlName="bio" placeholder="Tell us about yourself"></textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Twitter Username</label>
+                  <div class="input-group input-group-flat">
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" formControlName="twitterUsername" placeholder="username">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Website</label>
+                   <div class="input-group input-group-flat">
+                     <span class="input-group-text">https://</span>
+                     <input type="text" class="form-control" formControlName="website" placeholder="your-site.com">
+                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Nano Address</label>
+               <div class="input-group input-group-flat">
+                  <span class="input-group-text">
+                     <app-icon icon="nano" size="16"></app-icon>
+                  </span>
+                  <input type="text" class="form-control" formControlName="nanoAddress" placeholder="nano_..." [ngClass]="{'is-invalid': form.get('nanoAddress')?.invalid && form.get('nanoAddress')?.touched}">
+               </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Patreon URL</label>
+                        <input type="text" class="form-control" formControlName="patreonUrl" placeholder="https://patreon.com/...">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                     <div class="mb-3">
+                        <label class="form-check form-switch mt-4">
+                            <input class="form-check-input" type="checkbox" formControlName="ghSponsors">
+                            <span class="form-check-label">Enable GitHub Sponsors badge</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hr-text">Funding Goal</div>
+
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label">Goal Title</label>
+                  <input type="text" class="form-control" formControlName="goalTitle" placeholder="e.g. Server Costs">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Amount (Nano)</label>
+                  <input type="number" class="form-control" formControlName="goalAmount">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Goal Description</label>
+              <textarea class="form-control" rows="2" formControlName="goalDescription" placeholder="Details about this goal..."></textarea>
+            </div>
+            
+             <div class="mb-3">
+              <label class="form-label">Goal Nano Address</label>
+              <input type="text" class="form-control" formControlName="goalNanoAddress" placeholder="nano_... (Leave empty to use main address)" [ngClass]="{'is-invalid': form.get('goalNanoAddress')?.invalid && form.get('goalNanoAddress')?.touched}">
+            </div>
+
+             <div class="mb-3">
+              <label class="form-label">Goal Website/Link</label>
+              <input type="text" class="form-control" formControlName="goalWebsite" placeholder="https://...">
+            </div>
+
+          </div>
+          <div class="card-footer text-end">
+            @if (success()) {
+                <span class="text-success me-2">Saved successfully!</span>
+            }
+            <button type="submit" class="btn btn-primary" [disabled]="saving()">
+              @if (saving()) {
+                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              }
+              Update Profile
+            </button>
+          </div>
+        </form>
+      </div>
+      } @else {
+         <div class="col-12 text-center mt-5">
+            <div class="empty">
+                <div class="empty-icon">
+                    <app-icon icon="user" size="48"></app-icon>
+                </div>
+                <p class="empty-title">Not logged in</p>
+                <p class="empty-subtitle text-muted">
+                  Please log in to view and edit your profile.
+                </p>
+            </div>
+         </div>
+      }
+    </div>
+  </div>
+</div>

@@ -56,25 +56,29 @@ export interface Milestone {
 }
 
 export interface Contributor {
-  login: string;
+  githubLogin: string;
   avatarUrl: string;
   contributions: number;
   lastMonth: number;
   repos: string[];
-  profile?: Profile;
   hasPopularRepo: boolean;
   nodeContributor: boolean;
-  bio?: string;
-  twitterUsername?: string;
-  website?: string;
-  nanoAddress?: string;
-  ghSponsors?: number;
-  patreonUrl?: string;
-  goalTitle?: string;
-  goalAmount?: number;
-  goalNanoAddress?: string;
-  goalWebsite?: string;
-  goalDescription?: string;
+  // Profile data (nullable - only if user has logged in with GitHub)
+  userId: string | null;
+  bio: string | null;
+  twitterUsername: string | null;
+  website: string | null;
+  nanoAddress: string | null;
+  ghSponsors: boolean | null;
+  patreonUrl: string | null;
+  goalTitle: string | null;
+  goalAmount: number | null;
+  goalNanoAddress: string | null;
+  goalWebsite: string | null;
+  goalDescription: string | null;
+  name: string | null;
+  email: string | null;
+  image: string | null;
 }
 
 export interface ChartCommit {
@@ -83,21 +87,33 @@ export interface ChartCommit {
 }
 
 export interface Profile {
+  userId?: string;
+  githubLogin?: string;
+  bio?: string | null;
+  twitterUsername?: string | null;
+  website?: string | null;
+  nanoAddress?: string | null;
+  ghSponsors?: boolean | null;
+  patreonUrl?: string | null;
+  goalTitle?: string | null;
+  goalAmount?: number | null;
+  goalNanoAddress?: string | null;
+  goalWebsite?: string | null;
+  goalDescription?: string | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  // User info
   id: string;
-  login: string | null;
-  avatarUrl: string | null;
-  bio: string | null;
-  twitterUsername: string | null;
-  website: string | null;
-  nanoAddress: string | null;
-  ghSponsors: number | null;
-  patreonUrl: string | null;
-  goalTitle: string | null;
-  goalAmount: number | null;
-  goalNanoAddress: string | null;
-  goalWebsite: string | null;
-  goalDescription: string | null;
-  createdAt: string | null;
+  name: string | null;
+  email: string | null;
+  image: string | null;
+  isDeveloper: boolean;
+  // Computed stats (only if isDeveloper is true)
+  contributions?: number;
+  lastMonth?: number;
+  repos?: string[];
+  hasPopularRepo?: boolean;
+  nodeContributor?: boolean;
 }
 
 export interface Log {
@@ -129,5 +145,8 @@ export interface ApiDataResponse {
   misc: Record<string, any>;
   publicNodes: PublicNode[];
 }
+
+
+
 
 

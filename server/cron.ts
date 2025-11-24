@@ -1,20 +1,22 @@
-import Cron from 'croner';
+import { Cron } from 'croner';
 import { Octokit } from 'octokit';
-import {
-  Repo,
-  Contributor,
-  Milestone,
-  Commit,
-  PublicNode,
-  NodeEvent,
-  Misc,
-  Donor,
-} from './models';
-import db from './db';
-const octo = new Octokit({ auth: Bun.env.GITHUB_TOKEN });
-import REPOS from './repos.json';
 import axios from 'axios';
+import { eq, sql } from 'drizzle-orm';
+import { Repo, Misc, Donor } from './models';
+import db from './db';
+import * as schema from './schema';
+import REPOS from './repos.json';
 axios.defaults.headers.common['Accept-Encoding'] = 'gzip';
+const octo = new Octokit({ auth: Bun.env.GITHUB_TOKEN });
+
+// Helper function to batch insert data to avoid SQLite variable limit (999)
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
 
 export async function rate() {
   console.log((await octo.request('GET /rate_limit')).data.resources.core);
@@ -40,19 +42,24 @@ export async function refreshMilestones() {
     }))
     .sort((a, b) => b.title.localeCompare(a.title));
 
-  const insertMilestones = db.transaction((arr) => {
-    db.prepare('DELETE FROM Milestones').run();
-    for (const ms of arr)
-      Milestone.insert().run(
-        ms.title,
-        ms.open_issues,
-        ms.closed_issues,
-        ms.url,
-        ms.number
-      );
-  });
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.milestones);
+    if (latest.length > 0) {
+      const milestoneValues = latest.map((ms) => ({
+        title: ms.title,
+        openIssues: ms.open_issues,
+        closedIssues: ms.closed_issues,
+        url: ms.url,
+        number: ms.number,
+      }));
 
-  insertMilestones(latest);
+      // Batch inserts to avoid SQLite variable limit (999)
+      const chunks = chunkArray(milestoneValues, 500);
+      for (const chunk of chunks) {
+        await tx.insert(schema.milestones).values(chunk);
+      }
+    }
+  });
   console.timeEnd('refreshed_milestones');
 }
 
@@ -139,7 +146,7 @@ export async function refreshRepos() {
       name,
       full_name,
       html_url,
-      created_at,
+      createdAt: new Date(created_at),
       stargazers_count,
       avatar_url: owner.avatar_url,
       prs_30d,
@@ -148,22 +155,27 @@ export async function refreshRepos() {
     })
   );
 
-  const insertRepos = db.transaction((arr) => {
-    db.prepare('DELETE FROM Repos').run();
-    for (const repo of arr)
-      Repo.insert().run(
-        repo.name,
-        repo.full_name,
-        repo.created_at,
-        repo.stargazers_count,
-        repo.prs_30d,
-        repo.prs_7d,
-        repo.description,
-        repo.avatar_url
-      );
-  });
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.repos);
+    if (normalized.length > 0) {
+      const repoValues = normalized.map((repo) => ({
+        name: repo.name,
+        fullName: repo.full_name,
+        createdAt: repo.createdAt,
+        stargazersCount: repo.stargazers_count,
+        prs30d: repo.prs_30d,
+        prs7d: repo.prs_7d,
+        description: repo.description,
+        avatarUrl: repo.avatar_url,
+      }));
 
-  insertRepos(normalized);
+      // Batch inserts to avoid SQLite variable limit (999)
+      const chunks = chunkArray(repoValues, 500);
+      for (const chunk of chunks) {
+        await tx.insert(schema.repos).values(chunk);
+      }
+    }
+  });
   console.timeEnd('refreshed_repos');
 
   return normalized;
@@ -190,7 +202,7 @@ export async function refreshCommitsAndContributors(repos = []) {
       activity = activity.map((act) => ({
         ...act,
         repo_full_name: repos[i].full_name,
-        avatar_url: repos[i].avatar_url,
+        avatar_url: act?.author?.avatar_url || repos[i].avatar_url,
       }));
       allCommits = [...allCommits, ...activity];
 
@@ -200,7 +212,6 @@ export async function refreshCommitsAndContributors(repos = []) {
   }
   console.timeEnd('fetched_commits');
 
-  const contributors = {};
   const reposToUpdate = {};
 
   const seen = new Set();
@@ -212,23 +223,8 @@ export async function refreshCommitsAndContributors(repos = []) {
 
   for (let i = 0; i < allCommits.length; i++) {
     const commit = allCommits[i];
-    if (!contributors[commit.author.login]) {
-      contributors[commit.author.login] = {
-        avatar_url: commit.author.avatar_url,
-        login: commit.author.login,
-        contributions: 0,
-        last_month: 0,
-        repos: [],
-      };
-    }
-    contributors[commit.author.login].contributions += 1;
-    contributors[commit.author.login].repos = [
-      ...contributors[commit.author.login].repos,
-      commit.repo_full_name,
-    ];
 
     if (new Date(commit.commit.author?.date) > lastMonth) {
-      contributors[commit.author.login].last_month += 1;
       reposToUpdate[commit.repo_full_name] = reposToUpdate[
         commit.repo_full_name
       ] ?? { _30d: 0, _7d: 0 };
@@ -238,40 +234,19 @@ export async function refreshCommitsAndContributors(repos = []) {
     }
   }
 
-  const stmt = db.prepare(
-    'UPDATE Repos SET commits_30d = ?, commits_7d = ? WHERE full_name = ?'
-  );
-  db.transaction(() => {
-    Object.keys(reposToUpdate).forEach((name) => {
-      stmt.run(reposToUpdate[name]._30d, reposToUpdate[name]._7d, name);
-    });
-  })();
-
-  console.time('refreshed_commits');
-
-  const normalizedContribs = Object.values(contributors).map(
-    ({ avatar_url, login, contributions, repos, last_month }) => ({
-      avatar_url,
-      login,
-      contributions,
-      last_month,
-      repos: [...new Set(repos)],
-    })
-  );
-
-  const insertContributors = db.transaction((arr) => {
-    db.prepare('DELETE FROM Contributors').run();
-    for (const contrib of arr)
-      Contributor.insert().run(
-        contrib.avatar_url,
-        contrib.login,
-        contrib.contributions,
-        contrib.last_month,
-        JSON.stringify(contrib.repos)
-      );
+  await db.transaction(async (tx) => {
+    for (const name of Object.keys(reposToUpdate)) {
+      await tx
+        .update(schema.repos)
+        .set({
+          commits30d: reposToUpdate[name]._30d,
+          commits7d: reposToUpdate[name]._7d,
+        })
+        .where(eq(schema.repos.fullName, name));
+    }
   });
 
-  insertContributors(normalizedContribs);
+  console.time('refreshed_commits');
 
   const normalizedCommits = allCommits.map((commit) => ({
     repo_full_name: commit.repo_full_name,
@@ -281,19 +256,25 @@ export async function refreshCommitsAndContributors(repos = []) {
     message: commit.commit.message,
   }));
 
-  const insertCommits = db.transaction((arr) => {
-    db.prepare('DELETE FROM Commits').run();
-    for (const commit of arr)
-      Commit.insert().run(
-        commit.repo_full_name,
-        commit.author,
-        commit.date,
-        commit.message,
-        commit.avatar_url
-      );
-  });
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.commits);
+    if (normalizedCommits.length > 0) {
+      const commitValues = normalizedCommits.map((commit) => ({
+        repoFullName: commit.repo_full_name,
+        author: commit.author,
+        date: commit.date,
+        message: commit.message,
+        avatarUrl: commit.avatar_url,
+      }));
 
-  insertCommits(normalizedCommits);
+      // Batch inserts to avoid SQLite variable limit (999)
+      // With 5 columns, we can safely insert ~150 rows per batch
+      const chunks = chunkArray(commitValues, 500);
+      for (const chunk of chunks) {
+        await tx.insert(schema.commits).values(chunk);
+      }
+    }
+  });
   console.timeEnd('refreshed_commits');
 }
 
@@ -306,17 +287,17 @@ function isEmpty(obj) {
 
 // returns a random index weighted inversely
 export async function updateSpotlight() {
-  const repos = Repo.getAll()
+  const repos = (await Repo.getAll())
     .slice(15) // ignore top repos
     .filter((r) => r.description);
   const sl = repos[Math.floor(Math.random() * repos.length)];
-  Misc.update('spotlight', sl);
+  await Misc.update('spotlight', sl);
 }
 
 export async function refreshNodeEvents() {
   // Copyright (c) 2021 nano.community contributors
   const formatEvent = (item) => {
-    console.log(item);
+    //console.log(item);
     switch (item.type) {
       case 'CommitCommentEvent':
         return {
@@ -415,22 +396,27 @@ export async function refreshNodeEvents() {
       type: eve.type,
       author: eve.actor.login,
       avatar_url: eve.actor.avatar_url,
-      created_at: eve.created_at,
+      created_at: new Date(eve.created_at),
     }));
 
-  const insertEvents = db.transaction((arr) => {
-    db.prepare('DELETE FROM NodeEvents').run();
-    for (const ev of arr)
-      NodeEvent.insert().run(
-        JSON.stringify(ev.event),
-        ev.type,
-        ev.author,
-        ev.avatar_url,
-        ev.created_at
-      );
-  });
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.nodeEvents);
+    if (events.length > 0) {
+      const eventValues = events.map((ev) => ({
+        event: JSON.stringify(ev.event),
+        type: ev.type,
+        author: ev.author,
+        avatarUrl: ev.avatar_url,
+        createdAt: new Date(ev.created_at),
+      }));
 
-  insertEvents(events);
+      // Batch inserts to avoid SQLite variable limit (999)
+      const chunks = chunkArray(eventValues, 500);
+      for (const chunk of chunks) {
+        await tx.insert(schema.nodeEvents).values(chunk);
+      }
+    }
+  });
   console.timeEnd('refreshed_node_events');
   return events;
 }
@@ -476,21 +462,26 @@ export async function checkPublicNodes() {
     }
   }
 
-  const insertNodes = db.transaction((arr) => {
-    db.prepare('DELETE FROM PublicNodes').run();
-    for (const node of arr)
-      PublicNode.insert().run(
-        node.endpoint,
-        node.website,
-        node.websocket,
-        node.up ? 1 : 0,
-        node.resp_time,
-        node.version,
-        node.error ? JSON.stringify(node.error) : null
-      );
-  });
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.publicNodes);
+    if (endpointStatuses.length > 0) {
+      const nodeValues = endpointStatuses.map((node) => ({
+        endpoint: node.endpoint,
+        website: node.website,
+        websocket: node.websocket,
+        up: node.up ? 1 : 0,
+        respTime: node.resp_time,
+        version: node.version || null,
+        error: node.error ? JSON.stringify(node.error) : null,
+      }));
 
-  insertNodes(endpointStatuses);
+      // Batch inserts to avoid SQLite variable limit (999)
+      const chunks = chunkArray(nodeValues, 500);
+      for (const chunk of chunks) {
+        await tx.insert(schema.publicNodes).values(chunk);
+      }
+    }
+  });
   console.timeEnd('refreshed_public_nodes');
 }
 
@@ -563,20 +554,20 @@ export async function getDevFundHistory() {
     });
 }
 
-const job = new Cron('1 * * * *', async () => {
-  //refreshMilestones();
-  //getDevFundHistory();
-  //checkPublicNodes();
+const job = new Cron('16 * * * *', async () => {
+  refreshMilestones();
+  getDevFundHistory();
+  checkPublicNodes();
+  refreshNodeEvents();
   const repos = await refreshRepos();
   refreshCommitsAndContributors(repos);
+  updateSpotlight();
 });
 
-const eventsJob = new Cron('*/26 * * * *', async () => {
+const eventsJob = new Cron('*/30 * * * *', async () => {
   refreshNodeEvents();
 });
 
 const spotlightJob = new Cron('0 0 * * *', async () => {
   updateSpotlight();
 });
-await rate();
-// await refreshNodeEvents();

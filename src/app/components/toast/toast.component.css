@@ -1,0 +1,17 @@
+.toast {
+  min-width: 250px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  background-color: #164973 !important;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+.toast-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+

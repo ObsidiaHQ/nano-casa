@@ -6,12 +6,18 @@ import { PublicNodesComponent } from './components/public-nodes/public-nodes.com
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { BountiesComponent } from './components/bounties/bounties.component';
 import { LogComponent } from './components/log/log.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
     data: { animation: 'HomePage' },
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    data: { animation: 'NodesPage' },
   },
   {
     path: 'about',

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { environment } from '../environments/environment';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -14,12 +14,15 @@ import type {
   PublicNode,
   Repo,
 } from './api.types';
+import { authClient } from './auth-client';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SharedService {
   private readonly baseUrl = environment.server;
+  private toast = inject(ToastService);
   usersSort = signal<'month' | 'total'>('month');
   reposSort = signal<'date' | 'stars'>('date');
   loggedUser = signal<Profile | null>(null);
@@ -61,15 +64,8 @@ export class SharedService {
     localStorage.setItem('reposSort', by);
   }
 
-  selectUser(user: Contributor | null, editMode = false) {
-    if (editMode) {
-      const loggedContrib =
-        this.contributors().find((c) => c.login === this.loggedUser()?.login) ||
-        null;
-      this.selectedUser.set(loggedContrib);
-    } else {
-      this.selectedUser.set(user);
-    }
+  selectUser(user: Contributor | null) {
+    this.selectedUser.set(user);
   }
 
   private async request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -88,9 +84,14 @@ export class SharedService {
   }
 
   fetchUser() {
-    this.request<Profile | null>('/api/auth/user')
-      .then((user) => this.loggedUser.set(user))
-      .catch(() => this.loggedUser.set(null));
+    this.request<Profile>('/api/auth/user').then((profile) => {
+      if (profile) {
+        this.loggedUser.set(profile);
+      }
+    }).catch((error) => {
+      console.error('Failed to fetch user:', error);
+      this.loggedUser.set(null);
+    });
   }
 
   getData() {
@@ -122,22 +123,34 @@ export class SharedService {
   }
 
   async updateProfile(loggedUser: Profile) {
-    await this.request<void>('/api/update-profile', {
-      method: 'POST',
-      body: JSON.stringify(loggedUser),
-    });
-    const loggedContrib =
-      this.contributors().find((c) => c.login === this.loggedUser()?.login) ||
-      null;
-    this.selectedUser.set(loggedContrib);
-    this.loggedUser.set(loggedUser);
-    this.selectedUser.set(loggedContrib ? { ...loggedContrib, ...loggedUser } : null);
+    try {
+      await this.request<void>('/api/update-profile', {
+        method: 'POST',
+        body: JSON.stringify(loggedUser),
+      });
+      const loggedContrib =
+        this.contributors().find((c) => c.githubLogin === this.loggedUser()?.githubLogin) ||
+        null;
+      this.selectedUser.set(loggedContrib);
+      this.loggedUser.set(loggedUser);
+      this.selectedUser.set(loggedContrib ? { ...loggedContrib, ...loggedUser } : null);
+      this.toast.show('Profile updated successfully');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      this.toast.show('Failed to update profile');
+    }
   }
 
-  logOut() {
-    this.request<void>('/api/logout', { method: 'POST' })
-      .then(() => this.loggedUser.set(null))
-      .catch(() => this.loggedUser.set(null));
+  async logOut() {
+    try {
+      await authClient.signOut();
+      this.loggedUser.set(null);
+      this.toast.show('Logged out successfully');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      this.loggedUser.set(null);
+      window.location.href = '/';
+    }
   }
 
   get isSmallScreen(): boolean {

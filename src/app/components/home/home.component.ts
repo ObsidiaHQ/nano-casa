@@ -1,10 +1,13 @@
-import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
-import { EChartsOption } from 'echarts';
-import { graphic } from 'echarts/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, effect, inject } from '@angular/core';
+import { EChartsCoreOption } from 'echarts/core';
+import * as echarts from 'echarts/core';
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import { BarChart, LineChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent, DataZoomComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { Contributor, Profile, Repo } from '../../api.types';
 import { SortPipe } from '../../pipes/sort.pipe';
 import { SharedService } from '../../shared.service';
-import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
 import { IconComponent } from '../icon/icon.component';
 import { CommonModule } from '@angular/common';
 import { FilterPipe } from '../../pipes/filter.pipe';
@@ -15,17 +18,9 @@ import { PaginationComponent } from '../paginate/paginate.component';
 import { GoalComponent } from '../goal/goal.component';
 import { CountUpModule } from 'ngx-countup';
 import { RouterLink } from '@angular/router';
-import { MetaMaskInpageProvider } from '@metamask/providers';
+import { Web3Service } from '../../web3.service';
 
-declare global {
-  interface Window {
-    ethereum: MetaMaskInpageProvider;
-  }
-}
-
-const { ethereum } = window;
-
-const snapId = 'npm:@obsidia/xnap';
+echarts.use([BarChart, LineChart, GridComponent, CanvasRenderer, TooltipComponent, DataZoomComponent]);
 
 @Component({
   selector: 'app-home',
@@ -47,11 +42,12 @@ const snapId = 'npm:@obsidia/xnap';
     RouterLink,
   ],
   styleUrls: ['./home.component.css'],
-  providers: [provideEcharts()]
+  providers: [provideEchartsCore({ echarts })]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   protected shared = inject(SharedService);
-
+  protected web3 = inject(Web3Service);
+  protected cdr = inject(ChangeDetectorRef);
   reposPage: Repo[] = [];
   reposSort: 'date' | 'stars' = 'date';
   reposQuery = '';
@@ -62,18 +58,28 @@ export class HomeComponent implements OnInit, AfterViewInit {
   contributorsSort: 'month' | 'total' = 'month';
   contributorsQuery = '';
 
-  commitsChartOpts: EChartsOption;
-  reposChartOpts: EChartsOption;
-  devFundChartOpts: EChartsOption;
-  donorsChartOpts: EChartsOption;
+  commitsChartOpts: EChartsCoreOption;
+  reposChartOpts: EChartsCoreOption;
+  devFundChartOpts: EChartsCoreOption;
+  donorsChartOpts: EChartsCoreOption;
   loggedUser: Profile;
-  editMode = false;
+
+  donatingToUser: string | null = null;
+  donationAmount: number = 1;
+  showAnnouncementBanner = false;
+
+  constructor() {
+    const endDate = new Date('2026-02-01T00:00:00');
+    this.showAnnouncementBanner = new Date() < endDate;
+    effect(() => {
+      if (this.shared.repos().length > 0 && this.shared.commits().length > 0 && this.shared.devFund().data?.length > 0) {
+        this.initCharts();
+      }
+    });
+  }
 
   ngOnInit() {
     this.shared.loggedUser$.subscribe((u) => (this.loggedUser = u));
-    setTimeout(() => {
-      this.initCharts();
-    }, 350);
   }
 
   ngAfterViewInit(): void {
@@ -181,7 +187,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
             width: 0,
           },
           itemStyle: {
-            color: new graphic.LinearGradient(0, 0, 1, 0, [
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
               {
                 offset: 0,
                 color: '#70BAEB',
@@ -193,7 +199,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
             ]),
           },
           areaStyle: {
-            color: new graphic.LinearGradient(0, 0, 1, 0, [
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
               {
                 offset: 0,
                 color: '#70BAEB',
@@ -243,6 +249,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         },
       ],
     };
+
     this.donorsChartOpts = {
       tooltip: {
         trigger: 'axis',
@@ -261,6 +268,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       },
       xAxis: {
         show: false,
+        type: 'log'
       },
       yAxis: {
         show: false,
@@ -275,7 +283,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           type: 'bar',
           itemStyle: {
             borderRadius: [0, 10, 10, 0],
-            color: new graphic.LinearGradient(0, 0, 1, 1, [
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
               { offset: 0, color: '#DC538C' },
               { offset: 1, color: '#EEC200' },
             ]),
@@ -298,55 +306,39 @@ export class HomeComponent implements OnInit, AfterViewInit {
     };
   }
 
-  updateProfile() {
-    this.shared.updateProfile(this.loggedUser).then(() => {
-      this.shared.contributors.update((contributors) =>
-        contributors.map((c) => {
-          if (c.login === this.loggedUser.login) {
-            return { ...c, ...this.loggedUser };
-          }
-          return c;
-        })
-      );
-      this.shared.selectUser(null, true);
-      this.editMode = false;
-    });
-  }
-
-  setGoal() {
-    this.loggedUser.goalTitle = 'New goal';
-    this.loggedUser.goalAmount = 5;
-    this.loggedUser.goalNanoAddress = this.loggedUser.nanoAddress || 'nano_';
-    this.loggedUser.goalDescription = '';
-  }
-
-  deleteGoal() {
-    this.loggedUser.goalTitle = null;
-    this.loggedUser.goalAmount = null;
-    this.loggedUser.goalNanoAddress = null;
-    this.loggedUser.goalDescription = null;
-  }
-
-  async makeTx(account: string) {
-    let res: number;
-    try {
-      res = await ethereum.request({
-        method: 'wallet_invokeSnap',
-        params: {
-          snapId,
-          request: {
-            method: 'xno_makeTransaction',
-            params: {
-              to: account, // account,
-              value: '0.0001'
-            },
-          },
-        },
-      }) as number;
-    } catch (e) {
-      console.log(e);
-    } finally {
-      alert(JSON.stringify(res));
+  handleDonate(user: Contributor) {
+    if (this.web3.snapConnected()) {
+      if (this.donatingToUser === user.githubLogin) {
+        this.donatingToUser = null;
+      } else {
+        this.donatingToUser = user.githubLogin;
+        this.donationAmount = 1;
+      }
+    } else {
+      window.open(`https://nano.to/${user.nanoAddress}`, '_blank');
     }
+  }
+
+  updateDonationAmount(event: any) {
+    const val = parseFloat(event.target.innerText);
+    if (!isNaN(val)) {
+      this.donationAmount = val;
+    } else {
+      this.donationAmount = 1;
+    }
+  }
+
+  submitDonation(user: Contributor) {
+    if (!user.nanoAddress) return;
+    this.web3.makeTx(user.nanoAddress, this.donationAmount.toString()).subscribe({
+      next: (res) => {
+        this.donatingToUser = null;
+      },
+      error: (err) => {
+        console.error(err);
+        this.donatingToUser = null;
+        alert('Transaction failed or cancelled.');
+      }
+    });
   }
 }

@@ -1,6 +1,32 @@
 <!-- Page body -->
 <div class="page-body mt-5">
   <div class="container-xl">
+    
+    @if (showAnnouncementBanner ) {
+    <div class="announcement-banner mb-4">
+      <div class="announcement-content">
+        <div class="announcement-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div class="announcement-text">
+          <div class="announcement-title">
+            🎉 MetaMask integration is now live!
+          </div>
+          <div class="announcement-description">
+            Connect your MetaMask wallet for seamless Nano donations through our MetaMask/Xnap integration.
+          </div>
+        </div>
+        <div class="announcement-action">
+          <button class="btn btn-announcement" (click)="web3.snapConnected() ? null : web3.connect().subscribe()">
+            {{ web3.snapConnected() ? '✓ Connected' : 'Try It Now' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
     <div class="row row-cards">
 
       <div class="col-12 col-md-4 mt-3">
@@ -388,7 +414,7 @@
                     [icon]="contributorsSort === 'month' ? 'double-down' : 'down'"></app-icon>
                 </th>
                 <th style="width: 130px;">Goal</th>
-                <th class="w-1 text-center">Sponsor</th>
+                <th style="width: 150px;" class="text-center">Sponsor</th>
               </tr>
             </thead>
             <tbody>
@@ -397,11 +423,11 @@
                 <td class="py-2" scope="row">{{(i+1) + ((shared.isSmallScreen ? 12 : 40) * (contributorsPageIndex-1))}}</td>
                 <td data-label="Name" class="py-2">
                   <div class="d-flex align-items-center">
-                    <img class="avatar me-3" [src]="user.avatarUrl + '&s=40'" loading="lazy" [alt]="user.login">
+                    <img class="avatar me-3" [src]="user.image + '&s=40'" loading="lazy" [alt]="user.githubLogin">
                     <div class="flex-fill">
                       <div class="font-weight-medium">
-                        <a class="me-2" href="https://github.com/{{user.login}}" target="_blank">
-                          <span>{{user.login}}</span>
+                        <a class="me-2" href="https://github.com/{{user.githubLogin}}" target="_blank">
+                          <span>{{user.githubLogin}}</span>
                         </a>
                         @if (user.nodeContributor) {
                         <span class="badge bg-cyan-lt ms-1 ms-md-2 cursor-help" title="Contributed to the nano-node repo">
@@ -434,23 +460,42 @@
                 </td>
                 <td>
                   @if (user.goalAmount) {
-                  <app-goal [amount]="user.goalAmount" [address]="user.goalNanoAddress" [sid]="'id'+user.login"></app-goal>
+                  <app-goal [amount]="user.goalAmount" [address]="user.goalNanoAddress" [sid]="'id'+user.githubLogin"></app-goal>
                   }
                 </td>
                 <td class="py-2">
                   <div class="btn-list flex-nowrap justify-content-end">
-                    @if (user.nanoAddress) {
-                    <a (click)="makeTx(user.nanoAddress)" class="btn bg-azure-lt btn-icon" title="Donate nano">
-                      <app-icon icon="nano"></app-icon>
-                    </a>
-                    }
+                  @if (user.nanoAddress) {
+                  @if (donatingToUser === user.githubLogin) {
+                  <div class="donation-input-wrapper">
+                    <div class="input-group input-group-sm">
+                      <div class="form-control donation-input px-1 d-flex align-items-center justify-content-between">
+                        <app-icon icon="nano" size="17" class="text-muted me-1 d-flex"></app-icon>
+                        <div contenteditable="true" style="min-width: 20px; outline: none;" role="textbox"
+                          (input)="updateDonationAmount($event)" (keydown.enter)="submitDonation(user)"
+                          (keydown.escape)="donatingToUser = null">
+                          {{donationAmount}}
+                        </div>
+                      </div>
+                      <button class="btn bg-azure-lt btn-icon" type="button" (click)="submitDonation(user)"
+                        title="Send Transaction">
+                        <app-icon icon="check" size="18"></app-icon>
+                      </button>
+                    </div>
+                  </div>
+                  } @else {
+                  <a (click)="handleDonate(user)" class="btn bg-azure-lt btn-icon" title="Donate nano">
+                    <app-icon icon="nano"></app-icon>
+                  </a>
+                  }
+                  }
                     @if (user.patreonUrl) {
                     <a target="_blank" href="{{user.patreonUrl}}" class="btn bg-white-lt btn-icon" title="Become a patron">
                       <app-icon icon="patreon"></app-icon>
                     </a>
                     }
                     @if (user.ghSponsors) {
-                      <a target="_blank" href="https://github.com/sponsors/{{user.login}}" class="btn bg-pink-lt btn-icon" title="Sponsor on GitHub">
+                      <a target="_blank" href="https://github.com/sponsors/{{user.githubLogin}}" class="btn bg-pink-lt btn-icon" title="Sponsor on GitHub">
                       <app-icon icon="heart"></app-icon>
                     </a>
                     }
@@ -479,9 +524,7 @@
     @if (shared.selectedUser()) {
     <div class="modal-content">
       <div class="modal-body pt-5">
-        <img [src]="shared.selectedUser().avatarUrl + '&s=100'" class="profile avatar" [alt]="shared.selectedUser().login">
-        @if (!editMode) {
-
+        <img [src]="shared.selectedUser().image + '&s=100'" class="profile avatar" [alt]="shared.selectedUser().githubLogin">
         <div class="row">
           <div class="col-12 col-md-4 my-1">
             @if (shared.selectedUser().website) {
@@ -489,7 +532,7 @@
               <app-icon icon="web"></app-icon>
             </a>
             }
-            <a href="https://github.com/{{shared.selectedUser().login}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
+            <a href="https://github.com/{{shared.selectedUser().githubLogin}}" target="_blank" class="h4 px-2" title="Follow on GitHub">
               <app-icon icon="github"></app-icon>
             </a>
             @if (shared.selectedUser().twitterUsername) {
@@ -511,7 +554,7 @@
             </a>
             }
             @if (shared.selectedUser().ghSponsors) {
-            <a target="_blank" href="https://github.com/sponsors/{{shared.selectedUser().login}}" class="btn bg-pink-lt w-100 btn-icon"
+            <a target="_blank" href="https://github.com/sponsors/{{shared.selectedUser().githubLogin}}" class="btn bg-pink-lt w-100 btn-icon"
               title="Sponsor on GitHub">
               <app-icon icon="heart"></app-icon>
             </a>
@@ -520,11 +563,11 @@
         </div>
 
         @if (shared.selectedUser().bio) {
-        <div class="subheader mt-3 mb-2">About {{shared.selectedUser().login}}</div>
+        <div class="subheader mt-3 mb-2">About {{shared.selectedUser().githubLogin}}</div>
         }
         <div [innerHTML]="shared.selectedUser().bio"></div>
 
-        <div class="subheader mt-3 mb-2">{{shared.selectedUser().login}} contributed to</div>
+        <div class="subheader mt-3 mb-2">{{shared.selectedUser().githubLogin}} contributed to</div>
         <div>
           @for (repo of shared.selectedUser().repos; track $index) {
           <a href="https://github.com/{{repo}}"><span class="badge badge-outline badge-pill text-azure me-2 mb-2 p-2">{{repo}}</span></a>
@@ -534,7 +577,7 @@
         @if (shared.selectedUser().goalAmount) {
         <div class="text-body d-block">
           <span class="inline-goal">
-            <app-goal [sid]="'id_'+shared.selectedUser().login" [title]="shared.selectedUser().goalTitle" [amount]="shared.selectedUser().goalAmount"
+            <app-goal [sid]="'id_'+shared.selectedUser().githubLogin" [title]="shared.selectedUser().goalTitle" [amount]="shared.selectedUser().goalAmount"
               [address]="shared.selectedUser().goalNanoAddress" [barOnly]="false" [description]="shared.selectedUser().goalDescription">
             </app-goal>
           </span>
@@ -543,104 +586,9 @@
         <div class="text-muted italic text-center">No funding goal set.</div>
         }
 
-        } @else {
-
-        <div class="row">
-          <div class="col-12 col-md-4 mb-3">
-            <label class="form-label">Website</label>
-            <input type="text" class="form-control" placeholder="website, blog, etc" [(ngModel)]="loggedUser.website">
-          </div>
-          <div class="col-12 col-md-4 mb-3">
-            <label class="form-label">Twitter handle</label>
-            <input type="text" class="form-control" placeholder="username" [(ngModel)]="loggedUser.twitterUsername">
-          </div>
-          <div class="col-12 col-md-4 mb-3">
-            <label class="form-label">Patreon</label>
-            <input type="text" class="form-control" placeholder="link to your Patreon" [(ngModel)]="loggedUser.patreonUrl">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-12 col-md-7 mb-3">
-            <label class="form-label">Nano address</label>
-            <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.nanoAddress">
-          </div>
-
-          <div class="col-auto pt-md-4 mb-3">
-            <label class="form-check">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="loggedUser.ghSponsors" [checked]="loggedUser.ghSponsors">
-              <span class="form-check-label">GitHub Sponsors?</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="row mb-4">
-          <div class="col-12">
-            <label class="form-label">About</label>
-            <textarea class="form-control" rows="3" [(ngModel)]="loggedUser.bio" placeholder="you can also add links: [label](example.com)"></textarea>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-12">
-            <label class="form-label d-inline-block me-3 mb-3">Funding goal</label>
-            @if (!loggedUser.goalNanoAddress) {
-            <a type="button" class="text-azure" (click)="setGoal()"><app-icon icon="plus"></app-icon> New</a>
-            }
-            @if (loggedUser.goalNanoAddress) {
-            <a type="button" class="list-group-item-actions" (click)="deleteGoal()" title="Delete goal">
-              <app-icon icon="trash" strokeColor="#B13539"></app-icon>
-            </a>
-            }
-            @if (loggedUser?.goalNanoAddress) {
-            <div class="card mb-2" style="min-height: unset;">
-              <div class="list-group list-group-flush">
-                <div class="list-group-item list-group-item-action">
-                  <div class="row">
-                    <div class="col-9 col-md-7 mb-3">
-                      <label class="form-label">Title</label>
-                      <input type="text" class="form-control" placeholder="server cost, etc.." [(ngModel)]="loggedUser.goalTitle">
-                    </div>
-                    <div class="col-3 col-md-5 mb-3">
-                      <label class="form-label">Goal</label>
-                      <input type="number" class="form-control" min="1" [(ngModel)]="loggedUser.goalAmount">
-                    </div>
-                    <div class="col-12 col-md-7 mb-3">
-                      <label class="form-label">Nano address</label>
-                      <input type="text" class="form-control" placeholder="nano_123abc.. or nano.to username" [(ngModel)]="loggedUser.goalNanoAddress">
-                    </div>
-                    <div class="col-12 col-md-5 mb-3">
-                      <label class="form-label">Website</label>
-                      <input type="text" class="form-control" placeholder="optional" [(ngModel)]="loggedUser.goalWebsite">
-                    </div>
-                    <div class="col-12">
-                      <label class="form-label">Description</label>
-                      <textarea class="form-control" rows="2" [(ngModel)]="loggedUser.goalDescription" placeholder="optional"></textarea>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            } @else {
-
-            <div class="text-muted italic text-center">No funding goal set.</div>
-
-            }
-          </div>
-        </div>
-
-        }
-
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn me-auto" data-bs-dismiss="modal" (click)="editMode = false">Close</button>
-        @if (shared.loggedUser()?.login === shared.selectedUser().login && !editMode) {
-        <button type="button" class="btn btn-outline-success" (click)="editMode = true">Edit</button>
-        }
-        @if (shared.loggedUser() && editMode) {
-        <button type="button" class="btn btn-primary" (click)="updateProfile()">Save</button>
-        <!-- [disabled]="!loggedUser().goal_nano_address || !loggedUser().goal_amount" -->
-        }
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
     }

@@ -26,11 +26,10 @@ export class FilterPipe implements PipeTransform {
     } else if (type === 'user') {
       return [...values].filter((value: Contributor) => {
         return (
-          value.login.toLowerCase().includes(query.toLowerCase()) ||
+          value.githubLogin.toLowerCase().includes(query.toLowerCase()) ||
           value.repos.findIndex((re) =>
             re.toLowerCase().includes(query.toLowerCase())
-          ) > -1 ||
-          value.profile?.bio?.toLowerCase().includes(query.toLowerCase())
+          ) > -1
         );
       }) as Contributor[];
     } else {

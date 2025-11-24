@@ -4,5 +4,3 @@ import { environment } from '../environments/environment';
 export const authClient = createAuthClient({
   baseURL: environment.server,
 });
-
-

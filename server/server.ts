@@ -1,24 +1,25 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
+import { secureHeaders } from 'hono/secure-headers'
+import { serveStatic } from 'hono/bun';
 import { createMiddleware } from 'hono/factory';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
+import { eq, and } from 'drizzle-orm';
 import { auth } from './auth';
 import {
   Commit,
   Contributor,
+  DeveloperProfile,
   Milestone,
   Misc,
   NodeEvent,
   PublicNode,
-  Repo,
-  Profile,
-  CronJobRun,
-  Log,
+  Repo
 } from './models';
-import { BotsManager } from './bots';
-import db from './db'; // Import db instance
+import db from './db';
+import { developerProfiles, account } from './schema';
 
 type Env = {
   Variables: {
@@ -27,23 +28,6 @@ type Env = {
   };
 };
 
-const BM = new BotsManager();
-
-const authMiddleware = createMiddleware<Env>(async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
-  if (!session) {
-    c.set('user', null);
-    c.set('session', null);
-    await next();
-    return;
-  }
-
-  c.set('user', session.user);
-  c.set('session', session.session);
-  await next();
-});
-
 const adminMiddleware = createMiddleware<Env>(async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
@@ -51,8 +35,7 @@ const adminMiddleware = createMiddleware<Env>(async (c, next) => {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  // Check if user is admin (you can adjust this logic as needed)
-  const userLogin = session.user.email?.split('@')[0] || '';
+  const userLogin = (await DeveloperProfile.findByUserId(session.user.id))?.githubLogin || '';
   if (userLogin !== 'geommr') {
     return c.json({ error: 'Forbidden: Admin access required' }, 403);
   }
@@ -69,6 +52,7 @@ const app = new Hono<Env>({ strict: false })
         'http://127.0.0.1:8080',
         'http://localhost:4200',
         'https://nano.casa',
+        'https://nano.org',
       ],
       credentials: true,
       allowHeaders: ['Content-Type', 'Authorization'],
@@ -78,7 +62,97 @@ const app = new Hono<Env>({ strict: false })
     })
   )
   .use(logger())
-  .on(['POST', 'GET'], '/api/auth/**', (c) => {
+  .use('*', secureHeaders({
+    contentSecurityPolicy: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://goal.nano.to", "https://net.obsidia.io", "'unsafe-inline'"],
+      scriptSrcElem: ["'self'", "https://goal.nano.to", "https://net.obsidia.io", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      fontSrc: ["'self'", "https://api.fonts.coollabs.io", "https://cdn.fonts.coollabs.io"],
+      styleSrc: ["'self'", "https://api.fonts.coollabs.io", "'unsafe-inline'"],
+      connectSrc: ["'self'", "https://net.obsidia.io", "https://goal.nano.to", "https://rpc.nano.to"],
+      imgSrc: ["'self'", "data:", "https:", "http:"],
+    },
+  }))
+  .use("*", async (c, next) => {
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+    if (!session) {
+      c.set("user", null);
+      c.set("session", null);
+      await next();
+      return;
+    }
+
+    c.set("user", session.user);
+    c.set("session", session.session);
+    await next();
+  })
+  .get('/api/auth/user', async (c) => {
+    const user = c.get('user');
+    if (!user) {
+      return c.json(null);
+    }
+
+    const githubAccount = await db
+      .select()
+      .from(account)
+      .where(
+        and(
+          eq(account.userId, user.id),
+          eq(account.providerId, 'github')
+        )
+      )
+      .limit(1);
+
+    if (!githubAccount[0]) {
+      return c.json(null);
+    }
+
+    let profile = await DeveloperProfile.findByUserId(user?.id);
+
+    if (!profile) {
+      const accountInfo = await auth.api.accountInfo({ headers: c.req.raw.headers, body: { accountId: githubAccount[0].accountId } });
+      await DeveloperProfile.createOrUpdate(user.id, {
+        githubLogin: accountInfo.user.login,
+        bio: accountInfo.user.bio,
+        twitterUsername: accountInfo.user.twitter_username,
+        website: accountInfo.user.website,
+      });
+      profile = await DeveloperProfile.findByUserId(user.id);
+    }
+
+    return c.json({
+      // User info (required fields)
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      isDeveloper: !!profile,
+      // Profile data (if exists)
+      githubLogin: profile?.githubLogin,
+      bio: profile?.bio || null,
+      twitterUsername: profile?.twitterUsername || null,
+      website: profile?.website || null,
+      nanoAddress: profile?.nanoAddress || null,
+      ghSponsors: profile?.ghSponsors || null,
+      patreonUrl: profile?.patreonUrl || null,
+      goalTitle: profile?.goalTitle || null,
+      goalAmount: profile?.goalAmount || null,
+      goalNanoAddress: profile?.goalNanoAddress || null,
+      goalWebsite: profile?.goalWebsite || null,
+      goalDescription: profile?.goalDescription || null,
+      createdAt: profile?.createdAt || null,
+      updatedAt: profile?.updatedAt || null,
+      // Computed stats (only if developer profile exists)
+      contributions: profile?.contributions,
+      lastMonth: profile?.lastMonth,
+      repos: profile?.repos,
+      hasPopularRepo: profile?.hasPopularRepo,
+      nodeContributor: profile?.nodeContributor,
+    });
+  })
+  .on(['POST', 'GET'], '/api/auth/*', (c) => {
     return auth.handler(c.req.raw);
   })
   .get('/api/data', async (c) => {
@@ -96,60 +170,41 @@ const app = new Hono<Env>({ strict: false })
   })
   .post(
     '/api/update-profile',
-    authMiddleware,
     zValidator(
       'json',
       z.object({
         bio: z.nullable(z.string()),
         twitterUsername: z.nullable(z.string()),
-        website: z.nullable(z.string()),
-        nanoAddress: z.nullable(z.string()),
-        ghSponsors: z.nullable(z.number()),
+        website: z.nullable(z.string().transform(val => val?.replace(/(http|https):\/\//i, '') || null)),
+        nanoAddress: z.nullable(z.string().regex(/^(nano_|xrb_)/).optional()),
+        ghSponsors: z.nullable(z.boolean()),
         patreonUrl: z.nullable(z.string()),
         goalTitle: z.nullable(z.string()),
-        goalAmount: z.nullable(z.number()),
-        goalNanoAddress: z.nullable(z.string()),
-        goalWebsite: z.nullable(z.string()),
+        goalAmount: z.nullable(z.number().min(0)),
+        goalNanoAddress: z.nullable(z.string().regex(/^(nano_|xrb_)/).optional()),
+        goalWebsite: z.nullable(z.string().transform(val => val?.replace(/(http|https):\/\//i, '') || null)),
         goalDescription: z.nullable(z.string()),
       })
     ),
     async (c) => {
-      const user = c.var.user;
+      const user = c.get('user');
       if (!user) {
         return new Response('not logged in', {
           status: 401,
         });
       }
 
-      // Get the GitHub login from the user's account
-      const login = user.email?.split('@')[0] || user.name || '';
+      await db.update(developerProfiles).set({
+        ...c.req.valid('json'),
+      }).where(eq(developerProfiles.userId, user.id));
 
-      await Contributor.updateProfile(
-        c.req.valid('json') as Partial<Profile>,
-        login
-      );
-
-      return new Response('updated', {
-        status: 201,
-      });
+      return c.json({ success: true });
     }
   )
-  .post('/api/bounty', async (c) => {
-    BM.notify(await c.req.json());
-    return c.json({ msg: 'ok' });
-  })
-  .get('/api/auth/user', authMiddleware, async (c) => {
-    const user = c.var.user;
-    if (!user) {
-      return c.json(null);
-    }
-
-    // Try to find the profile from our database
-    const login = user.email?.split('@')[0] || user.name || '';
-    const profile = await Profile.findByLogin(login);
-
-    return c.json(profile || user);
-  })
+  // .post('/api/bounty', async (c) => {
+  //   BM.notify(await c.req.json());
+  //   return c.json({ msg: 'ok' });
+  // })
   .post('/api/logout', async (c) => {
     await auth.api.signOut({ headers: c.req.raw.headers });
     return c.json({ success: true });
@@ -171,20 +226,9 @@ const app = new Hono<Env>({ strict: false })
 
     return c.json(runsWithLogs);
   })
-  .get('/explorer', async (c) => {
-    const filePath = './html/index.html';
-    const file = Bun.file(filePath);
-    return new Response(file);
-  })
-  .get('/:filename{.+\\.(js|png|ico|css|svg|map)$}', async (c) => {
-    const filePath = './dist/nano-casa/browser' + new URL(c.req.url).pathname;
-    const file = Bun.file(filePath);
-    return new Response(file);
-  })
-  .get('/*', async (c) => {
-    const filePath = './dist/nano-casa/browser' + '/index.html';
-    const file = Bun.file(filePath);
-    return new Response(file);
+  .use('/*', serveStatic({ root: './nano-casa/browser' }))
+  .get('*', (c) => {
+    return new Response(Bun.file('./nano-casa/browser/index.html'));
   });
 
 export default {

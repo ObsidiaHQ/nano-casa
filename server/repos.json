@@ -34,10 +34,15 @@
     "PlasmaPower/distributed-vanity-server",
     "PlasmaPower/nano-bip32",
     "pRizz/nanocurrency-node",
-    "superdarkbit/nano-bip32-ed25519"
+    "superdarkbit/nano-bip32-ed25519",
+    "yxse/NanChat",
+    "eclipse1482/nanoise"
   ],
   "partial": {
-    "repos": ["cypherstack/stack_wallet", "cake-tech/cake_wallet"],
+    "repos": [
+      "cypherstack/stack_wallet",
+      "cake-tech/cake_wallet"
+    ],
     "query": "nano+OR+xno"
   },
   "ignored": [
@@ -56,7 +61,8 @@
     "0xGilang/RaiblocksOne",
     "gr0vity-dev/nano-node-builder",
     "Macacaqatar/Biota",
-    "MCP-Mirror/kilkelly_nano-currency-mcp-server"
+    "MCP-Mirror/kilkelly_nano-currency-mcp-server",
+    "Nano-Enterprise/.github"
   ],
   "queries": [
     "topic:nanocurrency",
@@ -99,10 +105,18 @@
       "endpoint": "https://nano.nownodes.io",
       "website": "https://nownodes.io/nodes/nano-xno"
     },
-    { "endpoint": "https://us-1.nano.to" },
-    { "endpoint": "https://us-2.nano.to" },
-    { "endpoint": "https://solar.nano.to" },
-    { "endpoint": "https://rpc.nano.to" },
+    {
+      "endpoint": "https://us-1.nano.to"
+    },
+    {
+      "endpoint": "https://us-2.nano.to"
+    },
+    {
+      "endpoint": "https://solar.nano.to"
+    },
+    {
+      "endpoint": "https://rpc.nano.to"
+    },
     {
       "endpoint": "https://www.bitrequest.app:8020",
       "website": "https://bitrequest.io",
