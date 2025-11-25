@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 
 export const repos = sqliteTable('repos', {
   fullName: text('full_name').primaryKey(),
@@ -20,7 +20,9 @@ export const commits = sqliteTable('commits', {
   date: text('date'),
   message: text('message'),
   avatarUrl: text('avatar_url'),
-});
+}, (table) => [
+  index('idx_commits_repo_date').on(table.repoFullName, table.date),
+]);
 
 export const milestones = sqliteTable('milestones', {
   title: text('title'),

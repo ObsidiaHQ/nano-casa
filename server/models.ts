@@ -5,6 +5,15 @@ import * as schema from './schema';
 
 export class Repo {
   public static async getAll(): Promise<Repo[]> {
+    const maxCommitDates = db
+      .select({
+        repoFullName: schema.commits.repoFullName,
+        maxDate: sql<string>`MAX(${schema.commits.date})`.as('max_date'),
+      })
+      .from(schema.commits)
+      .groupBy(schema.commits.repoFullName)
+      .as('max_commit_dates');
+
     const results = await db
       .select({
         name: schema.repos.name,
@@ -17,13 +26,10 @@ export class Repo {
         commits7d: schema.repos.commits7d,
         avatarUrl: schema.repos.avatarUrl,
         description: schema.repos.description,
-        mostRecentCommit: sql<string>`(
-          SELECT MAX(${schema.commits.date})
-          FROM ${schema.commits}
-          WHERE ${schema.commits.repoFullName} = ${schema.repos.fullName}
-        )`,
+        mostRecentCommit: maxCommitDates.maxDate,
       })
       .from(schema.repos)
+      .leftJoin(maxCommitDates, eq(maxCommitDates.repoFullName, schema.repos.fullName))
       .orderBy(schema.repos.createdAt);
     return results as Repo[];
   }

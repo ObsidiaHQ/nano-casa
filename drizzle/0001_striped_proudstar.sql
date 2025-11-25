@@ -1,0 +1,1 @@
+CREATE INDEX `idx_commits_repo_date` ON `commits` (`repo_full_name`,`date`);
