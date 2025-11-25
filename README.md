@@ -1,6 +1,6 @@
 ![GitHub](https://img.shields.io/github/license/obsidiaHQ/nano-casa)
 
-<img src="https://nano.casa/assets/logo.png" width="320">
+<img src="public/logo.png" width="320">
 
 Monitoring open source development in the [nano](https://nano.org/) ecosystem.
 
