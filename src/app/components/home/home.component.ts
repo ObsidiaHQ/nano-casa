@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   protected web3 = inject(Web3Service);
   protected cdr = inject(ChangeDetectorRef);
   reposPage: Repo[] = [];
-  reposSort: 'date' | 'stars' = 'date';
+  reposSort: 'date' | 'stars' | 'activity' = 'activity';
   reposQuery = '';
   busyWindow: 'busyWeek' | 'busyMonth' = 'busyMonth';
 

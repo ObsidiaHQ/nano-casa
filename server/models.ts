@@ -6,7 +6,23 @@ import * as schema from './schema';
 export class Repo {
   public static async getAll(): Promise<Repo[]> {
     const results = await db
-      .select()
+      .select({
+        name: schema.repos.name,
+        fullName: schema.repos.fullName,
+        createdAt: schema.repos.createdAt,
+        stargazersCount: schema.repos.stargazersCount,
+        prs30d: schema.repos.prs30d,
+        prs7d: schema.repos.prs7d,
+        commits30d: schema.repos.commits30d,
+        commits7d: schema.repos.commits7d,
+        avatarUrl: schema.repos.avatarUrl,
+        description: schema.repos.description,
+        mostRecentCommit: sql<string>`(
+          SELECT MAX(${schema.commits.date})
+          FROM ${schema.commits}
+          WHERE ${schema.commits.repoFullName} = ${schema.repos.fullName}
+        )`,
+      })
       .from(schema.repos)
       .orderBy(schema.repos.createdAt);
     return results as Repo[];
@@ -28,6 +44,7 @@ export interface Repo {
   commits7d: number | null;
   avatarUrl: string | null;
   description: string | null;
+  mostRecentCommit: string | null;
 }
 
 export class PublicNode {

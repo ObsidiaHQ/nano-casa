@@ -11,6 +11,7 @@ export interface Repo {
   commits7d: number | null;
   avatarUrl: string | null;
   description: string | null;
+  mostRecentCommit: string | null;
 }
 
 export interface PublicNode {

@@ -9,7 +9,7 @@ export class SortPipe implements PipeTransform {
   transform(
     values: any[],
     type: 'repo' | 'user' | 'busyWeek' | 'busyMonth',
-    sortBy?: 'month' | 'total' | 'date' | 'stars'
+    sortBy?: 'month' | 'total' | 'date' | 'stars' | 'activity'
   ) {
     if (type === 'busyMonth') {
       return [...values].sort(
@@ -21,9 +21,17 @@ export class SortPipe implements PipeTransform {
       ) as Repo[];
     } else if (type === 'repo') {
       return [...values].sort((a, b) => {
-        return sortBy === 'stars'
-          ? b.stargazersCount - a.stargazersCount
-          : +new Date(b.createdAt) - +new Date(a.createdAt);
+        if (sortBy === 'stars') {
+          return b.stargazersCount - a.stargazersCount;
+        } else if (sortBy === 'activity') {
+          // Sort by most recent commit date
+          const dateA = a.mostRecentCommit ? +new Date(a.mostRecentCommit) : 0;
+          const dateB = b.mostRecentCommit ? +new Date(b.mostRecentCommit) : 0;
+          return dateB - dateA;
+        } else {
+          // Default: sort by creation date
+          return +new Date(b.createdAt) - +new Date(a.createdAt);
+        }
       }) as Repo[];
     } else {
       return [...values].sort((a, b) => {
