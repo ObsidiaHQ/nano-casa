@@ -1,0 +1,62 @@
+<span
+  class="seasonal-logo"
+  [class.seasonal-logo--anniversary]="celebration.kind === 'anniversary'"
+  [class.seasonal-logo--christmas]="celebration.kind === 'christmas'"
+>
+  <img src="logo.png" width="110" height="32" alt="nano casa" class="navbar-brand-image">
+
+  @if (celebration.kind === 'anniversary') {
+    <svg class="party-hat" viewBox="0 0 36 40" aria-hidden="true">
+      <path d="M7 32 19 7l12 25Z" fill="#7048e8"/>
+      <path d="m12 23 15-5 3 6-21 7Z" fill="#ffd43b"/>
+      <path d="m16 14 7-3 3 6-13 5Z" fill="#f783ac"/>
+      <circle cx="19" cy="6" r="5" fill="#ffd43b"/>
+      <path d="M7 32h24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <span class="confetti" style="left:5%;background:#ffd43b;animation-delay:-.4s" aria-hidden="true"></span>
+    <span class="confetti" style="left:21%;background:#f783ac;animation-delay:-1.8s" aria-hidden="true"></span>
+    <span class="confetti" style="left:39%;background:#74c0fc;animation-delay:-.9s" aria-hidden="true"></span>
+    <span class="confetti" style="left:58%;background:#ffd43b;animation-delay:-2.2s" aria-hidden="true"></span>
+    <span class="confetti" style="left:76%;background:#69db7c;animation-delay:-1.3s" aria-hidden="true"></span>
+    <span class="confetti" style="left:94%;background:#f783ac;animation-delay:-2.5s" aria-hidden="true"></span>
+    <span class="anniversary-badge" title="Born April 6, 2022">
+      <strong>{{ celebration.age }}</strong>
+      <span>years</span>
+    </span>
+  }
+
+  @if (celebration.kind === 'halloween') {
+    <svg class="halloween-pumpkin" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M20 12c-1-5 1-8 5-10-1 4-1 7-3 10Z" fill="#509d54"/>
+      <ellipse cx="20" cy="24" rx="17" ry="14" fill="#F59F00"/>
+      <path d="M20 10c-6 3-8 23 0 28-8-1-13-6-13-14s5-13 13-14Zm0 0c6 3 8 23 0 28 8-1 13-6 13-14s-5-13-13-14Z" fill="#d9480f" opacity=".38"/>
+      <g class="pumpkin-face" fill="#633100">
+        <path d="m10 21 5-5 3 7Zm20 0-5-5-3 7ZM11 28l5 2 4-2 4 2 5-2-3 6H14Z"/>
+      </g>
+    </svg>
+    <svg class="halloween-spider" viewBox="0 0 28 42" aria-hidden="true">
+      <path d="M14 0v20" stroke="#adb5bd" stroke-width="1"/>
+      <g class="spider-body" fill="none" stroke="#ced4da" stroke-width="1.5" stroke-linecap="round">
+        <path d="m11 24-6-4m6 8-8-1m8 5-7 4m13-12 6-4m-6 8 8-1m-8 5 7 4"/>
+        <circle cx="14" cy="27" r="5" fill="#343a40"/>
+        <circle cx="14" cy="22" r="3.5" fill="#343a40"/>
+        <g fill="#ffe066" stroke="none"><circle cx="12.5" cy="21.5" r=".7"/><circle cx="15.5" cy="21.5" r=".7"/></g>
+      </g>
+    </svg>
+  }
+
+  @if (celebration.kind === 'christmas') {
+    <svg class="christmas-hat" viewBox="0 0 48 40" aria-hidden="true">
+      <path d="M7 27C10 13 20 5 31 5c5 0 9 2 12 6-8-2-13 5-12 16Z" fill="#e03131"/>
+      <path d="M12 24c4-8 11-13 20-16-7 4-11 10-11 18Z" fill="#fa5252"/>
+      <circle class="hat-pompom" cx="42" cy="12" r="6" fill="#fff"/>
+      <rect x="4" y="25" width="31" height="9" rx="4.5" fill="#fff"/>
+    </svg>
+    <span class="snowflake" style="left:8%;animation-delay:-.7s" aria-hidden="true"></span>
+    <span class="snowflake" style="left:25%;width:3px;height:3px;animation-delay:-2.4s;animation-duration:4s" aria-hidden="true"></span>
+    <span class="snowflake" style="left:43%;animation-delay:-1.5s;animation-duration:3.8s" aria-hidden="true"></span>
+    <span class="snowflake" style="left:62%;width:3px;height:3px;animation-delay:-3s" aria-hidden="true"></span>
+    <span class="snowflake" style="left:79%;animation-delay:-2s;animation-duration:4.2s" aria-hidden="true"></span>
+    <span class="snowflake" style="left:96%;width:3px;height:3px;animation-delay:-.2s" aria-hidden="true"></span>
+  }
+</span>

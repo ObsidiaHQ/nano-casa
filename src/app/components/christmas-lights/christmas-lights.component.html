@@ -1,0 +1,16 @@
+@if (visible) {
+  <div class="christmas-lights" aria-hidden="true">
+    <svg class="lights-cable" viewBox="0 0 1000 30" preserveAspectRatio="none">
+      <path d="M0 0 Q167 55 333 0 Q500 55 667 0 Q833 55 1000 0" fill="none" stroke="#4a545e" stroke-width="1.2"/>
+    </svg>
+    @for (light of lights; track light.left) {
+      <span
+        class="christmas-bulb"
+        [style.left.%]="light.left"
+        [style.top.px]="light.drop"
+        [style.color]="light.color"
+        [style.animation-delay]="light.delay"
+      ></span>
+    }
+  </div>
+}

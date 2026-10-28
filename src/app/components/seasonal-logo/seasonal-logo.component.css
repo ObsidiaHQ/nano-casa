@@ -1,0 +1,233 @@
+:host,
+.seasonal-logo {
+    display: inline-flex
+}
+
+.seasonal-logo {
+    position: relative;
+    align-items: center
+}
+
+.party-hat,
+.christmas-hat {
+    position: absolute;
+    overflow: visible;
+    pointer-events: none;
+    transform: rotate(-13deg);
+    transform-origin: 20% 90%;
+    animation: hat-sway 3.2s ease-in-out infinite
+}
+
+.party-hat {
+    top: -8px;
+    left: -4px;
+    width: 24px;
+    height: 24px;
+}
+
+.christmas-hat {
+    top: -7px;
+    left: -2px;
+    width: 24px;
+    height: 24px;
+}
+
+.hat-pompom {
+    transform-origin: 42px 12px;
+    animation: pompom-bounce 1.6s ease-in-out infinite
+}
+
+.anniversary-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    margin-left: .65rem;
+    padding: .35rem .5rem;
+    overflow: hidden;
+    color: #fff;
+    line-height: 1;
+    background: linear-gradient(135deg, #6741d9, #ae3ec9);
+    border-radius: .65rem
+}
+
+.anniversary-badge strong {
+    color: #ffd43b;
+    font-size: 1.05rem;
+}
+
+.anniversary-badge span {
+    font-size: .55rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+.anniversary-badge::after {
+    position: absolute;
+    inset: -50% auto -50% -35%;
+    width: 25%;
+    content: "";
+    background: #ffffff59;
+    transform: rotate(20deg);
+    animation: badge-shine 3.5s ease-in-out infinite
+}
+
+.confetti,
+.snowflake {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none
+}
+
+.confetti {
+    top: -10px;
+    width: 4px;
+    height: 7px;
+    border-radius: 1px;
+    animation: confetti-fall 2.6s linear infinite
+}
+
+.snowflake {
+    top: -9px;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #fffc;
+    animation: snowfall 3.4s linear infinite
+}
+
+.halloween-pumpkin,
+.halloween-spider {
+    position: absolute;
+    overflow: visible;
+    pointer-events: none
+}
+
+.halloween-pumpkin {
+    top: -2px;
+    left: -23px;
+    width: 27px;
+    height: 27px;
+    transform: rotate(-24deg);
+}
+
+.pumpkin-face {
+    animation: pumpkin-glow 2.2s ease-in-out infinite
+}
+
+.halloween-spider {
+    top: 18px;
+    left: 31px;
+    width: 22px;
+    height: 36px;
+    animation: spider-drop 3.5s ease-in-out infinite
+}
+
+.spider-body {
+    transform-origin: 14px 20px;
+    animation: spider-sway 2.4s ease-in-out infinite
+}
+
+@keyframes pumpkin-glow {
+    50% {
+        filter: drop-shadow(0 0 3px #ffd43b);
+        opacity: .75
+    }
+}
+
+@keyframes spider-drop {
+    50% {
+        transform: translateY(4px)
+    }
+}
+
+@keyframes spider-sway {
+    50% {
+        transform: rotate(8deg)
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .pumpkin-face,
+    .halloween-spider,
+    .spider-body {
+        animation: none
+    }
+}
+
+@keyframes hat-sway {
+    50% {
+        transform: rotate(-6deg) translateY(-2px)
+    }
+}
+
+@keyframes pompom-bounce {
+    50% {
+        transform: translateY(2px)
+    }
+}
+
+@keyframes badge-shine {
+
+    0%,
+    55% {
+        left: -35%
+    }
+
+    85%,
+    100% {
+        left: 125%
+    }
+}
+
+@keyframes confetti-fall {
+    0% {
+        opacity: 0;
+        transform: translateY(-4px) rotate(0)
+    }
+
+    15% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-5px, 43px) rotate(260deg)
+    }
+}
+
+@keyframes snowfall {
+    0% {
+        opacity: 0;
+        transform: translateY(-3px)
+    }
+
+    15%,
+    75% {
+        opacity: .9
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(6px, 47px)
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+
+    .party-hat,
+    .christmas-hat,
+    .hat-pompom,
+    .confetti,
+    .snowflake,
+    .anniversary-badge::after {
+        animation: none
+    }
+
+    .anniversary-badge::after {
+        display: none
+    }
+}

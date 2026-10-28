@@ -161,7 +161,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           },
         },
         type: 'value',
-        max: 400,
+        max: 450,
         min: 0,
         interval: 50,
       },

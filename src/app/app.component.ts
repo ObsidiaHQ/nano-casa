@@ -13,6 +13,8 @@ import { strings as englishShortStrings } from '../../node_modules/ngx-timeago/l
 import { authClient } from './auth-client';
 import { Web3Service } from './web3.service';
 import { ToastService } from './toast.service';
+import { SeasonalLogoComponent } from './components/seasonal-logo/seasonal-logo.component';
+import { ChristmasLightsComponent } from './components/christmas-lights/christmas-lights.component';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +25,8 @@ import { ToastService } from './toast.service';
     RouterLinkActive,
     TimeagoModule,
     RouterLink,
+    SeasonalLogoComponent,
+    ChristmasLightsComponent,
   ],
   templateUrl: './app.component.html',
   animations: [fader]
