@@ -45,14 +45,19 @@ import paginate from 'jw-paginate';
           prev
         </a>
       </li>
-      @for (_ of [].constructor(pager.totalPages); track $index; let i = $index)
-      {
-      <li
-        class="page-item d-none d-md-inline-block"
-        [ngClass]="{ active: pager.currentPage === i + 1 }"
-      >
-        <a class="page-link" (click)="setPage(i + 1)">{{ i + 1 }}</a>
-      </li>
+      @for (page of visiblePages; track $index) {
+        @if (page === null) {
+          <li class="page-item disabled d-none d-md-inline-block">
+            <span class="page-link">...</span>
+          </li>
+        } @else {
+          <li
+            class="page-item d-none d-md-inline-block"
+            [ngClass]="{ active: pager.currentPage === page }"
+          >
+            <a class="page-link" (click)="setPage(page)">{{ page }}</a>
+          </li>
+        }
       }
 
       <li
@@ -90,6 +95,41 @@ export class PaginationComponent implements OnInit, OnChanges {
 
   pager: any = {};
   initialPage = 1;
+
+  get visiblePages(): Array<number | null> {
+    const totalPages = this.pager.totalPages || 0;
+    const currentPage = this.pager.currentPage || 1;
+
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, null, totalPages];
+    }
+
+    if (currentPage >= totalPages - 3) {
+      return [
+        1,
+        null,
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    }
+
+    return [
+      1,
+      null,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      null,
+      totalPages,
+    ];
+  }
 
   ngOnInit() {
     if (this.items && this.items.length) {
