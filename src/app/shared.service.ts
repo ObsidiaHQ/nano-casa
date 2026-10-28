@@ -143,7 +143,7 @@ export class SharedService {
 
   async logOut() {
     try {
-      await authClient.signOut();
+      await authClient.signOut({});
       this.loggedUser.set(null);
       this.toast.show('Logged out successfully');
     } catch (error) {

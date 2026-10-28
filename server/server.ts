@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers'
-import { serveStatic } from 'hono/bun';
+import { serveStatic } from '@hono/bun';
 import { timing, setMetric, startTime, endTime } from 'hono/timing'
 import type { TimingVariables } from 'hono/timing'
 import { createMiddleware } from 'hono/factory';

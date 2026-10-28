@@ -36,7 +36,8 @@
     "pRizz/nanocurrency-node",
     "superdarkbit/nano-bip32-ed25519",
     "yxse/NanChat",
-    "eclipse1482/nanoise"
+    "eclipse1482/nanoise",
+    "gr0vity-dev/nano-local"
   ],
   "partial": {
     "repos": [
@@ -62,7 +63,8 @@
     "gr0vity-dev/nano-node-builder",
     "Macacaqatar/Biota",
     "MCP-Mirror/kilkelly_nano-currency-mcp-server",
-    "Nano-Enterprise/.github"
+    "Nano-Enterprise/.github",
+    "gosha2900/invoice-reader"
   ],
   "queries": [
     "topic:nanocurrency",
@@ -72,7 +74,8 @@
     "topic:crypto+topic:nano",
     "nanocurrency+in:description",
     "nano+currency+in:description",
-    "topic:raiblocks"
+    "topic:raiblocks",
+    "topic:xno"
   ],
   "public_nodes": [
     {

@@ -1,7 +1,7 @@
 const exec = require("child_process").exec;
 const fs = require("fs");
 const path = require("path");
-const DIST_PATH = "./dist/nano-casa/";
+const DIST_PATH = "./dist/nano-casa/browser/";
 
 // find the styles css file
 const files = getFilesFromPath(DIST_PATH, ".css");
